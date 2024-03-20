@@ -3,8 +3,8 @@ package com.atlantbh.cinebh.service;
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.model.Photo;
-import com.atlantbh.cinebh.repository.MovieRepository;
 import com.atlantbh.cinebh.repository.PhotoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,5 +36,19 @@ public class PhotoService {
 
     public Set<Photo> getPhotosByMovie(Movie movie){
         return photoRepository.getPhotosByMovie(movie);
+    }
+
+    public Photo getMovieCover(Movie movie)  {return  photoRepository.getMovieCover(movie);}
+
+    public Photo save(Photo photo) {
+        return photoRepository.save(photo);
+    }
+
+    public void remove(Long id) throws JsonProcessingException {
+        if (!photoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Movie with id= " + id+ " does not exist");
+        }
+        photoRepository.deleteById(id);
+
     }
 }

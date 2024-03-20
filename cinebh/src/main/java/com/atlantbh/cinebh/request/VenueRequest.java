@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PhotoRequest {
-    private String link;
-    private Boolean cover;
+public class VenueRequest {
+    private String name;
+    private String address;
+    private String telephone;
+    private String cityName;
 }

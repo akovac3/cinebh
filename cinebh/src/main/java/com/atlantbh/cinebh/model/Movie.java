@@ -29,9 +29,10 @@ public class Movie {
     private Date projectionEnd;
     private String director;
     private String synopsis;
-    private Float rating;
+    private String rating;
     private Integer duration;
     private String trailer;
+    private String status;
     @OneToMany(mappedBy="movie")
     private Set<Photo> photos = new HashSet<>();
 
@@ -44,13 +45,16 @@ public class Movie {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "actor_movies",
+            name = "writer_movie",
             joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "actor_id"))
-    private Set<Actor> actors = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "writer_id"))
+    private Set<Writer> writers = new HashSet<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    Set<MovieActor> movieActors = new HashSet<>();
 
 
-    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, Float rating, Integer duration, String trailer){
+    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer){
         this.name = name;
         this.year = year;
         this.language = language;

@@ -20,11 +20,9 @@ public class MovieRequest {
     private Date projectionEnd;
     private String director;
     private String synopsis;
-    private Float rating;
+    private String rating;
     private Integer duration;
     private String trailer;
-    private Set<String> photos;
-    private Set<Long> actors;
     private Set<Long> genres;
 
 }

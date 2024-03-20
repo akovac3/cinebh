@@ -6,8 +6,12 @@ import com.atlantbh.cinebh.repository.MovieRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -44,5 +48,14 @@ public class MovieService {
         movieRepository.deleteById(id);
 
     }
+
+    public Page<Movie> getCurrentlyShowing(int pageNumber) {
+        return movieRepository.findCurrentlyShowing(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, 4));
+    }
+
+    public Iterable<Movie> getUpcoming() {
+        return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()));
+    }
+
 
 }

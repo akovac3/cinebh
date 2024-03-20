@@ -1,32 +1,25 @@
 package com.atlantbh.cinebh.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
-@Table(name = "actors")
-@Getter
-@Setter
+@Table(name = "writers")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Actor {
+@Getter
+@Setter
+public class Writer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long actorId;
+    private Long writerId;
     private String firstName;
     private String lastName;
-    @OneToMany(mappedBy = "actor")
-    @JsonIgnore
-    private Set<MovieActor> movieActors = new HashSet<>();
 
-    public Actor(String firstName, String lastName){
+    public Writer(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }

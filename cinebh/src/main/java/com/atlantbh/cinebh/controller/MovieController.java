@@ -1,10 +1,12 @@
 package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.Actor;
-import com.atlantbh.cinebh.model.Genre;
-import com.atlantbh.cinebh.model.Movie;
-import com.atlantbh.cinebh.model.Photo;
+import com.atlantbh.cinebh.model.*;
+import com.atlantbh.cinebh.repository.MovieActorRepository;
+import com.atlantbh.cinebh.request.ActorRequest;
+import com.atlantbh.cinebh.request.PhotoRequest;
+import com.atlantbh.cinebh.request.WriterRequest;
+import com.atlantbh.cinebh.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
@@ -12,19 +14,20 @@ import com.atlantbh.cinebh.repository.ActorRepository;
 import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.repository.PhotoRepository;
 import com.atlantbh.cinebh.request.MovieRequest;
-import com.atlantbh.cinebh.service.MovieService;
-import com.atlantbh.cinebh.service.PhotoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -34,11 +37,15 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
-    private ActorRepository actorRepository;
-
     private GenreRepository genreRepository;
 
     private PhotoService photoService;
+
+    private MovieActorService movieActorService;
+
+    private ActorService actorService;
+
+    private WriterService writerService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,6 +61,16 @@ public class MovieController {
         return ResponseEntity.ok().body(newMovie);
     }
 
+    @GetMapping("/currently/{page}")
+    public ResponseEntity<Page<Movie>> getCurrentlyShowing(@PathVariable("page") int page) {
+        return ResponseEntity.ok(movieService.getCurrentlyShowing(page));
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<Iterable<Movie>> getUpcoming() {
+        return ResponseEntity.ok(movieService.getUpcoming());
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
         Movie movie = new Movie(movieRequest.getName(),
@@ -67,19 +84,7 @@ public class MovieController {
                 movieRequest.getDuration(),
                 movieRequest.getTrailer()
         );
-        Set<Long> actorsSet = movieRequest.getActors();
         Set<Long> genresSet = movieRequest.getGenres();
-        Set<String> photosSet = movieRequest.getPhotos();
-
-        Set<Actor> actors = new HashSet<>();
-
-        if(actorsSet != null)
-            actorsSet.forEach(actor -> {
-            Actor novi = actorRepository.findById(actor)
-                    .orElseThrow(() -> new RuntimeException("Error: Actor not found."));
-            actors.add(novi);
-        });
-        movie.setActors(actors);
 
         Set<Genre> genres = new HashSet<>();
         genresSet.forEach(genre -> {
@@ -89,15 +94,7 @@ public class MovieController {
         });
         movie.setGenres(genres);
 
-        Movie newMovie = movieService.createMovie(movie);
-
-        Set<Photo> photos = new HashSet<>();
-        photosSet.forEach(photo -> {
-            Photo nova = new Photo(photo, Boolean.FALSE, newMovie);
-            Photo created = photoService.createPhoto(nova);
-            photos.add(created);
-        });
-        movie.setPhotos(photos);
+        movieService.createMovie(movie);
 
         return new ResponseEntity<>("Movie successfully added!", HttpStatus.CREATED);
     }
@@ -116,18 +113,17 @@ public class MovieController {
         updateMovie.setDuration(movieDetails.getDuration());
         updateMovie.setTrailer(movieDetails.getTrailer());
 
-        Set<Long> actorsSet = movieDetails.getActors();
+//        Set<Long> actorsSet = movieDetails.getActors();
         Set<Long> genresSet = movieDetails.getGenres();
-        Set<String> photosSet = movieDetails.getPhotos();
+      //  Set<String> photosSet = movieDetails.getPhotos();
 
-        Set<Actor> actors = new HashSet<>();
+      /*  Set<MovieActor> actors = new HashSet<>();
         if(actorsSet != null)
         actorsSet.forEach(actor -> {
-            Actor novi = actorRepository.findById(actor)
-                    .orElseThrow(() -> new RuntimeException("Error: Actor not found."));
-            actors.add(novi);
+            MovieActor novi = movieActorService.findById(actor);
+            if(novi!= null) actors.add(novi);
         });
-        updateMovie.setActors(actors);
+        updateMovie.setMovieActors(actors);*/
 
         Set<Genre> genres = new HashSet<>();
         genresSet.forEach(genre -> {
@@ -137,7 +133,7 @@ public class MovieController {
         });
         updateMovie.setGenres(genres);
 
-        Set<Photo> photos = new HashSet<>();
+       /* Set<Photo> photos = new HashSet<>();
         photosSet.forEach(photo -> {
             Photo nova = new Photo(photo, Boolean.FALSE, updateMovie);
             Photo created = photoService.createPhoto(nova);
@@ -145,11 +141,65 @@ public class MovieController {
         });
 
         Set<Photo> oldPhotos = photoService.getPhotosByMovie(updateMovie);
-        updateMovie.setPhotos(photos);
+        updateMovie.setPhotos(photos);*/
 
         movieService.save(updateMovie);
 
         return  new ResponseEntity<>("Movie with id = " + id +" successfully updated!", HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/photos/{id}")
+    public ResponseEntity<String> addPhotos(@PathVariable long id,@Validated @RequestBody PhotoRequest[] photoRequests) {
+        Movie movie = movieService.findById(id);
+        Set<Photo> photos = new HashSet<>();
+
+        for (PhotoRequest photoRequest : photoRequests) {
+            Photo newPhoto = photoService.createPhoto(new Photo(photoRequest.getLink(), photoRequest.getCover(), movie));
+            photos.add(newPhoto);
+        }
+
+        movie.setPhotos(photos);
+        movieService.save(movie);
+        return  new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
+
+    }
+
+    @PostMapping(path = "/writers/{id}")
+    public ResponseEntity<String> addWriters(@PathVariable long id,@Validated @RequestBody WriterRequest[] writerRequests) {
+        Movie movie = movieService.findById(id);
+
+        Set<Writer> writers = new HashSet<>();
+        for(WriterRequest writerRequest: writerRequests){
+            Writer writer = writerService.findByName(writerRequest.getFirstName(), writerRequest.getLastName());
+            if(writer==null) writer = writerService.save(new Writer(writerRequest.getFirstName(), writerRequest.getLastName()));
+            writers.add(writer);
+        }
+        movie.setWriters(writers);
+
+        movieService.save(movie);
+        return  new ResponseEntity<>("Successfully added writers for movie with id=" + id + "!", HttpStatus.OK);
+
+    }
+
+
+        @PostMapping(path = "/actors/{id}")
+    public ResponseEntity<String> addActors(@PathVariable long id,@Validated @RequestBody ActorRequest[] actorRequests) {
+            Movie movie = movieService.findById(id);
+
+            Set<MovieActor> actors = new HashSet<>();
+
+            for(ActorRequest actor:actorRequests){
+            Actor newActor = actorService.findByName(actor.getFirstName(), actor.getLastName());
+            if(newActor == null) {
+                newActor = actorService.create(new Actor(actor.getFirstName(), actor.getLastName()));
+            }
+            MovieActor movieActor = movieActorService.save(new MovieActor(movie, newActor, actor.getRole()));
+            actors.add(movieActor);
+        };
+            movie.setMovieActors(actors);
+
+            movieService.save(movie);
+            return  new ResponseEntity<>("Successfully added actors for movie with id=" + id + "!", HttpStatus.OK);
     }
 
     private Movie applyPatchToMovie(

@@ -10,5 +10,8 @@ import java.util.Set;
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     @Query("SELECT img FROM Photo img WHERE img.movie=?1")
-    public Set<Photo> getPhotosByMovie(Movie movie);
+    Set<Photo> getPhotosByMovie(Movie movie);
+
+    @Query("SELECT img FROM Photo img WHERE img.movie=?1 AND img.cover=TRUE")
+    Photo getMovieCover(Movie movie);
 }

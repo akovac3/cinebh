@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PhotoRequest {
-    private String link;
-    private Boolean cover;
+public class ActorRequest {
+    private String firstName;
+    private String lastName;
+    private String role;
 }

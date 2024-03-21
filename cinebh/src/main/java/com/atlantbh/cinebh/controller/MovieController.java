@@ -2,20 +2,17 @@ package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.*;
-import com.atlantbh.cinebh.repository.MovieActorRepository;
+import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.request.ActorRequest;
+import com.atlantbh.cinebh.request.MovieRequest;
 import com.atlantbh.cinebh.request.PhotoRequest;
 import com.atlantbh.cinebh.request.WriterRequest;
 import com.atlantbh.cinebh.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.atlantbh.cinebh.repository.ActorRepository;
-import com.atlantbh.cinebh.repository.GenreRepository;
-import com.atlantbh.cinebh.repository.PhotoRepository;
-import com.atlantbh.cinebh.request.MovieRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,10 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -47,7 +42,7 @@ public class MovieController {
 
     private WriterService writerService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
 
 
     @GetMapping("/")
@@ -66,9 +61,9 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getCurrentlyShowing(page));
     }
 
-    @GetMapping("/upcoming")
-    public ResponseEntity<Iterable<Movie>> getUpcoming() {
-        return ResponseEntity.ok(movieService.getUpcoming());
+    @GetMapping("/upcoming/{page}")
+    public ResponseEntity<Page<Movie>> getUpcoming(@PathVariable("page") int page) {
+        return ResponseEntity.ok(movieService.getUpcoming(page));
     }
 
     @PostMapping("/")

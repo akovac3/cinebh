@@ -53,8 +53,8 @@ public class MovieService {
         return movieRepository.findCurrentlyShowing(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, 4));
     }
 
-    public Iterable<Movie> getUpcoming() {
-        return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()));
+    public Page<Movie> getUpcoming(int pageNumber) {
+        return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, 4));
     }
 
 

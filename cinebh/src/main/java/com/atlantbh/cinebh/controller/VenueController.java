@@ -2,6 +2,7 @@ package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
+import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.request.VenueRequest;
 import com.atlantbh.cinebh.service.CityService;
@@ -13,6 +14,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +25,7 @@ import java.io.Console;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/venues")
+@CrossOrigin(origins = "*")
 public class VenueController {
 
     @Autowired
@@ -39,6 +42,11 @@ public class VenueController {
         return ResponseEntity.ok(venueService.getAll());
     }
 
+    @GetMapping("/{page}/{size}")
+    public ResponseEntity<Page<Venue>> getVenues(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return ResponseEntity.ok(venueService.getVenues(page, size));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Venue> getVenueById(@PathVariable("id") Long id) {
         Venue venue = venueService.findById(id);
@@ -50,7 +58,7 @@ public class VenueController {
         City city = cityService.findByName(venueRequest.getCityName());
 
         System.out.println(city.getName());
-        Venue venue = new Venue(venueRequest.getName(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
+        Venue venue = new Venue(venueRequest.getName(),venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
         venueService.createVenue(venue);
 
         return new ResponseEntity<>("Venue successfully added!", HttpStatus.CREATED);

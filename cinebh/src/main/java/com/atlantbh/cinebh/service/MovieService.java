@@ -49,12 +49,12 @@ public class MovieService {
 
     }
 
-    public Page<Movie> getCurrentlyShowing(int pageNumber) {
-        return movieRepository.findCurrentlyShowing(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, 4));
+    public Page<Movie> getCurrentlyShowing(int pageNumber, int size) {
+        return movieRepository.findCurrentlyShowing(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, size));
     }
 
-    public Page<Movie> getUpcoming(int pageNumber) {
-        return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, 4));
+    public Page<Movie> getUpcoming(int pageNumber, int size) {
+        return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, size));
     }
 
 

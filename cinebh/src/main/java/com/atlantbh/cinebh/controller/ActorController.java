@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/actors")
+@CrossOrigin(origins = "*")
 public class ActorController {
     @Autowired
     private ActorService actorService;

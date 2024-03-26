@@ -19,6 +19,7 @@ public class Venue {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long venueId;
     private String name;
+    private String photo;
     private String address;
     private String telephone;
 
@@ -26,7 +27,7 @@ public class Venue {
     @JoinColumn(name = "city_id")
     private City city;
 
-    public Venue(String name, String address, String telephone, City city){
+    public Venue(String name, String photo, String address, String telephone, City city){
         this.name = name;
         this.address = address;
         this.telephone = telephone;

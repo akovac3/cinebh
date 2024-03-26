@@ -1,13 +1,18 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
+import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.repository.VenueRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -42,5 +47,9 @@ public class VenueService {
         }
         venueRepository.deleteById(id);
 
+    }
+
+    public Page<Venue> getVenues(int pageNumber, int size) {
+        return venueRepository.findAll(PageRequest.of(pageNumber, size));
     }
 }

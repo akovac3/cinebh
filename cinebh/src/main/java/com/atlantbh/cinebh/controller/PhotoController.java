@@ -21,6 +21,7 @@ import java.util.Set;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/photos")
+@CrossOrigin(origins = "*")
 public class PhotoController {
     @Autowired
     private MovieService movieService;
@@ -46,6 +47,7 @@ public class PhotoController {
 
         return ResponseEntity.ok(newPhotos);
     }
+
 
     /*@PostMapping("/")
     public ResponseEntity<String> createPhoto(@Validated @RequestBody PhotoRequest photoRequest){
@@ -73,6 +75,12 @@ public class PhotoController {
         Movie movie = movieService.findById(id);
         Photo cover = photoService.getMovieCover(movie);
         return ResponseEntity.ok(cover);
+    }
+
+    @GetMapping("/covers")
+    public ResponseEntity<Iterable<Photo>> getAllCovers() {
+        Set<Photo> covers = photoService.getCovers();
+        return ResponseEntity.ok(covers);
     }
 
     @DeleteMapping("/{id}")

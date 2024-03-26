@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VenueRequest {
     private String name;
+    private String photo;
     private String address;
     private String telephone;
     private String cityName;

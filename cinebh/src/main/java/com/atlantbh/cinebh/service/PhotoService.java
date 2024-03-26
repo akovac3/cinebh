@@ -51,4 +51,8 @@ public class PhotoService {
         photoRepository.deleteById(id);
 
     }
+
+    public Set<Photo> getCovers() {
+        return photoRepository.findByCoverTrue();
+    }
 }

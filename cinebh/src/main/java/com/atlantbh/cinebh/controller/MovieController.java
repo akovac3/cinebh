@@ -27,6 +27,7 @@ import java.util.Set;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/movies")
+@CrossOrigin(origins = "*")
 public class MovieController {
 
     @Autowired
@@ -56,14 +57,14 @@ public class MovieController {
         return ResponseEntity.ok().body(newMovie);
     }
 
-    @GetMapping("/currently/{page}")
-    public ResponseEntity<Page<Movie>> getCurrentlyShowing(@PathVariable("page") int page) {
-        return ResponseEntity.ok(movieService.getCurrentlyShowing(page));
+    @GetMapping("/currently/{page}/{size}")
+    public ResponseEntity<Page<Movie>> getCurrentlyShowing(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return ResponseEntity.ok(movieService.getCurrentlyShowing(page, size));
     }
 
-    @GetMapping("/upcoming/{page}")
-    public ResponseEntity<Page<Movie>> getUpcoming(@PathVariable("page") int page) {
-        return ResponseEntity.ok(movieService.getUpcoming(page));
+    @GetMapping("/upcoming/{page}/{size}")
+    public ResponseEntity<Page<Movie>> getUpcoming(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return ResponseEntity.ok(movieService.getUpcoming(page, size));
     }
 
     @PostMapping("/")

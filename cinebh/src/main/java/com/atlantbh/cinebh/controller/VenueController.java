@@ -2,7 +2,6 @@ package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
-import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.request.VenueRequest;
 import com.atlantbh.cinebh.service.CityService;
@@ -18,14 +17,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.Console;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/venues")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class VenueController {
 
     @Autowired
@@ -35,7 +40,6 @@ public class VenueController {
     private CityService cityService;
 
     ObjectMapper objectMapper = new ObjectMapper();
-
 
     @GetMapping("/")
     public ResponseEntity<Iterable<Venue>> getAll() {
@@ -56,33 +60,24 @@ public class VenueController {
     @PostMapping("/")
     public ResponseEntity<String> createVenue(@Validated @RequestBody VenueRequest venueRequest) {
         City city = cityService.findByName(venueRequest.getCityName());
-
-        System.out.println(city.getName());
-        Venue venue = new Venue(venueRequest.getName(),venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
+        Venue venue = new Venue(venueRequest.getName(), venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
         venueService.createVenue(venue);
-
         return new ResponseEntity<>("Venue successfully added!", HttpStatus.CREATED);
-
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<String> updateVenue(@PathVariable Long id,@Validated @RequestBody VenueRequest venueRequest) {
+    public ResponseEntity<String> updateVenue(@PathVariable Long id, @Validated @RequestBody VenueRequest venueRequest) {
         Venue updateVenue = venueService.findById(id);
         updateVenue.setName(venueRequest.getName());
         updateVenue.setAddress(venueRequest.getAddress());
         updateVenue.setTelephone(venueRequest.getTelephone());
-
         City newCity = cityService.findByName(venueRequest.getCityName());
-
         updateVenue.setCity(newCity);
-
         venueService.save(updateVenue);
-        return  new ResponseEntity<>("Venue with id = " + id +" successfully updated!", HttpStatus.OK);
-
+        return new ResponseEntity<>("Venue with id = " + id + " successfully updated!", HttpStatus.OK);
     }
 
-    private Venue applyPatchToVenue(
-            JsonPatch patch, Venue targetVenue) throws JsonPatchException, JsonProcessingException {
+    private Venue applyPatchToVenue(JsonPatch patch, Venue targetVenue) throws JsonPatchException, JsonProcessingException {
         JsonNode patched = patch.apply(objectMapper.convertValue(targetVenue, JsonNode.class));
         return objectMapper.treeToValue(patched, Venue.class);
     }
@@ -112,6 +107,4 @@ public class VenueController {
         venueService.remove(id);
         return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
     }
-
-
 }

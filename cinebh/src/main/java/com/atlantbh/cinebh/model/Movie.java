@@ -1,7 +1,17 @@
 package com.atlantbh.cinebh.model;
 
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +30,7 @@ import java.util.Set;
 public class Movie {
     @Id
     @Column(name = "movieId", nullable = false)
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieId;
     private String name;
     private Integer year;
@@ -33,7 +43,8 @@ public class Movie {
     private Integer duration;
     private String trailer;
     private String status;
-    @OneToMany(mappedBy="movie")
+
+    @OneToMany(mappedBy = "movie")
     private Set<Photo> photos = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -53,8 +64,7 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     Set<MovieActor> movieActors = new HashSet<>();
 
-
-    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer){
+    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer) {
         this.name = name;
         this.year = year;
         this.language = language;

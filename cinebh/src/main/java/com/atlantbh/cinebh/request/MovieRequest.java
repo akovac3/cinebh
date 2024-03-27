@@ -24,5 +24,4 @@ public class MovieRequest {
     private Integer duration;
     private String trailer;
     private Set<Long> genres;
-
 }

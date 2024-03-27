@@ -1,9 +1,7 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.model.Writer;
-import com.atlantbh.cinebh.repository.VenueRepository;
 import com.atlantbh.cinebh.repository.WriterRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -37,10 +35,9 @@ public class WriterService {
 
     public void remove(Long id) throws JsonProcessingException {
         if (!writerRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Writer with id= " + id+ " does not exist");
+            throw new ResourceNotFoundException("Writer with id= " + id + " does not exist");
         }
         writerRepository.deleteById(id);
-
     }
 
     public Writer findByName(String firstName, String lastName) {

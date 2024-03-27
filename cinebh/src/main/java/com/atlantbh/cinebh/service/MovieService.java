@@ -33,7 +33,8 @@ public class MovieService {
             throw new ResourceNotFoundException("Movie with provided id not found!");
         }
     }
-    public Movie createMovie(Movie movie){
+
+    public Movie createMovie(Movie movie) {
         return movieRepository.save(movie);
     }
 
@@ -43,10 +44,9 @@ public class MovieService {
 
     public void remove(Long id) throws JsonProcessingException {
         if (!movieRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Movie with id= " + id+ " does not exist");
+            throw new ResourceNotFoundException("Movie with id= " + id + " does not exist");
         }
         movieRepository.deleteById(id);
-
     }
 
     public Page<Movie> getCurrentlyShowing(int pageNumber, int size) {
@@ -56,6 +56,4 @@ public class MovieService {
     public Page<Movie> getUpcoming(int pageNumber, int size) {
         return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, size));
     }
-
-
 }

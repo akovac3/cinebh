@@ -2,9 +2,7 @@ package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Actor;
-import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.ActorRepository;
-import com.atlantbh.cinebh.request.ActorRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,8 @@ public class ActorService {
             throw new ResourceNotFoundException("Actor with provided id not found!");
         }
     }
-    public Actor create(Actor actor){
+
+    public Actor create(Actor actor) {
         return actorRepository.save(actor);
     }
 
@@ -39,13 +38,12 @@ public class ActorService {
 
     public void remove(Long id) throws JsonProcessingException {
         if (!actorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Actor with id= " + id+ " does not exist");
+            throw new ResourceNotFoundException("Actor with id= " + id + " does not exist");
         }
         actorRepository.deleteById(id);
-
     }
 
-    public Actor findByName(String firstName, String lastName){
+    public Actor findByName(String firstName, String lastName) {
         return actorRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 }

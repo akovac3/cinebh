@@ -2,7 +2,6 @@ package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
-import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.CityRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -47,6 +46,5 @@ public class CityService {
             throw new ResourceNotFoundException("City with id= " + id+ " does not exist");
         }
         cityRepository.deleteById(id);
-
     }
 }

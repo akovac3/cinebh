@@ -30,15 +30,18 @@ public class PhotoService {
             throw new ResourceNotFoundException("Movie with provided id not found!");
         }
     }
-    public Photo createPhoto(Photo photo){
+
+    public Photo createPhoto(Photo photo) {
         return photoRepository.save(photo);
     }
 
-    public Set<Photo> getPhotosByMovie(Movie movie){
+    public Set<Photo> getPhotosByMovie(Movie movie) {
         return photoRepository.getPhotosByMovie(movie);
     }
 
-    public Photo getMovieCover(Movie movie)  {return  photoRepository.getMovieCover(movie);}
+    public Photo getMovieCover(Movie movie) {
+        return photoRepository.getMovieCover(movie);
+    }
 
     public Photo save(Photo photo) {
         return photoRepository.save(photo);
@@ -46,10 +49,9 @@ public class PhotoService {
 
     public void remove(Long id) throws JsonProcessingException {
         if (!photoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Movie with id= " + id+ " does not exist");
+            throw new ResourceNotFoundException("Movie with id= " + id + " does not exist");
         }
         photoRepository.deleteById(id);
-
     }
 
     public Set<Photo> getCovers() {

@@ -1,7 +1,6 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.model.MovieActor;
 import com.atlantbh.cinebh.repository.MovieActorRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,15 +29,15 @@ public class MovieActorService {
             throw new ResourceNotFoundException("MovieActor with provided id not found!");
         }
     }
-    public MovieActor save(MovieActor movieActor){
+
+    public MovieActor save(MovieActor movieActor) {
         return movieActorRepository.save(movieActor);
     }
 
     public void remove(Long id) throws JsonProcessingException {
         if (!movieActorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("MovieActor with id= " + id+ " does not exist");
+            throw new ResourceNotFoundException("MovieActor with id= " + id + " does not exist");
         }
         movieActorRepository.deleteById(id);
-
     }
 }

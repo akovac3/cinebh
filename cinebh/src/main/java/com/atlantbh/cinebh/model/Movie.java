@@ -5,6 +5,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.FetchType;
@@ -42,7 +44,9 @@ public class Movie {
     private String rating;
     private Integer duration;
     private String trailer;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @OneToMany(mappedBy = "movie")
     private Set<Photo> photos = new HashSet<>();
@@ -64,7 +68,7 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     Set<MovieActor> movieActors = new HashSet<>();
 
-    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer) {
+    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer, Status status) {
         this.name = name;
         this.year = year;
         this.language = language;
@@ -75,5 +79,6 @@ public class Movie {
         this.rating = rating;
         this.duration = duration;
         this.trailer = trailer;
+        this.status = status;
     }
 }

@@ -3,6 +3,7 @@ package com.atlantbh.cinebh.controller;
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
+import com.atlantbh.cinebh.request.PaginationParams;
 import com.atlantbh.cinebh.request.VenueRequest;
 import com.atlantbh.cinebh.service.CityService;
 import com.atlantbh.cinebh.service.VenueService;
@@ -41,14 +42,14 @@ public class VenueController {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<Iterable<Venue>> getAll() {
         return ResponseEntity.ok(venueService.getAll());
     }
 
-    @GetMapping("/{page}/{size}")
-    public ResponseEntity<Page<Venue>> getVenues(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return ResponseEntity.ok(venueService.getVenues(page, size));
+    @GetMapping("/")
+    public ResponseEntity<Page<Venue>> getVenues(PaginationParams paginationParams) {
+        return ResponseEntity.ok(venueService.getVenues(paginationParams.getPage(), paginationParams.getSize()));
     }
 
     @GetMapping("/{id}")

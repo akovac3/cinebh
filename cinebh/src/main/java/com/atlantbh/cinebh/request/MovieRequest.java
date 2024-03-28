@@ -1,5 +1,6 @@
 package com.atlantbh.cinebh.request;
 
+import com.atlantbh.cinebh.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,6 @@ public class MovieRequest {
     private String rating;
     private Integer duration;
     private String trailer;
+    private Status status;
     private Set<Long> genres;
 }

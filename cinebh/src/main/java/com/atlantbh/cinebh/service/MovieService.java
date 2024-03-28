@@ -49,11 +49,11 @@ public class MovieService {
         movieRepository.deleteById(id);
     }
 
-    public Page<Movie> getCurrentlyShowing(int pageNumber, int size) {
+    public Page<Movie> getCurrentlyShowing(Integer pageNumber, Integer size) {
         return movieRepository.findCurrentlyShowing(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, size));
     }
 
-    public Page<Movie> getUpcoming(int pageNumber, int size) {
+    public Page<Movie> getUpcoming(Integer pageNumber, Integer size) {
         return movieRepository.findUpcoming(Date.valueOf(LocalDate.now()), PageRequest.of(pageNumber, size));
     }
 }

@@ -8,10 +8,11 @@ import com.atlantbh.cinebh.model.Photo;
 import com.atlantbh.cinebh.model.Writer;
 import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.repository.GenreRepository;
-import com.atlantbh.cinebh.request.ActorRequest;
 import com.atlantbh.cinebh.request.MovieRequest;
-import com.atlantbh.cinebh.request.PhotoRequest;
+import com.atlantbh.cinebh.request.PaginationParams;
 import com.atlantbh.cinebh.request.WriterRequest;
+import com.atlantbh.cinebh.request.ActorRequest;
+import com.atlantbh.cinebh.request.PhotoRequest;
 import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
@@ -24,19 +25,18 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,7 +62,6 @@ public class MovieController {
 
     ObjectMapper objectMapper;
 
-
     @GetMapping("/")
     public ResponseEntity<Iterable<Movie>> getAll() {
         return ResponseEntity.ok(movieService.getAll());
@@ -74,14 +73,14 @@ public class MovieController {
         return ResponseEntity.ok().body(newMovie);
     }
 
-    @GetMapping("/currently/{page}/{size}")
-    public ResponseEntity<Page<Movie>> getCurrentlyShowing(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return ResponseEntity.ok(movieService.getCurrentlyShowing(page, size));
+    @GetMapping("/currently")
+    public ResponseEntity<Iterable<Movie>> getCurrently(PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getCurrentlyShowing(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping("/upcoming/{page}/{size}")
-    public ResponseEntity<Page<Movie>> getUpcoming(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return ResponseEntity.ok(movieService.getUpcoming(page, size));
+    @GetMapping("/upcoming")
+    public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
     }
 
     @PostMapping("/")
@@ -95,7 +94,8 @@ public class MovieController {
                 movieRequest.getSynopsis(),
                 movieRequest.getRating(),
                 movieRequest.getDuration(),
-                movieRequest.getTrailer()
+                movieRequest.getTrailer(),
+                movieRequest.getStatus()
         );
         Set<Long> genresSet = movieRequest.getGenres();
         Set<Genre> genres = new HashSet<>();
@@ -122,6 +122,7 @@ public class MovieController {
         updateMovie.setRating(movieDetails.getRating());
         updateMovie.setDuration(movieDetails.getDuration());
         updateMovie.setTrailer(movieDetails.getTrailer());
+        updateMovie.setStatus(movieDetails.getStatus());
         Set<Long> genresSet = movieDetails.getGenres();
         Set<Genre> genres = new HashSet<>();
         genresSet.forEach(genre -> {

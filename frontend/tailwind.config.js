@@ -24,7 +24,14 @@ export default {
       'paleRed':'#FEF2F2',
       'dis':'#D0D5DD',
       'slider':'#F9FAFB',
-      'sliderD':'#98A2B3'
+      'sliderD':'#98A2B3',
+      'yellow':'#FEF0C7',
+      'green':'#D1FADF',
+      'red':'#FEE4E2',
+      'textGrey': '#344054',
+      'textGreen': '#027A48',
+      'textRed': '#B42318',
+      'textYellow': '#B54708'
     }
   },
   plugins: [],

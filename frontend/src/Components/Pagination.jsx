@@ -23,7 +23,7 @@ export default function Pagination({
           <span className=' font-semibold	'>{currentPage * postsPerPage + 1}</span>
           <span> </span>
           to
-          <span className="font-semibold	"> { currentPage * postsPerPage + postsPerPage > totalPosts ? totalPosts : currentPage * postsPerPage + postsPerPage} </span>
+          <span className="font-semibold	"> {currentPage * postsPerPage + postsPerPage > totalPosts ? totalPosts : currentPage * postsPerPage + postsPerPage} </span>
           of
           <span className="font-semibold	"> {totalPosts} </span>
           results
@@ -33,15 +33,15 @@ export default function Pagination({
       <div className="gap-4">
         <nav className=" flex"
         >
-         
-<Button onClick={paginateBack} disabled={currentPage===0} variant="secondary" className="bg-white text-gray disabled:text-shadow1 disabled:border-shadow1  shadow-sm border-shadow1 shadow-[rgba(52, 64, 84, 0.04)] w-[48px] h-[48px] mr-4"> 
-        <FontAwesomeIcon icon={fas.faArrowLeft} style={{width:"14px", height:"16px"}} />
-</Button>
-<Button onClick={paginateFront} disabled={currentPage===maxPages-1} variant="secondary" className="bg-white text-gray disabled:text-shadow1 disabled:border-shadow1 shadow-sm border-shadow1 shadow-[rgba(52, 64, 84, 0.04)] w-[48px] h-[48px]"> 
-        <FontAwesomeIcon icon={fas.faArrowRight} style={{width:"14px", height:"16px"}} />
-</Button>
 
-          
+          <Button onClick={paginateBack} disabled={currentPage === 0} variant="secondary" className="bg-white text-gray disabled:text-shadow1 disabled:border-shadow1  shadow-sm border-shadow1 shadow-[rgba(52, 64, 84, 0.04)] w-[48px] h-[48px] mr-4">
+            <FontAwesomeIcon icon={fas.faArrowLeft} style={{ width: "14px", height: "16px" }} />
+          </Button>
+          <Button onClick={paginateFront} disabled={currentPage === maxPages - 1} variant="secondary" className="bg-white text-gray disabled:text-shadow1 disabled:border-shadow1 shadow-sm border-shadow1 shadow-[rgba(52, 64, 84, 0.04)] w-[48px] h-[48px]">
+            <FontAwesomeIcon icon={fas.faArrowRight} style={{ width: "14px", height: "16px" }} />
+          </Button>
+
+
         </nav>
       </div>
     </div>

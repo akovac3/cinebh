@@ -6,7 +6,7 @@
 
 @layer components {
     .slide {
-        @apply absolute top-0 bottom-0 w-full h-full opacity-0 transition-transform ease-out duration-500
+        @apply absolute w-full h-full opacity-0 transition-transform ease-out duration-500
     }
 
     .current-slide {

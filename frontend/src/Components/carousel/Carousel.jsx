@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Card from "./Card";
-import VenueCard from "./VenueCard";
+import MovieCard from "../card/MovieCard";
+import VenueCard from "../card/VenueCard";
 import { useEffect } from "react";
 import axios from "axios";
-import Pagination from "./Pagination";
+import Pagination from "../Pagination";
 
 const Carousel = (props) => {
 
@@ -23,23 +23,16 @@ const Carousel = (props) => {
       setMovies(response.data.content);
       setTotalPosts(response.data.totalElements)
       setMaxPages(response.data.totalPages)
-      console.log(response.data)
-      //console.log(response.data.totalElements)
     } catch (err) {
       console.log(err);
     }
     setLoading(false);
-
   };
-
-
 
   useEffect(() => {
     fetchResults();
   }, [currentPage])
 
-
-  // Change page
   const paginateFront = () => {
     setCurrentPage(prev => prev + 1);
   }
@@ -48,12 +41,11 @@ const Carousel = (props) => {
   }
 
   return (
-    <div className="pb-5">
-      <div className="flex gap-2.5 py-10 px-2">
+    <div className="pb-[20px]">
+      <div className="flex gap-24 py-40 pr-[20px]">
         {data.map((item, index) => (
-          movies ? <Card key={index} movie={item} photos={item.photos} /> : <VenueCard key={index} venue={item} />
-
-        ))}
+          movies ? <MovieCard key={index} movie={item} photos={item.photos} /> : <VenueCard key={index} venue={item} />))
+        }
       </div>
 
       <Pagination
@@ -63,10 +55,7 @@ const Carousel = (props) => {
         paginateFront={paginateFront}
         currentPage={currentPage}
         maxPages={maxPages}
-
-        className="pr-20"
-      />
-
+        className="pr-80" />
     </div>
   )
 }

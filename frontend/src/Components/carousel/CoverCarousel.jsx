@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import Button from "./Button";
-import Badge from "./Badge";
+import Badge from "../Badge";
+import Button from "../Button";
 
 const CoverCarousel = ({ movies, autoSlide = true, autoSlideInterval = 7000 }) => {
     const [current, setCurrent] = useState(0)
@@ -23,15 +23,15 @@ const CoverCarousel = ({ movies, autoSlide = true, autoSlideInterval = 7000 }) =
                         {index === current && (
                             <div >
                                 {slide.photos.map((img) => {
-                                    if (img.cover) return <img className="w-full object-cover h-full" src={img.link} alt="slika" />
+                                    if (img.cover) return <img key={img.link} className="w-full object-cover h-full" src={img.link} alt="slika" />
                                 })}
-                                <div className="absolute top-[376px] w-[553px] gap-8 left-24 font-body text-lightGray">
+                                <div className="absolute top-[376px] w-[653px] gap-32 left-[112px] font-body text-neutral-25">
                                     <div>
                                         <Badge>{slide.genres[0].name}</Badge>
                                     </div>
-                                    <h2 className="text-5xl/[56px] font-bold tracking-[-0.005em] mb-3 mt-2">{slide.name}</h2>
-                                    <p>{slide.synopsis}</p>
-                                    <Button variant="primary" className="w-[114px] mt-5">Buy Ticket</Button>
+                                    <h2 className="text-heading-h2 mb-12 mt-12">{slide.name}</h2>
+                                    <p className="text-heading-h6">{slide.synopsis}</p>
+                                    <Button variant="primary" className="w-[114px] mt-24">Buy Ticket</Button>
                                 </div>
                             </div>
                         )}
@@ -40,10 +40,10 @@ const CoverCarousel = ({ movies, autoSlide = true, autoSlideInterval = 7000 }) =
             })}
 
 
-            <div className="absolute bottom-7 right-0 left-0">
-                <div className="flex items-center justify-center gap-4">
+            <div className="absolute bottom-24 right-0 left-0">
+                <div className="flex items-center justify-center gap-[15px]">
                     {movies.map((_, i) => (
-                        <div onClick={() => { setCurrent(i) }} key={i} className={`transition-all h-1 bg-slider w-[30px] cursor-pointer rounded ${current === i ? "" : "bg-sliderD"}`} />
+                        <div onClick={() => { setCurrent(i) }} key={i} className={`transition-all h-4 w-[30px] cursor-pointer rounded-4 ${current === i ? "bg-neutral-50" : "bg-neutral-400"}`} />
                     ))}
                 </div>
             </div>

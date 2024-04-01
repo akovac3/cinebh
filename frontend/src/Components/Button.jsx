@@ -1,18 +1,17 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
-import { cva} from "class-variance-authority"
+import { cva } from "class-variance-authority"
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 
-const buttonVariants = cva("rounded-lg gap-4 flex items-center justify-center font-body", {
-    variants : {
-        variant : {
-            primary: "bg-darkRed text-lightGray font-semibold px-3 py-5 disabled:bg-dis disabled:text-lightGray",
-            secondary: "text-darkRed border border-darkRed font-semibold px-3 py-5 disabled:text-dis disabled:border-dis"
+const buttonVariants = cva("max-w-fit rounded-8 gap-16 flex items-center justify-center font-body", {
+    variants: {
+        variant: {
+            primary: "bg-primary-600 text-neutral-25 font-semibold px-[20px] py-12 disabled:bg-neutral-300 disabled:text-neutral-25",
+            secondary: "text-primary-600 border border-primary-600 font-semibold px-[20px] py-12 disabled:text-neutral-300 disabled:border-neutral-300"
         },
-        size : {
-            lg: "text-base w-[80px] h-[48px] tracking-[0.005em] ",
-            md:"text-sm w-[75px] h-[45px] tracking-[0.0025em] ",
-            sm: "text-xs w-[62px] h-[32px] tracking-[0.0015em] "
+        size: {
+            lg: "text-body-l",
+            md: "text-body-m",
+            sm: "text-body-s w-[62px] h-[32px]"
         }
     },
     defaultVariants: {
@@ -20,9 +19,10 @@ const buttonVariants = cva("rounded-lg gap-4 flex items-center justify-center fo
         size: "lg"
     }
 })
-const Button = ({children, className, variant, size, ...props}) => {
+
+const Button = ({ children, className, variant, size, ...props }) => {
     return (
-        <button className={twMerge(clsx(buttonVariants({variant, size, className})))} {...props}>
+        <button className={twMerge(clsx(buttonVariants({ variant, size, className })))} {...props}>
             {children}
         </button>
     )

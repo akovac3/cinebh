@@ -26,7 +26,7 @@ const Home = () => {
       <div className="w-full h-[164px]">
         <VenueCarousel route={routeVenues} />
       </div>
-      <div className="h-[619px] gap-[10px] px-[112px] py-[20px] w-full">
+      <div className="h-[619px] gap-[10px] px-[118px] py-[20px] w-full">
         <div className="flex">
           <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Currently Showing</p>
           <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>
@@ -34,7 +34,7 @@ const Home = () => {
         <Carousel route={routeCurrently} movies={true} />
       </div>
 
-      <div className="h-[619px] gap-[10px] px-[112px] py-40 w-full">
+      <div className="h-[619px] gap-[10px] px-[118px] py-40 w-full">
         <div className="flex pr-[20px]">
           <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Upcoming Movies</p>
           <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>
@@ -42,7 +42,7 @@ const Home = () => {
         <Carousel route={routeUpcoming} movies={true} />
       </div>
 
-      <div className="h-[619px] gap-[10px] px-[112px] pt-40 pb-80 w-full">
+      <div className="h-[619px] gap-[10px] px-[118px] pt-40 pb-80 w-full">
         <div className="flex pr-[20px]">
           <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Venues</p>
           <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>

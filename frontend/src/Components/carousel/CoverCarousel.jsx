@@ -25,7 +25,7 @@ const CoverCarousel = ({ movies, autoSlide = true, autoSlideInterval = 7000 }) =
                                 {slide.photos.map((img) => {
                                     if (img.cover) return <img key={img.link} className="w-full object-cover h-full" src={img.link} alt="slika" />
                                 })}
-                                <div className="absolute top-[376px] w-[653px] gap-32 left-[112px] font-body text-neutral-25">
+                                <div className="absolute top-[376px] w-[653px] gap-32 left-[118px] font-body text-neutral-25">
                                     <div>
                                         <Badge>{slide.genres[0].name}</Badge>
                                     </div>

@@ -42,7 +42,7 @@ const Carousel = (props) => {
 
   return (
     <div className="pb-[20px]">
-      <div className="flex gap-24 py-40 pr-[20px]">
+      <div className="flex gap-24 py-40">
         {data.map((item, index) => (
           movies ? <MovieCard key={index} movie={item} photos={item.photos} /> : <VenueCard key={index} venue={item} />))
         }
@@ -54,8 +54,7 @@ const Carousel = (props) => {
         paginateBack={paginateBack}
         paginateFront={paginateFront}
         currentPage={currentPage}
-        maxPages={maxPages}
-        className="pr-80" />
+        maxPages={maxPages} />
     </div>
   )
 }

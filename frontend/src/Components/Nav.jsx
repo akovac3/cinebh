@@ -34,7 +34,7 @@ const Nav = () => {
 
   return (
     <nav>
-      <div className=" font-body bg-neutral-800 h-[80px] flex justify-between items-baseline z-50 text-neutral-0 lg:py-16 px-[112px] py-16 border-b border-neutral-500">
+      <div className=" font-body bg-neutral-800 h-[80px] flex justify-between items-baseline z-50 text-neutral-0 lg:py-16 px-[118px] py-16 border-b border-neutral-500">
         <Logo className="flex-1" />
 
         <div className="md:flex lg:flex-1 justify-center font-normal text-body-l text-neutral-0 hidden">

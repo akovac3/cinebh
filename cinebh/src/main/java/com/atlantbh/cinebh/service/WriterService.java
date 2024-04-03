@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class WriterService {
@@ -21,12 +19,7 @@ public class WriterService {
     }
 
     public Writer findById(Long id) {
-        Optional<Writer> writer = writerRepository.findById(id);
-        if (writer.isPresent()) {
-            return writer.get();
-        } else {
-            throw new ResourceNotFoundException("Writer with provided id not found!");
-        }
+        return writerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Writer with provided id not found!"));
     }
 
     public Writer save(Writer writer) {

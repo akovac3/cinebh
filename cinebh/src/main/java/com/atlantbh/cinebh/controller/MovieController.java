@@ -38,8 +38,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -98,14 +99,12 @@ public class MovieController {
                 movieRequest.getStatus()
         );
         Set<Long> genresSet = movieRequest.getGenres();
-        Set<Genre> genres = new HashSet<>();
-        genresSet.forEach(genre -> {
-            Genre novi = genreRepository.findById(genre)
-                    .orElseThrow(() -> new RuntimeException("Error: Genre not found."));
-            genres.add(novi);
-        });
+        Set<Genre> genres = genresSet.stream()
+                .map(genreId -> genreRepository.findById(genreId)
+                        .orElseThrow(() -> new RuntimeException("Error: Genre not found for ID " + genreId)))
+                .collect(Collectors.toSet());
         movie.setGenres(genres);
-        movieService.createMovie(movie);
+        movieService.save(movie);
         return new ResponseEntity<>("Movie successfully added!", HttpStatus.CREATED);
     }
 
@@ -124,12 +123,10 @@ public class MovieController {
         updateMovie.setTrailer(movieDetails.getTrailer());
         updateMovie.setStatus(movieDetails.getStatus());
         Set<Long> genresSet = movieDetails.getGenres();
-        Set<Genre> genres = new HashSet<>();
-        genresSet.forEach(genre -> {
-            Genre novi = genreRepository.findById(genre)
-                    .orElseThrow(() -> new RuntimeException("Error: Genre not found."));
-            genres.add(novi);
-        });
+        Set<Genre> genres = genresSet.stream()
+                .map(genreId -> genreRepository.findById(genreId)
+                        .orElseThrow(() -> new RuntimeException("Error: Genre not found for ID " + genreId)))
+                .collect(Collectors.toSet());
         updateMovie.setGenres(genres);
         movieService.save(updateMovie);
         return new ResponseEntity<>("Movie with id = " + id + " successfully updated!", HttpStatus.OK);
@@ -138,11 +135,8 @@ public class MovieController {
     @PostMapping(path = "/photos/{id}")
     public ResponseEntity<String> addPhotos(@PathVariable long id, @Validated @RequestBody PhotoRequest[] photoRequests) {
         Movie movie = movieService.findById(id);
-        Set<Photo> photos = new HashSet<>();
-        for (PhotoRequest photoRequest : photoRequests) {
-            Photo newPhoto = photoService.createPhoto(new Photo(photoRequest.getLink(), photoRequest.getCover(), movie));
-            photos.add(newPhoto);
-        }
+        Set<Photo> photos = Arrays.stream(photoRequests).
+                map(photoRequest -> photoService.createPhoto(new Photo(photoRequest.getLink(), photoRequest.getCover(), movie))).collect(Collectors.toSet());
         movie.setPhotos(photos);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
@@ -151,31 +145,32 @@ public class MovieController {
     @PostMapping(path = "/writers/{id}")
     public ResponseEntity<String> addWriters(@PathVariable long id, @Validated @RequestBody WriterRequest[] writerRequests) {
         Movie movie = movieService.findById(id);
-        Set<Writer> writers = new HashSet<>();
-        for (WriterRequest writerRequest : writerRequests) {
-            Writer writer = writerService.findByName(writerRequest.getFirstName(), writerRequest.getLastName());
-            if (writer == null)
-                writer = writerService.save(new Writer(writerRequest.getFirstName(), writerRequest.getLastName()));
-            writers.add(writer);
-        }
+        Set<Writer> writers = Arrays.stream(writerRequests)
+                .map(writerRequest -> {
+                    Writer writer = writerService.findByName(writerRequest.getFirstName(), writerRequest.getLastName());
+                    if (writer == null) {
+                        writer = writerService.save(new Writer(writerRequest.getFirstName(), writerRequest.getLastName()));
+                    }
+                    return writer;
+                })
+                .collect(Collectors.toSet());
         movie.setWriters(writers);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added writers for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-
     @PostMapping(path = "/actors/{id}")
     public ResponseEntity<String> addActors(@PathVariable long id, @Validated @RequestBody ActorRequest[] actorRequests) {
         Movie movie = movieService.findById(id);
-        Set<MovieActor> actors = new HashSet<>();
-        for (ActorRequest actor : actorRequests) {
-            Actor newActor = actorService.findByName(actor.getFirstName(), actor.getLastName());
-            if (newActor == null) {
-                newActor = actorService.create(new Actor(actor.getFirstName(), actor.getLastName()));
-            }
-            MovieActor movieActor = movieActorService.save(new MovieActor(movie, newActor, actor.getRole()));
-            actors.add(movieActor);
-        }
+        Set<MovieActor> actors = Arrays.stream(actorRequests).map(
+                        actorRequest -> {
+                            Actor newActor = actorService.findByName(actorRequest.getFirstName(), actorRequest.getLastName());
+                            if (newActor == null) {
+                                newActor = actorService.save(new Actor(actorRequest.getFirstName(), actorRequest.getLastName()));
+                            }
+                            return movieActorService.save(new MovieActor(movie, newActor, actorRequest.getRole()));
+                        })
+                .collect(Collectors.toSet());
         movie.setMovieActors(actors);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added actors for movie with id=" + id + "!", HttpStatus.OK);
@@ -187,7 +182,7 @@ public class MovieController {
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
-    public ResponseEntity updateMovie(@PathVariable Long id, @RequestBody JsonPatch patch) {
+    public ResponseEntity<String> updateMovie(@PathVariable Long id, @RequestBody JsonPatch patch) {
         try {
             Movie movie = movieService.findById(id);
             Movie moviePatched = applyPatchToMovie(patch, movie);

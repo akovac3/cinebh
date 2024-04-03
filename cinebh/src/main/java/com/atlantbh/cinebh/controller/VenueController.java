@@ -62,7 +62,7 @@ public class VenueController {
     public ResponseEntity<String> createVenue(@Validated @RequestBody VenueRequest venueRequest) {
         City city = cityService.findByName(venueRequest.getCityName());
         Venue venue = new Venue(venueRequest.getName(), venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
-        venueService.createVenue(venue);
+        venueService.save(venue);
         return new ResponseEntity<>("Venue successfully added!", HttpStatus.CREATED);
     }
 
@@ -84,7 +84,7 @@ public class VenueController {
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
-    public ResponseEntity updateVenue(@PathVariable Long id, @RequestBody JsonPatch patch) {
+    public ResponseEntity<String> updateVenue(@PathVariable Long id, @RequestBody JsonPatch patch) {
         try {
             Venue venue = venueService.findById(id);
             Venue venuePatched = applyPatchToVenue(patch, venue);

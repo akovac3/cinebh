@@ -8,12 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class MovieActorService {
-
     @Autowired
     private MovieActorRepository movieActorRepository;
 
@@ -22,12 +19,7 @@ public class MovieActorService {
     }
 
     public MovieActor findById(Long id) {
-        Optional<MovieActor> movieActor = movieActorRepository.findById(id);
-        if (movieActor.isPresent()) {
-            return movieActor.get();
-        } else {
-            throw new ResourceNotFoundException("MovieActor with provided id not found!");
-        }
+        return movieActorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("MovieActor with provided id not found!"));
     }
 
     public MovieActor save(MovieActor movieActor) {

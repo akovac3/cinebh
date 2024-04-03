@@ -6,13 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.sql.Date;
-
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    @Query("SELECT mov FROM Movie mov WHERE mov.projectionStart<=?1 AND mov.projectionEnd>=?1")
-    Page<Movie> findCurrentlyShowing(Date date, Pageable pageable);
+    @Query("SELECT mov FROM Movie mov WHERE mov.projectionStart <= CURRENT_DATE() AND mov.projectionEnd >= CURRENT_DATE()")
+    Page<Movie> findCurrentlyShowing(Pageable pageable);
 
-    @Query("SELECT mov FROM Movie mov WHERE mov.projectionStart>?1")
-    Page<Movie> findUpcoming(Date date, Pageable pageable);
+    @Query("SELECT mov FROM Movie mov WHERE mov.projectionStart>=DATEADD(DAY, 10, CURRENT_DATE())")
+    Page<Movie> findUpcoming(Pageable pageable);
 }

@@ -10,8 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class VenueService {
@@ -23,16 +21,7 @@ public class VenueService {
     }
 
     public Venue findById(Long id) {
-        Optional<Venue> venue = venueRepository.findById(id);
-        if (venue.isPresent()) {
-            return venue.get();
-        } else {
-            throw new ResourceNotFoundException("Venue with provided id not found!");
-        }
-    }
-
-    public Venue createVenue(Venue venue) {
-        return venueRepository.save(venue);
+        return venueRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venue with provided id not found!"));
     }
 
     public Venue save(Venue venue) {

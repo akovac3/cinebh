@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
 public class CityService {
@@ -21,20 +19,11 @@ public class CityService {
     }
 
     public City findById(Long id) {
-        Optional<City> city = cityRepository.findById(id);
-        if (city.isPresent()) {
-            return city.get();
-        } else {
-            throw new ResourceNotFoundException("City with provided id not found!");
-        }
+        return cityRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("City with provided id not found!"));
     }
 
     public City findByName(String name) {
-        City city = cityRepository.findByName(name);
-        return city;
-    }
-    public City create(City city){
-        return cityRepository.save(city);
+        return cityRepository.findByName(name);
     }
 
     public City save(City city) {

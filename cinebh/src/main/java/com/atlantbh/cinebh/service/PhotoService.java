@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -23,12 +22,7 @@ public class PhotoService {
     }
 
     public Photo findById(Long id) {
-        Optional<Photo> photo = photoRepository.findById(id);
-        if (photo.isPresent()) {
-            return photo.get();
-        } else {
-            throw new ResourceNotFoundException("Movie with provided id not found!");
-        }
+        return photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Photo with provided id not found!"));
     }
 
     public Photo createPhoto(Photo photo) {

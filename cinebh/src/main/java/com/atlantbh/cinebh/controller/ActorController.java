@@ -37,9 +37,7 @@ public class ActorController {
 
     @PostMapping("/")
     public ResponseEntity<String> createActor(@Validated @RequestBody ActorRequest actorRequest) {
-        Actor actor = new Actor(actorRequest.getFirstName(), actorRequest.getLastName());
-
-        actorService.create(actor);
+        actorService.save(new Actor(actorRequest.getFirstName(), actorRequest.getLastName()));
         return new ResponseEntity<>("Actor successfully added!", HttpStatus.CREATED);
     }
 }

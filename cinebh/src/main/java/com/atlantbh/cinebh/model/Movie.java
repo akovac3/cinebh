@@ -51,6 +51,9 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private Set<Photo> photos = new HashSet<>();
 
+    @OneToMany(mappedBy = "movie")
+    private Set<Projection> projections = new HashSet<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "genre_movies",

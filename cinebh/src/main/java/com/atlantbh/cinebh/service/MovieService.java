@@ -4,15 +4,20 @@ import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.MovieRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import static com.atlantbh.cinebh.specification.MovieSpecification.*;
 @Service
 @AllArgsConstructor
 public class MovieService {
@@ -44,5 +49,15 @@ public class MovieService {
 
     public Page<Movie> getUpcoming(Integer pageNumber, Integer size) {
         return movieRepository.findUpcoming(PageRequest.of(pageNumber, size));
+    }
+
+    public Set<Movie> getMovies(String nameLikeFilter, List<String> times, List<Long> genres, List<Long> cinemas, List<Long> cities) {
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(nameLikeFilter) ? null : nameLike(nameLikeFilter))
+                .and(CollectionUtils.isEmpty(times) ? null : inProjectionTimes(times))
+                .and(CollectionUtils.isEmpty(genres) ? null : hasGenreIn(genres))
+                .and(CollectionUtils.isEmpty(cinemas) ? null : hasProjectionInCinemas(cinemas))
+                .and(CollectionUtils.isEmpty(cities) ? null : hasProjectionInCities(cities));
+
+        return new HashSet<>(movieRepository.findAll(filters));
     }
 }

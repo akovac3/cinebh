@@ -18,6 +18,11 @@ import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
 import com.atlantbh.cinebh.service.PhotoService;
 import com.atlantbh.cinebh.service.WriterService;
+import com.atlantbh.cinebh.service.VenueService;
+import com.atlantbh.cinebh.service.ProjectionService;
+import com.atlantbh.cinebh.request.ProjectionRequest;
+import com.atlantbh.cinebh.model.Projection;
+import com.atlantbh.cinebh.model.Venue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +45,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,6 +58,9 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
+    @Autowired
+    private VenueService venueService;
+
     private GenreRepository genreRepository;
 
     private PhotoService photoService;
@@ -60,6 +70,8 @@ public class MovieController {
     private ActorService actorService;
 
     private WriterService writerService;
+
+    private ProjectionService projectionService;
 
     ObjectMapper objectMapper;
 
@@ -82,6 +94,15 @@ public class MovieController {
     @GetMapping("/upcoming")
     public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
+    }
+
+    @GetMapping
+    public ResponseEntity<Set<Movie>> getMovies(@RequestParam(required = false) String nameLike,
+                                                @RequestParam(required = false) List<String> times,
+                                                @RequestParam(required = false) List<Long> genres,
+                                                @RequestParam(required = false) List<Long> cinemas,
+                                                @RequestParam(required = false) List<Long> cities) {
+        return ResponseEntity.ok(movieService.getMovies(nameLike, times, genres, cinemas, cities));
     }
 
     @PostMapping("/")
@@ -140,6 +161,20 @@ public class MovieController {
         movie.setPhotos(photos);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/projection/{id}")
+    public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
+        Movie movie = movieService.findById(id);
+        Set<Projection> projections = movie.getProjections();
+        for (ProjectionRequest projectionRequest : projectionRequests) {
+            Venue venue = venueService.findById(projectionRequest.getVenueId());
+            Projection projection = new Projection(projectionRequest.getTime(), movie, venue);
+            projectionService.create(projection);
+            projections.add(projection);
+        }
+        movieService.save(movie);
+        return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
     }
 
     @PostMapping(path = "/writers/{id}")

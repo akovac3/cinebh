@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import VenueBadge from "../VenueBadge";
-import { CustomCarousel } from "../Carousel";
+import { Carousel, CarouselItem } from "../Carousel";
 
 const VenueCarousel = (props) => {
   const route = props.route;
@@ -16,11 +16,13 @@ const VenueCarousel = (props) => {
   }, [])
 
   return (
-    <CustomCarousel covers={ false }>
+    <Carousel covers={ false }>
       { venues.map((item, index) => {
-        return <VenueBadge key={ index } venue={ item.name } />
+        return <CarouselItem>
+          <VenueBadge key={ index } venue={ item.name } />
+        </CarouselItem>
       }) }
-    </CustomCarousel>
+    </Carousel>
   )
 }
 

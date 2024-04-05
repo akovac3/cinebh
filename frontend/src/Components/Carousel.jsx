@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const CustomCarousel = ({ children, covers = false, navigation = false, autoSlide = true, autoSlideInterval = 7000 }) => {
+const Carousel = ({ children, covers = false, navigation = false, autoSlide = true, autoSlideInterval = 7000 }) => {
     const [current, setCurrent] = useState(0)
 
     const prev = () => setCurrent((current) => (current === 0 ? 2 : current - 1))
@@ -48,10 +48,10 @@ const CustomCarousel = ({ children, covers = false, navigation = false, autoSlid
     )
 }
 
-const CustomCarouselItem = ({ children, className }) => {
+const CarouselItem = ({ children, className }) => {
     return (
         <div className={ className }>{ children }</div>
     )
 }
 
-export { CustomCarousel, CustomCarouselItem }
+export { Carousel, CarouselItem }

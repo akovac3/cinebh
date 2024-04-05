@@ -1,12 +1,12 @@
 import Badge from "../Badge";
 import Button from "../Button";
-import { CustomCarousel, CustomCarouselItem } from "../Carousel";
+import { Carousel, CarouselItem } from "../Carousel";
 
 const CoverCarousel = ({ movies }) => {
     return (
-        <CustomCarousel covers={ true } navigation={ true }>
+        <Carousel covers={ true } navigation={ true }>
             { movies.map((slide, index) => {
-                return <CustomCarouselItem key={ index }>
+                return <CarouselItem key={ index }>
                     { slide.photos.map((img) => {
                         if (img.cover) return <img key={ img.link } className="w-full object-cover h-full" src={ img.link } alt="slika" />
                     }) }
@@ -18,9 +18,9 @@ const CoverCarousel = ({ movies }) => {
                         <p className="text-heading-h6">{ slide.synopsis }</p>
                         <Button variant="primary" className="mt-24">Buy Ticket</Button>
                     </div>
-                </CustomCarouselItem>
+                </CarouselItem>
             }) }
-        </CustomCarousel>
+        </Carousel>
     )
 }
 

@@ -3,8 +3,8 @@ import axios from "axios";
 import VenueBadge from "../VenueBadge";
 
 const VenueCarousel = (props) => {
-  const venues = props.venues;
   const route = props.route;
+  const [venues, setVenues] = useState([])
 
   useEffect(() => {
     axios.get(route + "all").then((response) => {

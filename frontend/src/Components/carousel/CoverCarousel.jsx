@@ -4,20 +4,9 @@ import Badge from "../Badge";
 import Button from "../Button";
 import { CustomCarousel, CustomCarouselItem } from "../Carousel";
 
-const CoverCarousel = ({ movies, autoSlide = true, autoSlideInterval = 7000 }) => {
-    const [current, setCurrent] = useState(0)
-
-    const prev = () => setCurrent((current) => (current === 0 ? 2 : current - 1))
-    const next = () => setCurrent((current) => (current === 2 ? 0 : current + 1))
-
-    useEffect(() => {
-        if (!autoSlide) return
-        const slideInterval = setInterval(next, autoSlideInterval)
-        return () => clearInterval(slideInterval)
-    }, [])
-
+const CoverCarousel = ({ movies }) => {
     return (
-        <CustomCarousel prev={ prev } next={ next }>
+        <CustomCarousel covers={ true } navigation={ true }>
             { movies.map((slide, index) => {
                 return <CustomCarouselItem key={ index }>
                     { slide.photos.map((img) => {

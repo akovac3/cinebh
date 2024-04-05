@@ -21,8 +21,7 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Comfortable seating
-                        </p>
+                            Comfortable seating</p>
                         <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
                             Affordable pricing</p>
                         <p className="pb-24">
@@ -48,8 +47,7 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Side-by-side design
-                        </p>
+                            Side-by-side design</p>
                         <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
                             Comfortable padding</p>
                         <p className="pb-24">
@@ -75,8 +73,7 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Enhanced comfort
-                        </p>
+                            Enhanced comfort</p>
                         <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
                             Priority seating</p>
                         <p className="pb-24">

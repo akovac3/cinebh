@@ -10,6 +10,15 @@ export default {
         body: ['Urbanist'],
         // Add more custom font families as needed
       },
+      animation: {
+        'infinite-scroll': 'infinite-scroll 40s linear infinite',
+      },
+      keyframes: {
+        'infinite-scroll': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-100%)' },
+        }
+      }
     },
 
     spacing: {

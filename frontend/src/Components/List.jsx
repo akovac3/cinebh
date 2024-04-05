@@ -1,12 +1,11 @@
 import Pagination from "./Pagination";
 
-const CustomList = ({ children, postsPerPage, totalPosts, paginateBack, paginateFront, currentPage, maxPages }) => {
+const List = ({ children, postsPerPage, totalPosts, paginateBack, paginateFront, currentPage, maxPages }) => {
   return (
     <div className="pb-[20px]">
-      <div className="flex gap-24 py-40">
+      <div className="gap-24 py-40 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         { children }
       </div>
-
       <Pagination
         postsPerPage={ postsPerPage }
         totalPosts={ totalPosts }
@@ -18,10 +17,10 @@ const CustomList = ({ children, postsPerPage, totalPosts, paginateBack, paginate
   )
 }
 
-const CustomListItem = ({ children }) => {
+const ListItem = ({ children }) => {
   return (
     <div>{ children }</div>
   )
 }
 
-export { CustomList, CustomListItem }
+export { List, ListItem }

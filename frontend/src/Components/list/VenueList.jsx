@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import VenueCard from "../card/VenueCard";
 import axios from "axios";
-import { CustomList, CustomListItem } from "../List";
+import { List, ListItem } from "../List";
 
 const VenueList = (props) => {
     const route = props.route;
@@ -30,16 +30,19 @@ const VenueList = (props) => {
     const paginateFront = () => {
         setCurrentPage(prev => prev + 1);
     }
+
     const paginateBack = () => {
         setCurrentPage(prev => prev - 1);
     }
 
     return (
-        <CustomList postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
+        <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
             { venues.map((item, index) => {
-                return <VenueCard key={ index } venue={ item } />
+                return <ListItem key={ index }>
+                    <VenueCard key={ index } venue={ item } />
+                </ListItem>
             }) }
-        </CustomList>
+        </List>
     )
 }
 

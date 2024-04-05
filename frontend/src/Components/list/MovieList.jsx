@@ -2,7 +2,7 @@ import { useState } from "react";
 import MovieCard from "../card/MovieCard";
 import { useEffect } from "react";
 import axios from "axios";
-import { CustomList, CustomListItem } from "../List";
+import { List, ListItem } from "../List";
 
 const MovieList = (props) => {
     const route = props.route;
@@ -30,18 +30,19 @@ const MovieList = (props) => {
     const paginateFront = () => {
         setCurrentPage(prev => prev + 1);
     }
+
     const paginateBack = () => {
         setCurrentPage(prev => prev - 1);
     }
 
     return (
-        <CustomList postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
+        <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
             { data.map((item, index) => {
-                return <CustomListItem key={ index }>
+                return <ListItem key={ index }>
                     <MovieCard key={ index } movie={ item } photos={ item.photos } />
-                </CustomListItem>
+                </ListItem>
             }) }
-        </CustomList>
+        </List>
     )
 }
 

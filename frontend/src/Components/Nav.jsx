@@ -45,7 +45,7 @@ const Nav = () => {
             { list }
           </ul>
         </div>
-        <Button variant="secondary" className="text-neutral-25 border-neutral-25">
+        <Button variant="secondary" className="!text-neutral-25 !border-neutral-25">
           Sign in
         </Button>
         { click && content }

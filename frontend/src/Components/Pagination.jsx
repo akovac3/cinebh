@@ -20,10 +20,10 @@ const Pagination = ({ postsPerPage, totalPosts, paginateFront, paginateBack, cur
       </div>
       <div className="gap-16">
         <nav className="flex">
-          <Button onClick={ paginateBack } disabled={ currentPage === 0 } variant="secondary" className="bg-neutral-0 text-neutral-800 disabled:text-neutral-200 disabled:border-neutral-200 border-neutral-200 shadow-light-25 w-[48px] h-[48px] mr-16">
+          <Button onClick={ paginateBack } disabled={ currentPage === 0 } variant="secondary" className="!bg-neutral-0 !text-neutral-800 disabled:!text-neutral-200 disabled:!border-neutral-200 !border-neutral-200 !shadow-light-25 w-[48px] h-[48px] mr-16">
             <FontAwesomeIcon icon={ fas.faArrowLeft } className="h-16" />
           </Button>
-          <Button onClick={ paginateFront } disabled={ currentPage === maxPages - 1 } variant="secondary" className="bg-neutral-0 text-neutral-800 disabled:text-neutral-200 disabled:border-neutral-200 border-neutral-200 shadow-light-25 w-[48px] h-[48px]">
+          <Button onClick={ paginateFront } disabled={ currentPage === maxPages - 1 } variant="secondary" className="!bg-neutral-0 !text-neutral-800 disabled:!text-neutral-200 disabled:!border-neutral-200 !border-neutral-200 !shadow-light-25 w-[48px] h-[48px]">
             <FontAwesomeIcon icon={ fas.faArrowRight } className="h-16" />
           </Button>
         </nav>

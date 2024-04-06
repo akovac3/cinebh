@@ -1,25 +1,16 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import VenueBadge from "../VenueBadge";
+import Badge from "../Badge";
 import { Carousel, CarouselItem } from "../Carousel";
 
-const VenueCarousel = (props) => {
-  const route = props.route;
-  const [venues, setVenues] = useState([])
-
-  useEffect(() => {
-    axios.get(route + "all").then((response) => {
-      setVenues(response.data);
-    }).catch((err) => {
-      console.log(err);
-    })
-  }, [])
-
+const VenueCarousel = ({ venues }) => {
   return (
     <Carousel covers={ false }>
       { venues.map((item, index) => {
-        return <CarouselItem>
-          <VenueBadge key={ index } venue={ item.name } />
+        return <CarouselItem key={ index }>
+          <Badge key={ index } className="border !text-neutral-400 !bg-neutral-25 !border-neutral-200 !py-32 !px-16">
+            <p className="text-heading-h5">
+              { item.name }
+            </p>
+          </Badge>
         </CarouselItem>
       }) }
     </Carousel>

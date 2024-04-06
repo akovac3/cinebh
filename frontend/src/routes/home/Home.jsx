@@ -10,10 +10,18 @@ const Home = () => {
   const routeUpcoming = "http://localhost:8080/api/movies/upcoming";
   const routeVenues = "http://localhost:8080/api/venues/"
   const [coverMovies, setCoverMovies] = useState([]);
+  const [venues, setVenues] = useState([]);
 
   useEffect(() => {
     axios.get(routeCurrently + "?page=" + 0 + "&size=" + 3).then((response) => {
       setCoverMovies(response.data.content);
+    }).catch((err) => {
+      console.log(err);
+    })
+
+    axios.get(routeVenues + "all").then((response) => {
+      setVenues(response.data);
+      console.log(response.data)
     }).catch((err) => {
       console.log(err);
     })
@@ -25,7 +33,7 @@ const Home = () => {
         <CoverCarousel movies={ coverMovies } />
       </div>
       <div className="w-full h-[164px]">
-        <VenueCarousel route={ routeVenues } />
+        <VenueCarousel venues={ venues } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
         <div className="flex">

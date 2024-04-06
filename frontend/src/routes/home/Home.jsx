@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import CoverCarousel from "../../components/carousel/CoverCarousel"
 import axios from "axios";
 import VenueCarousel from "../../components/carousel/VenueCarousel";
-import MovieList from "../../components/list/MovieList";
-import VenueList from "../../components/list/VenueList";
+import MovieList from "../list/MovieList";
+import VenueList from "../list/VenueList";
+import { Link } from "react-router-dom";
+import { createClassName } from "../../utils/utils";
 
 const Home = () => {
   const routeCurrently = "http://localhost:8080/api/movies/currently";
@@ -12,19 +14,23 @@ const Home = () => {
   const [coverMovies, setCoverMovies] = useState([]);
   const [venues, setVenues] = useState([]);
 
-  useEffect(() => {
-    axios.get(routeCurrently + "?page=" + 0 + "&size=" + 3).then((response) => {
-      setCoverMovies(response.data.content);
-    }).catch((err) => {
-      console.log(err);
-    })
+  const loadMovies = async (page, size) => {
+    await axios.get(routeCurrently + "?page=" + page + "&size=" + size).then((res) =>
+      setCoverMovies(res.data.content)).catch((err) => console.log(err))
+  }
 
-    axios.get(routeVenues + "all").then((response) => {
+  const loadVenues = async () => {
+    try {
+      const response = await axios.get(routeVenues + "all");
       setVenues(response.data);
-      console.log(response.data)
-    }).catch((err) => {
+    } catch (err) {
       console.log(err);
-    })
+    }
+  }
+
+  useEffect(() => {
+    loadMovies(0, 3);
+    loadVenues();
   }, [])
 
   return (
@@ -36,26 +42,26 @@ const Home = () => {
         <VenueCarousel venues={ venues } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <div className="flex">
-          <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Currently Showing</p>
-          <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>
-        </div>
+        <ContentLabel title="Currently Showing" />
         <MovieList route={ routeCurrently } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <div className="flex">
-          <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Upcomig Movies</p>
-          <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>
-        </div>
+        <ContentLabel title="Upcoming Movies" />
         <MovieList route={ routeUpcoming } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <div className="flex">
-          <p className="flex-1 font-bold text-[32px]/[40px] tracking-[0.0075em]">Venues</p>
-          <a className="pt-12 text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] text-center align-bottom cursor-pointer">See all</a>
-        </div>
+        <ContentLabel title="Venues" />
         <VenueList route={ routeVenues } />
       </div>
+    </div>
+  )
+}
+
+const ContentLabel = ({ className, title, link }) => {
+  return (
+    <div className={ createClassName("flex justify-between items-center", className) }>
+      <p className="font-bold text-[32px]/[40px] tracking-[0.0075em]">{ title }</p>
+      <Link to={ link } className="text-primary-600 text-[16px]/[24px] font-semibold tracking-[0.015em] cursor-pointer" >See all</Link>
     </div>
   )
 }

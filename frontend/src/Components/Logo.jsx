@@ -1,9 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { fas } from "@fortawesome/free-solid-svg-icons"
+import { createClassName } from "../utils/utils"
 
-const Logo = () => {
+const Logo = (className) => {
     return (
-        <div className="flex items-center font-body">
+        <div className={ createClassName("flex items-center font-body", className) }>
             <span className="flex justify-center items-center bg-neutral-25 w-[26px] h-[24px] rounded-8 text-primary-600">
                 <FontAwesomeIcon icon={ fas.faVideo } className="h-[14px]" />
             </span>

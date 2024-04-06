@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { createClassName } from '../utils/utils'
 
-const Carousel = ({ children, covers = false, navigation = false, autoSlide = true, autoSlideInterval = 7000 }) => {
+const Carousel = ({ className, children, covers = false, navigation = false, autoSlide = true, autoSlideInterval = 7000 }) => {
     const [current, setCurrent] = useState(0)
 
     const prev = () => setCurrent((current) => (current === 0 ? 2 : current - 1))
@@ -13,8 +14,7 @@ const Carousel = ({ children, covers = false, navigation = false, autoSlide = tr
     }, [])
 
     return (
-
-        <div className="w-full h-full relative overflow-hidden cursor-default">
+        <div className={ createClassName("w-full h-full relative overflow-hidden cursor-default", className) }>
             { !covers &&
                 <div className="w-full h-full flex whitespace-nowrap">
                     <div className="flex w-full h-full pr-[30px] py-8 gap-40 items-center justify-center animate-infinite-scroll">
@@ -34,7 +34,6 @@ const Carousel = ({ children, covers = false, navigation = false, autoSlide = tr
                     </div>
                 )
             }) }
-
             { navigation && <div className="absolute bottom-24 right-0 left-0">
                 <div className="flex items-center justify-center gap-[15px]">
                     { children.map((_, i) => (

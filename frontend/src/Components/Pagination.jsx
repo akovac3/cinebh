@@ -2,10 +2,11 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import Button from "./Button";
+import { createClassName } from "../utils/utils";
 
-const Pagination = ({ postsPerPage, totalPosts, paginateFront, paginateBack, currentPage, maxPages, className }) => {
+const Pagination = ({ className, postsPerPage, totalPosts, paginateFront, paginateBack, currentPage, maxPages }) => {
   return (
-    <div className="p-12 gap-16 flex items-end justify-end">
+    <div className={ createClassName("gap-16 flex items-end justify-end", className) }>
       <div className="h-[48px] text-body-l font-normal flex items-center justify-center">
         <p>
           Showing &nbsp;

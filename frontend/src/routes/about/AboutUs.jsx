@@ -1,7 +1,7 @@
 const AboutUs = () => {
     return (
         <div className="font-body pt-80">
-            <div className="grid grid-cols-3 gap-[150px] px-[118px]">
+            <div className="grid grid-cols-3 px-[118px]">
                 <div className="text-heading-h5 text-neutral-800 flex flex-col pt-[100px] lg:pr-64 md:pr-12 sm:pr-12">
                     About Our Dream.
                     <br />

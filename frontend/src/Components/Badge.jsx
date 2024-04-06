@@ -1,4 +1,6 @@
-const Badge = ({ children, className, variant = 'default', size = 'lg', color = 'grey', ...props }) => {
+import { createClassName } from "../utils/utils"
+
+const Badge = ({ className, children, variant = 'default', size = 'lg', color = 'grey', ...props }) => {
 
     const sizeClassName = {
         lg: "text-body-m h-[32px] rounded-8 px-[6px] py-8",
@@ -22,16 +24,6 @@ const Badge = ({ children, className, variant = 'default', size = 'lg', color = 
             { children }
         </div>
     )
-}
-
-const createClassName = (...classes) => {
-    let finalClass = ''
-    for (const c of classes) {
-        if (c?.length > 0 && c.trim().length > 0) {
-            finalClass += (finalClass.length > 0 && finalClass.trim().length > 0 ? ' ' : '') + c.trim();
-        }
-    }
-    return finalClass;
 }
 
 export default Badge;

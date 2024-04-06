@@ -1,12 +1,12 @@
 import { useState } from "react";
+import MovieCard from "../../components/card/MovieCard";
 import { useEffect } from "react";
-import VenueCard from "../card/VenueCard";
 import axios from "axios";
-import { List, ListItem } from "../List";
+import { List, ListItem } from "../../components/List";
 
-const VenueList = (props) => {
+const MovieList = (props) => {
     const route = props.route;
-    const [venues, setVenues] = useState([]);
+    const [data, setMovies] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [postsPerPage] = useState(4);
     const [maxPages, setMaxPages] = useState(0);
@@ -15,7 +15,7 @@ const VenueList = (props) => {
     const fetchResults = async () => {
         try {
             const response = await axios.get(route + "?page=" + currentPage + "&size=" + postsPerPage);
-            setVenues(response.data.content);
+            setMovies(response.data.content);
             setTotalPosts(response.data.totalElements)
             setMaxPages(response.data.totalPages)
         } catch (err) {
@@ -37,13 +37,13 @@ const VenueList = (props) => {
 
     return (
         <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
-            { venues.map((item, index) => {
+            { data.map((item, index) => {
                 return <ListItem key={ index }>
-                    <VenueCard key={ index } venue={ item } />
+                    <MovieCard key={ index } movie={ item } photos={ item.photos } />
                 </ListItem>
             }) }
         </List>
     )
 }
 
-export default VenueList;
+export default MovieList;

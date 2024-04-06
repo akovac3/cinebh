@@ -1,3 +1,5 @@
+import { createClassName } from "../utils/utils"
+
 const Button = ({ className, children, variant = 'primary', size = 'lg', type = 'default', ...props }) => {
     const sizeClassName = {
         lg: "text-body-l",
@@ -19,16 +21,6 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
             { children }
         </button>
     )
-}
-
-const createClassName = (...classes) => {
-    let finalClass = ''
-    for (const c of classes) {
-        if (c?.length > 0 && c.trim().length > 0) {
-            finalClass += (finalClass.length > 0 && finalClass.trim().length > 0 ? ' ' : '') + c.trim();
-        }
-    }
-    return finalClass;
 }
 
 export default Button;

@@ -8,11 +8,7 @@ import com.atlantbh.cinebh.model.Photo;
 import com.atlantbh.cinebh.model.Writer;
 import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.repository.GenreRepository;
-import com.atlantbh.cinebh.request.MovieRequest;
-import com.atlantbh.cinebh.request.PaginationParams;
-import com.atlantbh.cinebh.request.WriterRequest;
-import com.atlantbh.cinebh.request.ActorRequest;
-import com.atlantbh.cinebh.request.PhotoRequest;
+import com.atlantbh.cinebh.request.*;
 import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
@@ -20,7 +16,6 @@ import com.atlantbh.cinebh.service.PhotoService;
 import com.atlantbh.cinebh.service.WriterService;
 import com.atlantbh.cinebh.service.VenueService;
 import com.atlantbh.cinebh.service.ProjectionService;
-import com.atlantbh.cinebh.request.ProjectionRequest;
 import com.atlantbh.cinebh.model.Projection;
 import com.atlantbh.cinebh.model.Venue;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,6 +39,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -96,13 +93,14 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping
-    public ResponseEntity<Set<Movie>> getMovies(@RequestParam(required = false) String nameLike,
-                                                @RequestParam(required = false) List<String> times,
-                                                @RequestParam(required = false) List<Long> genres,
-                                                @RequestParam(required = false) List<Long> cinemas,
-                                                @RequestParam(required = false) List<Long> cities) {
-        return ResponseEntity.ok(movieService.getMovies(nameLike, times, genres, cinemas, cities));
+    @GetMapping("/currently/")
+    public ResponseEntity<Set<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams) {
+        return ResponseEntity.ok(movieService.getMovies(filterParams));
+    }
+
+    @GetMapping("/upcoming/")
+    public ResponseEntity<Set<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams) {
+        return ResponseEntity.ok(movieService.getUpcoming(filterParams));
     }
 
     @PostMapping("/")

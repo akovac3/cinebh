@@ -3,10 +3,13 @@ package com.atlantbh.cinebh.specification;
 import com.atlantbh.cinebh.model.*;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,8 +17,27 @@ import java.util.List;
 public class MovieSpecification {
 
     private MovieSpecification() {}
+
     public static Specification<Movie> nameLike(String nameLike) {
         return (root, query, builder) -> builder.like(root.get("name"), "%" + nameLike + "%");
+    }
+
+    public static Specification<Movie> projectionStartLessThenDate(Date date) {
+        if(date==null) date = Date.valueOf(LocalDate.now());
+        Date finalDate = date;
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("projectionStart"), finalDate);
+    }
+
+    public static Specification<Movie> projectionEndGreaterThenDate(Date date) {
+        if(date==null) date = Date.valueOf(LocalDate.now());
+        Date finalDate = date;
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionEnd"), finalDate);
+    }
+
+    public static Specification<Movie> projectionStartGreaterThenDate(Date date) {
+        if(date==null) date = Date.valueOf(LocalDate.now());
+        Date finalDate = date;
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionStart"), finalDate);
     }
 
     public static Specification<Movie> hasGenreIn(List<Long> genreIds){

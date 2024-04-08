@@ -3,6 +3,8 @@ package com.atlantbh.cinebh.service;
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.MovieRepository;
+import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
+import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,12 +54,35 @@ public class MovieService {
         return movieRepository.findUpcoming(PageRequest.of(pageNumber, size));
     }
 
-    public Set<Movie> getMovies(String nameLikeFilter, List<String> times, List<Long> genres, List<Long> cinemas, List<Long> cities) {
-        Specification<Movie> filters = Specification.where(StringUtils.isBlank(nameLikeFilter) ? null : nameLike(nameLikeFilter))
-                .and(CollectionUtils.isEmpty(times) ? null : inProjectionTimes(times))
-                .and(CollectionUtils.isEmpty(genres) ? null : hasGenreIn(genres))
-                .and(CollectionUtils.isEmpty(cinemas) ? null : hasProjectionInCinemas(cinemas))
-                .and(CollectionUtils.isEmpty(cities) ? null : hasProjectionInCities(cities));
+    public Set<Movie> getMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams) {
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(currentlyMoviesFilterParams.getCinemas()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCities()) ? null : hasProjectionInCities(currentlyMoviesFilterParams.getCities()))
+                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
+
+        return new HashSet<>(movieRepository.findAll(filters));
+    }
+
+    public Set<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams) {
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(currentlyMoviesFilterParams.getCinemas()))
+                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCities()) ? null : hasProjectionInCities(currentlyMoviesFilterParams.getCities()))
+                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
+
+        return new HashSet<>(movieRepository.findAll(filters));
+    }
+
+    public Set<Movie> getUpcoming(UpcomingMoviesFilterParams upcomingMoviesFilterParams) {
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(upcomingMoviesFilterParams.getNameLike()) ? null : nameLike(upcomingMoviesFilterParams.getNameLike()))
+                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getGenres()) ? null : hasGenreIn(upcomingMoviesFilterParams.getGenres()))
+                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(upcomingMoviesFilterParams.getCinemas()))
+                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getCities()) ? null : hasProjectionInCities(upcomingMoviesFilterParams.getCities()))
+                .and(projectionStartGreaterThenDate(upcomingMoviesFilterParams.getStartDate()))
+                .and(projectionStartLessThenDate(upcomingMoviesFilterParams.getEndDate()));
 
         return new HashSet<>(movieRepository.findAll(filters));
     }

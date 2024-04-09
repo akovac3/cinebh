@@ -78,10 +78,4 @@ public class PhotoController {
         photoService.remove(id);
         return new ResponseEntity<>("Photo successfully deleted!", HttpStatus.OK);
     }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
-        movieService.remove(id);
-        return new ResponseEntity<>("Photo successfully deleted!", HttpStatus.OK);
-    }
 }

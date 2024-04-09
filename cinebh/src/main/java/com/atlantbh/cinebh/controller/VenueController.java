@@ -102,10 +102,4 @@ public class VenueController {
         venueService.remove(id);
         return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
     }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
-        venueService.remove(id);
-        return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
-    }
 }

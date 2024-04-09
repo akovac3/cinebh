@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CurrentlyMoviesFilterParams extends FilterParams{
+public class CurrentlyMoviesFilterParams extends MovieFilterParams {
     private List<String> times;
-
 }

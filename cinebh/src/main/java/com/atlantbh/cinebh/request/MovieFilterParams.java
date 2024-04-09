@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FilterParams {
+public class MovieFilterParams {
     private String nameLike;
     List<Long> genres;
     List<Long> cinemas;

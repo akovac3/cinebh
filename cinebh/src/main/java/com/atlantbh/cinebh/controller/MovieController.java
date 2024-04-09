@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,22 +79,22 @@ public class MovieController {
         return ResponseEntity.ok().body(newMovie);
     }
 
-    @GetMapping("/currently")
+    @GetMapping("/currently/all")
     public ResponseEntity<Iterable<Movie>> getCurrently(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getCurrentlyShowing(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping("/upcoming")
+    @GetMapping("/upcoming/all")
     public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping("/currently/")
+    @GetMapping("/currently")
     public ResponseEntity<Set<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams) {
         return ResponseEntity.ok(movieService.getMovies(filterParams));
     }
 
-    @GetMapping("/upcoming/")
+    @GetMapping("/upcoming")
     public ResponseEntity<Set<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams) {
         return ResponseEntity.ok(movieService.getUpcoming(filterParams));
     }
@@ -151,7 +147,7 @@ public class MovieController {
         return new ResponseEntity<>("Movie with id = " + id + " successfully updated!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/photos/{id}")
+    @PostMapping(path = "/{id}/photos")
     public ResponseEntity<String> addPhotos(@PathVariable long id, @Validated @RequestBody PhotoRequest[] photoRequests) {
         Movie movie = movieService.findById(id);
         Set<Photo> photos = Arrays.stream(photoRequests).
@@ -161,7 +157,7 @@ public class MovieController {
         return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/projection/{id}")
+    @PostMapping(path = "/{id}/projection")
     public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
         Movie movie = movieService.findById(id);
         Set<Projection> projections = movie.getProjections();
@@ -175,7 +171,7 @@ public class MovieController {
         return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/writers/{id}")
+    @PostMapping(path = "/{id}/writers")
     public ResponseEntity<String> addWriters(@PathVariable long id, @Validated @RequestBody WriterRequest[] writerRequests) {
         Movie movie = movieService.findById(id);
         Set<Writer> writers = Arrays.stream(writerRequests)
@@ -192,7 +188,7 @@ public class MovieController {
         return new ResponseEntity<>("Successfully added writers for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/actors/{id}")
+    @PostMapping(path = "/{id}/actors")
     public ResponseEntity<String> addActors(@PathVariable long id, @Validated @RequestBody ActorRequest[] actorRequests) {
         Movie movie = movieService.findById(id);
         Set<MovieActor> actors = Arrays.stream(actorRequests).map(
@@ -230,12 +226,6 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMovie(@PathVariable long id) throws JsonProcessingException {
-        movieService.remove(id);
-        return new ResponseEntity<>("Movie successfully deleted!", HttpStatus.OK);
-    }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
         movieService.remove(id);
         return new ResponseEntity<>("Movie successfully deleted!", HttpStatus.OK);
     }

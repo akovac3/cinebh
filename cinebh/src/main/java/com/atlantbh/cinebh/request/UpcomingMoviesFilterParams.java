@@ -11,6 +11,6 @@ import java.sql.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpcomingMoviesFilterParams extends FilterParams{
+public class UpcomingMoviesFilterParams extends MovieFilterParams {
     private Date endDate;
 }

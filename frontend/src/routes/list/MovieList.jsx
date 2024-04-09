@@ -1,7 +1,7 @@
-import { useState } from "react";
-import MovieCard from "../../components/card/MovieCard";
-import { useEffect } from "react";
 import axios from "axios";
+import { useState, useEffect } from "react";
+
+import MovieCard from "../../components/card/MovieCard";
 import { List, ListItem } from "../../components/List";
 
 const MovieList = (props) => {
@@ -38,9 +38,11 @@ const MovieList = (props) => {
     return (
         <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
             { data.map((item, index) => {
-                return <ListItem key={ index }>
-                    <MovieCard key={ index } movie={ item } photos={ item.photos } />
-                </ListItem>
+                return (
+                    <ListItem key={ index }>
+                        <MovieCard key={ index } movie={ item } photos={ item.photos } />
+                    </ListItem>
+                )
             }) }
         </List>
     )

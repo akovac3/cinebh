@@ -15,7 +15,7 @@ const Carousel = ({ className, children, covers = false, navigation = false, aut
 
     return (
         <div className={ createClassName("w-full h-full relative overflow-hidden cursor-default", className) }>
-            { !covers &&
+            { !covers && (
                 <div className="w-full h-full flex whitespace-nowrap">
                     <div className="flex w-full h-full pr-[30px] py-8 gap-40 items-center justify-center animate-infinite-scroll">
                         { children }
@@ -24,7 +24,7 @@ const Carousel = ({ className, children, covers = false, navigation = false, aut
                         { children }
                     </div>
                 </div>
-            }
+            ) }
             { covers && children.map((child, index) => {
                 return (
                     <div className={ index === current ? "slide_current" : "slide" } style={ index === current ? { transform: `translateX(-${0}%)` } : { transform: `translateX(-${50}%)` } } key={ index }>
@@ -34,14 +34,15 @@ const Carousel = ({ className, children, covers = false, navigation = false, aut
                     </div>
                 )
             }) }
-            { navigation && <div className="absolute bottom-24 right-0 left-0">
-                <div className="flex items-center justify-center gap-[15px]">
-                    { children.map((_, i) => (
-                        <div onClick={ () => { setCurrent(i) } } key={ i } className={ `transition-all h-4 w-[30px] cursor-pointer rounded-4 ${current === i ? "bg-neutral-50" : "bg-neutral-400"}` } />
-                    )) }
+            { navigation && (
+                <div className="absolute bottom-24 right-0 left-0">
+                    <div className="flex items-center justify-center gap-[15px]">
+                        { children.map((_, i) => (
+                            <div onClick={ () => { setCurrent(i) } } key={ i } className={ `transition-all h-4 w-[30px] cursor-pointer rounded-4 ${current === i ? "bg-neutral-50" : "bg-neutral-400"}` } />
+                        )) }
+                    </div>
                 </div>
-
-            </div>
+            )
             }
         </div>
     )

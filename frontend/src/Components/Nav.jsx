@@ -1,8 +1,10 @@
-import Logo from "./Logo";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+
+import Logo from "./Logo";
 import Button from "./Button";
+
 import { createClassName } from "../utils/utils";
 
 const Nav = (className) => {
@@ -55,7 +57,7 @@ const Nav = (className) => {
         </button>
       </div>
     </nav>
-  );
-};
+  )
+}
 
 export default Nav;

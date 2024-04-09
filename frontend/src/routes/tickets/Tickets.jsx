@@ -1,8 +1,12 @@
+import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { fas } from "@fortawesome/free-solid-svg-icons"
+
 import Button from "../../components/Button"
 
 const Tickets = () => {
+    const navigate = useNavigate();
+
     return (
         <div className='font-body text-neutral-800 pb-64'>
             <div className="flex flex-col items-center justify-center">
@@ -21,21 +25,26 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Comfortable seating</p>
-                        <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
+                            Comfortable seating
+                        </p>
+                        <p className="pb-24">
+                            <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
                             Affordable pricing</p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Wide selection</p>
+                            Wide selection
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Accessible  locations</p>
+                            Accessible  locations
+                        </p>
                         <p className="pb-12">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Suitable for everyone</p>
+                            Suitable for everyone
+                        </p>
                     </div>
                     <div className="flex flex-col items-center justify-center p-40">
-                        <Button variant={ "secondary" } size={ "lg" }>Explore Movies</Button>
+                        <Button variant={ "secondary" } size={ "lg" } onClick={ () => { navigate('/currently-showing') } }>Explore Movies</Button>
                     </div>
                 </div>
                 <div className="border border-neutral-400 rounded-16 bg-neutral-25 w-[408px] h-[644px] mx-24 shadow-light-100">
@@ -47,21 +56,26 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Side-by-side design</p>
+                            Side-by-side design
+                        </p>
                         <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Comfortable padding</p>
+                            Comfortable padding
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Adjustable armrests</p>
+                            Adjustable armrest
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Cup holders</p>
+                            Cup holders
+                        </p>
                         <p className="pb-12">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Reserved for couples</p>
+                            Reserved for couples
+                        </p>
                     </div>
                     <div className="flex flex-col items-center justify-center p-40">
-                        <Button className="text-neutral-25">Explore Movies</Button>
+                        <Button className="text-neutral-25" onClick={ () => { navigate('/currently-showing') } }>Explore Movies</Button>
                     </div>
                 </div>
                 <div className="border border-neutral-200 rounded-16 bg-neutral-25 w-[408px] h-[564px] mt-40">
@@ -73,21 +87,26 @@ const Tickets = () => {
                     <div className="px-32 text-body-l font-normal">
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Enhanced comfort</p>
+                            Enhanced comfort
+                        </p>
                         <p className="pb-24"> <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Priority seating</p>
+                            Priority seating
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Prime viewing</p>
+                            Prime viewing
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Personal space</p>
+                            Personal space
+                        </p>
                         <p className="pb-24">
                             <FontAwesomeIcon icon={ fas.faCheck } className="text-primary-600 pr-16" />
-                            Luxury extras</p>
+                            Luxury extras
+                        </p>
                     </div>
                     <div className="flex flex-col items-center justify-center p-40">
-                        <Button variant={ "secondary" } size={ "lg" }>Explore Movies</Button>
+                        <Button variant={ "secondary" } size={ "lg" } onClick={ () => { navigate('/currently-showing') } }>Explore Movies</Button>
                     </div>
                 </div>
             </div>

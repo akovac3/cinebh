@@ -1,4 +1,5 @@
 import Pagination from "./Pagination";
+
 import { createClassName } from "../utils/utils";
 
 const List = ({ className, children, postsPerPage, totalPosts, paginateBack, paginateFront, currentPage, maxPages }) => {

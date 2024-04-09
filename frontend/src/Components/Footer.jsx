@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { fas } from "@fortawesome/free-solid-svg-icons"
+import { faVideo } from "@fortawesome/free-solid-svg-icons"
+
 import { createClassName } from "../utils/utils"
 
 const Footer = ({ className }) => {
@@ -8,7 +9,7 @@ const Footer = ({ className }) => {
             <div className="h-[212px] bg-gradient-to-r from-supporting-special-start to-supporting-special-stop flex flex-col items-center justify-center text-neutral-25">
                 <div className="flex items-center">
                     <span className="flex justify-center items-center bg-neutral-25 w-[26px] h-[24px] text-primary-600 rounded-8">
-                        <FontAwesomeIcon icon={ fas.faVideo } className="h-[14px]" />
+                        <FontAwesomeIcon icon={ faVideo } className="h-[14px]" />
                     </span>
                     <p className="pl-4 text-heading-h5">Cinebh.</p>
                 </div>

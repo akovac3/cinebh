@@ -4,7 +4,7 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
     const sizeClassName = {
         lg: "text-body-l",
         md: "text-body-m",
-        sm: "text-body-s w-[62px] h-[32px]"
+        sm: "text-body-s"
     }
 
     const variantClassName = {
@@ -12,12 +12,12 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
         secondary: "text-primary-600 border border-primary-600 font-semibold px-[20px] py-12 disabled:text-neutral-300 disabled:border-neutral-300"
     }
 
-    const defaultClasname = {
+    const defaultClassName = {
         default: "max-w-fit rounded-8 gap-16 flex items-center justify-center font-body"
     }
 
     return (
-        <button className={ createClassName(variantClassName[variant], sizeClassName[size], defaultClasname[type], className) }  { ...props }>
+        <button className={ createClassName(variantClassName[variant], sizeClassName[size], defaultClassName[type], className) }  { ...props }>
             { children }
         </button>
     )

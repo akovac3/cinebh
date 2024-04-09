@@ -22,7 +22,7 @@ const AboutUs = () => {
                     Join us at Cinebh and discover why we're not just your average movie theater—we're your destination for cinematic excellence and entertainment bliss.
                 </div>
             </div>
-            <div className=" w-full h-[555px] top-[572px] bg-cover bg-[url('https://www.chineasy.com/wp-content/uploads/2021/05/denise-jans-OaVJQZ-nFD0-unsplash.jpg')]">
+            <div className="w-full h-[555px] top-[572px] bg-cover bg-[url('https://www.chineasy.com/wp-content/uploads/2021/05/denise-jans-OaVJQZ-nFD0-unsplash.jpg')]">
             </div>
         </div>
     )

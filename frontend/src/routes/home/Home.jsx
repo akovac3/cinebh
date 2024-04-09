@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
-import CoverCarousel from "../../components/carousel/CoverCarousel"
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import CoverCarousel from "../../components/carousel/CoverCarousel"
 import VenueCarousel from "../../components/carousel/VenueCarousel";
 import MovieList from "../list/MovieList";
 import VenueList from "../list/VenueList";
-import { Link } from "react-router-dom";
+
 import { createClassName } from "../../utils/utils";
 
 const Home = () => {

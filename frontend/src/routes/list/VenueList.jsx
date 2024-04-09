@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import VenueCard from "../../components/card/VenueCard";
 import axios from "axios";
+import { useState, useEffect } from "react";
+
+import VenueCard from "../../components/card/VenueCard";
 import { List, ListItem } from "../../components/List";
 
 const VenueList = (props) => {
@@ -38,9 +38,11 @@ const VenueList = (props) => {
     return (
         <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
             { venues.map((item, index) => {
-                return <ListItem key={ index }>
-                    <VenueCard key={ index } venue={ item } />
-                </ListItem>
+                return (
+                    <ListItem key={ index }>
+                        <VenueCard key={ index } venue={ item } />
+                    </ListItem>
+                )
             }) }
         </List>
     )

@@ -25,6 +25,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -90,13 +91,13 @@ public class MovieController {
     }
 
     @GetMapping("/currently")
-    public ResponseEntity<Set<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams) {
-        return ResponseEntity.ok(movieService.getMovies(filterParams));
+    public ResponseEntity<Page<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<Set<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams) {
-        return ResponseEntity.ok(movieService.getUpcoming(filterParams));
+    public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
     }
 
     @PostMapping("/")

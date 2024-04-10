@@ -1,9 +1,11 @@
 package com.atlantbh.cinebh.specification;
 
-import com.atlantbh.cinebh.model.*;
-import jakarta.persistence.criteria.Expression;
+import com.atlantbh.cinebh.model.Movie;
+import com.atlantbh.cinebh.model.Genre;
+import com.atlantbh.cinebh.model.Projection;
+import com.atlantbh.cinebh.model.Venue;
+import com.atlantbh.cinebh.model.City;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,7 +13,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class MovieSpecification {
@@ -19,7 +20,7 @@ public class MovieSpecification {
     private MovieSpecification() {}
 
     public static Specification<Movie> nameLike(String nameLike) {
-        return (root, query, builder) -> builder.like(root.get("name"), "%" + nameLike + "%");
+        return (root, query, builder) -> builder.like(builder.lower(root.get("name")), "%" + nameLike.toLowerCase() + "%");
     }
 
     public static Specification<Movie> projectionStartLessThenDate(Date date) {

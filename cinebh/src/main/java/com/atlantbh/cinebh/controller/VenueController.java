@@ -58,6 +58,12 @@ public class VenueController {
         return ResponseEntity.ok().body(venue);
     }
 
+    @GetMapping("/city/{id}")
+    public ResponseEntity<Iterable<Venue>> getVenuesByCity(@PathVariable("id") Long id) {
+        City city = cityService.findById(id);
+        return ResponseEntity.ok(venueService.getVenuesByCity(city));
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> createVenue(@Validated @RequestBody VenueRequest venueRequest) {
         City city = cityService.findByName(venueRequest.getCityName());

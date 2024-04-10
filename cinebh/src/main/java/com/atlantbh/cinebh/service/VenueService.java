@@ -1,6 +1,7 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
+import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.repository.VenueRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,6 +19,10 @@ public class VenueService {
 
     public Iterable<Venue> getAll() {
         return venueRepository.findAll();
+    }
+
+    public Iterable<Venue> getVenuesByCity(City city) {
+        return venueRepository.findAllByCity(city);
     }
 
     public Venue findById(Long id) {

@@ -4,6 +4,7 @@ import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.MovieRepository;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
+import com.atlantbh.cinebh.request.PaginationParams;
 import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.common.util.StringUtils;
@@ -54,7 +55,7 @@ public class MovieService {
         return movieRepository.findUpcoming(PageRequest.of(pageNumber, size));
     }
 
-    public Set<Movie> getMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams) {
+    public Page<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
         Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
@@ -62,21 +63,10 @@ public class MovieService {
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCities()) ? null : hasProjectionInCities(currentlyMoviesFilterParams.getCities()))
                 .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
 
-        return new HashSet<>(movieRepository.findAll(filters));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    public Set<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams) {
-        Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(currentlyMoviesFilterParams.getCinemas()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCities()) ? null : hasProjectionInCities(currentlyMoviesFilterParams.getCities()))
-                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
-
-        return new HashSet<>(movieRepository.findAll(filters));
-    }
-
-    public Set<Movie> getUpcoming(UpcomingMoviesFilterParams upcomingMoviesFilterParams) {
+    public Page<Movie> getUpcoming(UpcomingMoviesFilterParams upcomingMoviesFilterParams, PaginationParams paginationParams) {
         Specification<Movie> filters = Specification.where(StringUtils.isBlank(upcomingMoviesFilterParams.getNameLike()) ? null : nameLike(upcomingMoviesFilterParams.getNameLike()))
                 .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getGenres()) ? null : hasGenreIn(upcomingMoviesFilterParams.getGenres()))
                 .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(upcomingMoviesFilterParams.getCinemas()))
@@ -84,6 +74,6 @@ public class MovieService {
                 .and(projectionStartGreaterThenDate(upcomingMoviesFilterParams.getStartDate()))
                 .and(projectionStartLessThenDate(upcomingMoviesFilterParams.getEndDate()));
 
-        return new HashSet<>(movieRepository.findAll(filters));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
     }
 }

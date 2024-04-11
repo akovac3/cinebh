@@ -15,7 +15,7 @@ import java.util.List;
 public class MovieFilterParams {
     private String nameLike;
     List<Long> genres;
-    List<Long> cinemas;
-    List<Long> cities;
+    Long venue = 0L;
+    Long city = 0L;
     Date startDate;
 }

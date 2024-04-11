@@ -8,7 +8,14 @@ import com.atlantbh.cinebh.model.Photo;
 import com.atlantbh.cinebh.model.Writer;
 import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.repository.GenreRepository;
-import com.atlantbh.cinebh.request.*;
+import com.atlantbh.cinebh.request.PaginationParams;
+import com.atlantbh.cinebh.request.PhotoRequest;
+import com.atlantbh.cinebh.request.ActorRequest;
+import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
+import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
+import com.atlantbh.cinebh.request.ProjectionRequest;
+import com.atlantbh.cinebh.request.WriterRequest;
+import com.atlantbh.cinebh.request.MovieRequest;
 import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
@@ -95,10 +102,10 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
 
-    @GetMapping("/upcoming")
+    /*@GetMapping("/upcoming")
     public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
-    }
+    }*/
 
     @PostMapping("/")
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
@@ -162,12 +169,12 @@ public class MovieController {
     public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
         Movie movie = movieService.findById(id);
         Set<Projection> projections = movie.getProjections();
-        for (ProjectionRequest projectionRequest : projectionRequests) {
-            Venue venue = venueService.findById(projectionRequest.getVenueId());
-            Projection projection = new Projection(projectionRequest.getTime(), movie, venue);
-            projectionService.create(projection);
-            projections.add(projection);
-        }
+        projections.addAll(Arrays.stream(projectionRequests)
+                .map(projectionRequest -> {
+                    Venue venue = venueService.findById(projectionRequest.getVenueId());
+                    return projectionService.save(new Projection(projectionRequest.getTime(), movie, venue));
+                }).collect(Collectors.toSet()));
+        movie.setProjections(projections);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
     }

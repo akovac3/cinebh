@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
-import java.sql.Date;
 
 @Entity
 @Table(name = "projections")

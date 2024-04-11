@@ -1,11 +1,15 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
+import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Movie;
+import com.atlantbh.cinebh.model.Venue;
+import com.atlantbh.cinebh.repository.CityRepository;
 import com.atlantbh.cinebh.repository.MovieRepository;
+import com.atlantbh.cinebh.repository.VenueRepository;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
 import com.atlantbh.cinebh.request.PaginationParams;
-import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
+import com.atlantbh.cinebh.specification.MovieSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
@@ -16,17 +20,22 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.sql.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collections;
+import java.util.Optional;
 
 import static com.atlantbh.cinebh.specification.MovieSpecification.*;
+
 @Service
 @AllArgsConstructor
 public class MovieService {
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private VenueRepository venueRepository;
 
     public Iterable<Movie> getAll() {
         return movieRepository.findAll();
@@ -56,24 +65,15 @@ public class MovieService {
     }
 
     public Page<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
+        Optional<City> city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
+        Optional<Venue> venue = venueRepository.findById(currentlyMoviesFilterParams.getVenue());
+        if(currentlyMoviesFilterParams.getCity()!=null) city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
         Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(currentlyMoviesFilterParams.getCinemas()))
-                .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getCities()) ? null : hasProjectionInCities(currentlyMoviesFilterParams.getCities()))
+                .and(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null))
+                .and(city.map(MovieSpecification::hasProjectionInCities).orElse(null))
                 .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
-
-        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
-    }
-
-    public Page<Movie> getUpcoming(UpcomingMoviesFilterParams upcomingMoviesFilterParams, PaginationParams paginationParams) {
-        Specification<Movie> filters = Specification.where(StringUtils.isBlank(upcomingMoviesFilterParams.getNameLike()) ? null : nameLike(upcomingMoviesFilterParams.getNameLike()))
-                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getGenres()) ? null : hasGenreIn(upcomingMoviesFilterParams.getGenres()))
-                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getCinemas()) ? null : hasProjectionInCinemas(upcomingMoviesFilterParams.getCinemas()))
-                .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getCities()) ? null : hasProjectionInCities(upcomingMoviesFilterParams.getCities()))
-                .and(projectionStartGreaterThenDate(upcomingMoviesFilterParams.getStartDate()))
-                .and(projectionStartLessThenDate(upcomingMoviesFilterParams.getEndDate()));
-
         return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
     }
 }

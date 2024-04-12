@@ -3,6 +3,7 @@ import Label from "./Label";
 import { createClassName } from "../utils/utils";
 
 const Input = ({ className, label, open, text, rightIcon, leftIcon, ...props }) => {
+
     return (
         <div className={ createClassName("w-full relative flex items-center justify-between py-3", className) }>
             <div className="flex w-full justify-between items-center text-neutral-700 cursor-pointer">
@@ -12,7 +13,6 @@ const Input = ({ className, label, open, text, rightIcon, leftIcon, ...props }) 
                     </div>
                 </Label>
             </div>
-
         </div>
     )
 }

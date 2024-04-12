@@ -1,3 +1,5 @@
+import { createClassName } from "../utils/utils"
+
 const Label = ({ className, label, open, value, children, rightIcon, leftIcon, variant = 'default', size = 'lg', ...props }) => {
     const varianClassName = {
         default: "bg-neutral-0 border rounded-8 border-neutral-200 gap-16 flex shadow-light-50 text-neutral-500 px-12 py-12 focus:border-solid focus:border-primary-600 focus:outline focus:outline-primary-200",
@@ -14,7 +16,6 @@ const Label = ({ className, label, open, value, children, rightIcon, leftIcon, v
     }
 
     return (
-
         <div className="relative text-neutral-700  w-full">
             { label ? <p className="font-semibold pb-4">{ label }</p> : null }
             <div className={ open ? createClassName(varianClassName[variant], sizeClassName[size], varianClassName["focused"], className) : createClassName(varianClassName[variant], sizeClassName[size], className) }>
@@ -32,16 +33,6 @@ const Label = ({ className, label, open, value, children, rightIcon, leftIcon, v
             </div>
         </div>
     )
-}
-
-const createClassName = (...classes) => {
-    let finalClass = ''
-    for (const c of classes) {
-        if (c?.length > 0 && c.trim().length > 0) {
-            finalClass += (finalClass.length > 0 && finalClass.trim().length > 0 ? ' ' : '') + c.trim();
-        }
-    }
-    return finalClass;
 }
 
 export default Label;

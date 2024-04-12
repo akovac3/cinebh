@@ -29,7 +29,7 @@ const CurrentlyShowingCard = (props) => {
     }, [movie])
 
     return (
-        <Card className="h-[318px] py-4 px-8 my-12">
+        <Card className="!h-[318px] py-4 px-8 my-12">
             <div className="grid grid-cols-4 gap-24 p-[10px]">
                 <div className="">
                     <img className="w-[96%] h-[287px] rounded-16" src={ cover } alt="" />

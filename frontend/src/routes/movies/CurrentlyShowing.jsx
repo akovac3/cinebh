@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom"
 
-
 import { Dropdown, DropdownItem } from "../../components/Dropdown";
 import CurrentlyShowingCard from "../../components/card/CurrentlyShowingCard";
 import Input from "../../components/Input";
@@ -130,8 +129,8 @@ const CurrentlyShowing = () => {
         let month = dateValue.getMonth() + 1;
         if (dateValue) route = route.concat("startDate=" + dateValue.getFullYear() + "-" + month + "-" + dateValue.getDate())
         if (nameLikeValue) route = route.concat("&nameLike=" + nameLikeValue)
-        if (cityValue) route = route.concat("&cities=" + cityValue.cityId)
-        if (venueValue) route = route.concat("&cinemas=" + venueValue.venueId)
+        if (cityValue) route = route.concat("&city=" + cityValue.cityId)
+        if (venueValue) route = route.concat("&venue=" + venueValue.venueId)
         if (genreValue) route = route.concat("&genres=" + genreValue.id)
         if (timeValue) route = route.concat("&times=" + timeValue.id + ":00")
         route = route.concat("&page=" + currentPage + "&size=" + postsPerPage)

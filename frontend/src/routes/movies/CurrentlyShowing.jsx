@@ -30,8 +30,8 @@ const CurrentlyShowing = () => {
     const [venueValue, setVenueValue] = useState(null);
     const [nameLikeValue, setNameLikeValue] = useState(null);
     const [dateValue, setDateValue] = useState(new Date());
-    const citiesParam = searchParams.get('cities');
-    const venuesParams = searchParams.get('cinemas');
+    const citiesParam = searchParams.get('city');
+    const venuesParams = searchParams.get('venue');
     const genresParams = searchParams.get('genres');
     const timesParams = searchParams.get('times');
     const [focused, setFocused] = useState(false)
@@ -148,8 +148,8 @@ const CurrentlyShowing = () => {
     const updateSearchParams = () => {
         const newSearchParams = new URLSearchParams();
 
-        if (cityValue) newSearchParams.append('cities', cityValue.cityId)
-        if (venueValue) newSearchParams.append('cinemas', venueValue.venueId)
+        if (cityValue) newSearchParams.append('city', cityValue.cityId)
+        if (venueValue) newSearchParams.append('venue', venueValue.venueId)
         if (genreValue) newSearchParams.append('genres', genreValue.id)
         if (timeValue) newSearchParams.append('times', timeValue.id + ':00')
 

@@ -10,8 +10,8 @@ import VenueList from "../list/VenueList";
 import { createClassName } from "../../utils/utils";
 
 const Home = () => {
-  const routeCurrently = "http://localhost:8080/api/movies/currently";
-  const routeUpcoming = "http://localhost:8080/api/movies/upcoming";
+  const routeCurrently = "http://localhost:8080/api/movies/currently/all";
+  const routeUpcoming = "http://localhost:8080/api/movies/upcoming/all";
   const routeVenues = "http://localhost:8080/api/venues/"
   const [coverMovies, setCoverMovies] = useState([]);
   const [venues, setVenues] = useState([]);
@@ -44,7 +44,7 @@ const Home = () => {
         <VenueCarousel venues={ venues } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <ContentLabel title="Currently Showing" />
+        <ContentLabel title="Currently Showing" link={ '/currently-showing' } />
         <MovieList route={ routeCurrently } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">

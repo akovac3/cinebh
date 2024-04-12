@@ -7,8 +7,8 @@ const Dropdown = ({ className, children, label, placeholder, value, rightIcon, l
     return (
         <div className={ createClassName("w-full relative flex items-center justify-between py-3", className) }>
             <div onClick={ () => setOpen(!open) } className="flex w-full justify-between items-center text-neutral-700 cursor-pointer">
-                <Label label={ label } rightIcon={ rightIcon } leftIcon={ leftIcon } open={ open }>
-                    <div className={ `pl-12 ${open ? "!text-neutral-900" : "!text-neutral-500"} cursor-pointer` }>
+                <Label label={ label } value={ value } rightIcon={ rightIcon } leftIcon={ leftIcon } open={ open }>
+                    <div className={ `pl-12 ${open ? "!text-neutral-900" : "!text-neutral-500"} ${value ? "!text-neutral-900" : "!text-neutral-500"} cursor-pointer` }>
                         <p>{ value ? value.name : placeholder }</p>
                     </div>
                 </Label>

@@ -10,8 +10,8 @@ import VenueList from "../list/VenueList";
 import { createClassName } from "../../utils/utils";
 
 const Home = () => {
-  const routeCurrently = "http://localhost:8080/api/movies/currently/all";
-  const routeUpcoming = "http://localhost:8080/api/movies/upcoming/all";
+  const routeCurrently = "http://localhost:8080/api/movies/currently";
+  const routeUpcoming = "http://localhost:8080/api/movies/upcoming";
   const routeVenues = "http://localhost:8080/api/venues/"
   const [coverMovies, setCoverMovies] = useState([]);
   const [venues, setVenues] = useState([]);

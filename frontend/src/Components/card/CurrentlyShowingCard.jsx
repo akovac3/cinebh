@@ -6,6 +6,7 @@ import Badge from "../Badge";
 const CurrentlyShowingCard = (props) => {
     const movie = props.movie;
     const photos = props.photos;
+    const movieProjections = props.projections;
     const [endDate, setEndDate] = useState();
     const [cover, setCover] = useState();
     const month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
@@ -23,17 +24,25 @@ const CurrentlyShowingCard = (props) => {
         setEndDate(date.getDate() + "." + month[date.getMonth()] + "." + date.getFullYear())
     }
 
+    function getProjectionTimes() {
+        let array = []
+        movieProjections.map((projection) => {
+            if (array.indexOf(projection.time) === -1) {
+                array.push(projection.time);
+            }
+        })
+        return array;
+    }
+
     useEffect(() => {
         getCover();
         getEndDate();
     }, [movie])
 
     return (
-        <Card className="!h-[318px] py-4 px-8 my-12">
-            <div className="grid grid-cols-4 gap-24 p-[10px]">
-                <div className="">
-                    <img className="w-[96%] h-[287px] rounded-16" src={ cover } alt="" />
-                </div>
+        <Card className="lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8 my-12">
+            <div className="grid lg:grid-cols-4 gap-24 p-[10px]">
+                <img className="w-[96%] h-[287px] rounded-16" src={ cover } alt="" />
 
                 <div className="text-neutral-800 mr-24 relative">
                     <p className="text-heading-h4 pb-8">{ movie.name }</p>
@@ -52,10 +61,10 @@ const CurrentlyShowingCard = (props) => {
                 <div className="col-span-2">
                     <p className="text-heading-h6 text-primary-600 py-12">Showtimes</p>
                     <div className="flex gap-12">
-                        { movie.projections.map((projection, index) => {
+                        { getProjectionTimes().map((projection, index) => {
                             return (
                                 <div key={ index } className="border rounded-8 shadow-light-50 bg-neutral-0 border-neutral-200 text-neutral-800 hover:bg-primary-600 hover:!text-neutral-25 hover:border-primary-600 cursor-pointer">
-                                    <p className="p-[10px] text-heading-h6">{ projection.time.slice(0, 5) }</p>
+                                    <p className="p-[10px] text-heading-h6">{ projection.slice(0, 5) }</p>
                                 </div>
                             )
                         }) }

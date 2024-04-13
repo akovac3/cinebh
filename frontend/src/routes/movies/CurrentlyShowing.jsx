@@ -125,7 +125,7 @@ const CurrentlyShowing = () => {
     }
 
     const loadMovies = async () => {
-        let route = "http://localhost:8080/api/movies/currently?";
+        let route = "http://localhost:8080/api/movies/search-currently?";
         let month = dateValue.getMonth() + 1;
         if (dateValue) route = route.concat("startDate=" + dateValue.getFullYear() + "-" + month + "-" + dateValue.getDate())
         if (nameLikeValue) route = route.concat("&nameLike=" + nameLikeValue)
@@ -198,7 +198,7 @@ const CurrentlyShowing = () => {
         <div className="font-body px-[118px] pt-40">
             <p className="text-neutral-800 text-heading-h4 pb-32">Currently Showing ({ movies.length })</p>
             <Input text="Search movies" open={ focused } leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> } className="w-full" onChange={ handleChange } onFocus={ onFocus } onBlur={ onBlur }></Input>
-            <div className="grid grid-cols-4 py-16 gap-8">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 py-16 gap-8">
                 <Dropdown placeholder="All cities" value={ cityValue } options={ cities } leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> } rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> } >
                     <div> <DropdownItem> <div onClick={
                         () => {
@@ -288,7 +288,7 @@ const CurrentlyShowing = () => {
                 </Dropdown>
 
             </div>
-            <div className="grid grid-cols-10 gap-8 pb-[20px]">
+            <div className="grid lg:grid-cols-10 md:grid-cols-5 sm:grid-cols-3 gap-8 pb-[20px]">
                 {
                     dates.map((date, index) => {
                         return (
@@ -304,7 +304,7 @@ const CurrentlyShowing = () => {
 
             <div>
                 { movies.length != 0 ? movies.map((item, index) => {
-                    return <CurrentlyShowingCard key={ index } movie={ item } endDate={ item.projectionEnd } photos={ item.photos } />
+                    return <CurrentlyShowingCard key={ index } movie={ item } projections={ item.projections } endDate={ item.projectionEnd } photos={ item.photos } />
                 }) :
                     <Card className="flex justify-center items-center shadow-light-50 mt-12 mb-32">
                         <div className="text-neutral-600 w-[55%] flex flex-col justify-center items-center text-body-l">

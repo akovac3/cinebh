@@ -20,7 +20,7 @@ const MovieCard = (props) => {
     }, [movie])
 
     return (
-        <Card>
+        <Card className="h-[395px]">
             <div className="p-[10px]">
                 <div className="flex items-center justify-center">
                     <img className="w-[98%] h-[287px] gap-0 rounded-16" src={ cover } alt="" />

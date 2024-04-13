@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieSpecification {
+
     public static Specification<Movie> nameLike(String nameLike) {
         return (root, query, builder) -> builder.like(builder.lower(root.get("name")), "%" + nameLike.toLowerCase() + "%");
     }

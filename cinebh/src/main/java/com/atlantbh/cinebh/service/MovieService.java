@@ -20,7 +20,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static com.atlantbh.cinebh.specification.MovieSpecification.*;
@@ -67,12 +66,11 @@ public class MovieService {
     public Page<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
         Optional<City> city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
         Optional<Venue> venue = venueRepository.findById(currentlyMoviesFilterParams.getVenue());
-        if(currentlyMoviesFilterParams.getCity()!=null) city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
         Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
-                .and(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null))
                 .and(city.map(MovieSpecification::hasProjectionInCities).orElse(null))
+                .and(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null))
                 .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
         return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
     }

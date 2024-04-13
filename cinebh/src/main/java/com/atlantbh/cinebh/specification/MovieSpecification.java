@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieSpecification {
-
     public static Specification<Movie> nameLike(String nameLike) {
         return (root, query, builder) -> builder.like(builder.lower(root.get("name")), "%" + nameLike.toLowerCase() + "%");
     }
@@ -54,16 +53,15 @@ public class MovieSpecification {
 
     public static Specification<Movie> hasProjectionInCinemas(Venue venue) {
         return (root, query, builder) -> {
-            Join<Movie, Projection> movieProjections = root.join("projections");
-            return builder.and(movieProjections.get("venue").in(venue));
+            query.distinct(true);
+            return builder.and(root.get("projections").get("venue").in(venue));
         };
     }
 
     public static Specification<Movie> hasProjectionInCities(City city) {
         return (root, query, builder) -> {
-            Join<Movie, Projection> movieProjections = root.join("projections");
-            Join<Venue, Movie> projectionVenue = movieProjections.join("venue");
-            return builder.equal(projectionVenue.get("city"), city);
+            query.distinct(true);
+            return builder.and(root.get("projections").get("venue").get("city").in(city));
         };
     }
 }

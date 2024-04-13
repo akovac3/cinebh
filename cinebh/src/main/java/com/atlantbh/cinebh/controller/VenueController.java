@@ -40,7 +40,7 @@ public class VenueController {
     @Autowired
     private CityService cityService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
 
     @GetMapping("/all")
     public ResponseEntity<Iterable<Venue>> getAll() {

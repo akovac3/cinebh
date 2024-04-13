@@ -11,7 +11,6 @@ import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.request.PaginationParams;
 import com.atlantbh.cinebh.request.PhotoRequest;
 import com.atlantbh.cinebh.request.ActorRequest;
-import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
 import com.atlantbh.cinebh.request.ProjectionRequest;
 import com.atlantbh.cinebh.request.WriterRequest;
@@ -87,25 +86,20 @@ public class MovieController {
         return ResponseEntity.ok().body(newMovie);
     }
 
-    @GetMapping("/currently/all")
+    @GetMapping("/currently")
     public ResponseEntity<Iterable<Movie>> getCurrently(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getCurrentlyShowing(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping("/upcoming/all")
+    @GetMapping("/upcoming")
     public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
     }
 
-    @GetMapping("/currently")
+    @GetMapping("/search-currently")
     public ResponseEntity<Page<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
-
-    /*@GetMapping("/upcoming")
-    public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
-        return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
-    }*/
 
     @PostMapping("/")
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {

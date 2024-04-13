@@ -21,5 +21,4 @@ public class CityController {
     public ResponseEntity<Iterable<City>> getAll() {
         return ResponseEntity.ok(cityService.getAll());
     }
-
 }

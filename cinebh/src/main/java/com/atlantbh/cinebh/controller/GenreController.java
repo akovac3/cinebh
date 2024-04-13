@@ -1,7 +1,6 @@
 package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.model.Genre;
-import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.service.GenreService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +21,4 @@ public class GenreController {
     public ResponseEntity<Iterable<Genre>> getAll() {
         return ResponseEntity.ok(genreService.getAll());
     }
-
 }

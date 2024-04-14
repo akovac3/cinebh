@@ -41,6 +41,6 @@ public class VenueService {
     }
 
     public Page<Venue> getVenues(int pageNumber, int size) {
-        return venueRepository.findAll(PageRequest.of(pageNumber, size));
+        return venueRepository.findAll(PageRequest.of(pageNumber-1, size));
     }
 }

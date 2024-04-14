@@ -47,7 +47,7 @@ public class VenueController {
         return ResponseEntity.ok(venueService.getAll());
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Page<Venue>> getVenues(PaginationParams paginationParams) {
         return ResponseEntity.ok(venueService.getVenues(paginationParams.getPage(), paginationParams.getSize()));
     }

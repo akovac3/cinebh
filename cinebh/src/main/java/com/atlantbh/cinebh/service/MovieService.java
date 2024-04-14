@@ -56,11 +56,11 @@ public class MovieService {
     }
 
     public Page<Movie> getCurrentlyShowing(Integer pageNumber, Integer size) {
-        return movieRepository.findCurrentlyShowing(PageRequest.of(pageNumber, size));
+        return movieRepository.findCurrentlyShowing(PageRequest.of(pageNumber-1, size));
     }
 
     public Page<Movie> getUpcoming(Integer pageNumber, Integer size) {
-        return movieRepository.findUpcoming(PageRequest.of(pageNumber, size));
+        return movieRepository.findUpcoming(PageRequest.of(pageNumber-1, size));
     }
 
     public Page<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
@@ -71,7 +71,8 @@ public class MovieService {
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
                 .and(city.map(MovieSpecification::hasProjectionInCities).orElse(null))
                 .and(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null))
-                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate()))).and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
-        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage(), paginationParams.getSize()));
+                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate())))
+                .and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
     }
 }

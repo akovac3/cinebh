@@ -8,31 +8,32 @@ import MovieList from "../list/MovieList";
 import VenueList from "../list/VenueList";
 
 import { createClassName } from "../../utils/utils";
+import { url, movies, venues, currently, upcoming } from "../../utils/api";
 
 const Home = () => {
-  const routeCurrently = "http://localhost:8080/api/movies/currently";
-  const routeUpcoming = "http://localhost:8080/api/movies/upcoming";
-  const routeVenues = "http://localhost:8080/api/venues/"
+  const routeCurrently = url + movies + currently;
+  const routeUpcoming = url + movies + upcoming;
+  const routeVenueList = url + venues;
   const [coverMovies, setCoverMovies] = useState([]);
-  const [venues, setVenues] = useState([]);
+  const [venueList, setVenueList] = useState([]);
 
   const loadMovies = async (page, size) => {
     await axios.get(routeCurrently + "?page=" + page + "&size=" + size).then((res) =>
       setCoverMovies(res.data.content)).catch((err) => console.log(err))
   }
 
-  const loadVenues = async () => {
+  const loadVenueList = async () => {
     try {
-      const response = await axios.get(routeVenues + "all");
-      setVenues(response.data);
+      const response = await axios.get(routeVenueList + "/all");
+      setVenueList(response.data);
     } catch (err) {
       console.log(err);
     }
   }
 
   useEffect(() => {
-    loadMovies(0, 3);
-    loadVenues();
+    loadMovies(1, 3);
+    loadVenueList();
   }, [])
 
   return (
@@ -41,7 +42,7 @@ const Home = () => {
         <CoverCarousel movies={ coverMovies } />
       </div>
       <div className="w-full h-[164px]">
-        <VenueCarousel venues={ venues } />
+        <VenueCarousel venues={ venueList } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
         <ContentLabel title="Currently Showing" link={ '/currently-showing' } />
@@ -52,8 +53,8 @@ const Home = () => {
         <MovieList route={ routeUpcoming } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <ContentLabel title="Venues" />
-        <VenueList route={ routeVenues } />
+        <ContentLabel title="VenueList" />
+        <VenueList route={ routeVenueList } />
       </div>
     </div>
   )

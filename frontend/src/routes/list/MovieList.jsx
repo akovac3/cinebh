@@ -7,9 +7,9 @@ import { List, ListItem } from "../../components/List";
 const MovieList = (props) => {
     const route = props.route;
     const [data, setMovies] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [postsPerPage] = useState(4);
-    const [maxPages, setMaxPages] = useState(0);
+    const [maxPages, setMaxPages] = useState(1);
     const [totalPosts, setTotalPosts] = useState(0);
 
     const fetchResults = async () => {
@@ -17,7 +17,7 @@ const MovieList = (props) => {
             const response = await axios.get(route + "?page=" + currentPage + "&size=" + postsPerPage);
             setMovies(response.data.content);
             setTotalPosts(response.data.totalElements)
-            setMaxPages(response.data.totalPages)
+            setMaxPages(response.data.totalPages + 1)
         } catch (err) {
             console.log(err);
         }

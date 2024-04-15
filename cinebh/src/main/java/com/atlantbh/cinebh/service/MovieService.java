@@ -21,7 +21,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static com.atlantbh.cinebh.specification.MovieSpecification.*;
@@ -65,22 +64,10 @@ public class MovieService {
         return movieRepository.findUpcoming(PageRequest.of(pageNumber-1, size));
     }
 
-    public List<Movie> getMoviesForVenue(Long id) {
-        Optional<Venue> venue = venueRepository.findById(id);
-        Specification<Movie> filters = Specification.where(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null));
-        return movieRepository.findAll(filters);
-    }
-
-    public List<Movie> getMoviesForCity(Long id) {
-        Optional<City> city = cityRepository.findById(id);
-        Specification<Movie> filters = Specification.where(city.map(MovieSpecification::hasProjectionInCities).orElse(null));
-        return movieRepository.findAll(filters);
-    }
-
     public Page<Movie> getCurrentlyShowingMovies(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
         Optional<City> city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
         Optional<Venue> venue = venueRepository.findById(currentlyMoviesFilterParams.getVenue());
-        Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getNameLike()) ? null : nameLike(currentlyMoviesFilterParams.getNameLike()))
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(currentlyMoviesFilterParams.getContains()) ? null : nameLike(currentlyMoviesFilterParams.getContains()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getTimes()) ? null : inProjectionTimes(currentlyMoviesFilterParams.getTimes()))
                 .and(CollectionUtils.isEmpty(currentlyMoviesFilterParams.getGenres()) ? null : hasGenreIn(currentlyMoviesFilterParams.getGenres()))
                 .and(city.map(MovieSpecification::hasProjectionInCities).orElse(null))
@@ -94,7 +81,7 @@ public class MovieService {
     public Page<Movie> getUpcoming(UpcomingMoviesFilterParams upcomingMoviesFilterParams, PaginationParams paginationParams) {
         Optional<City> city = cityRepository.findById(upcomingMoviesFilterParams.getCity());
         Optional<Venue> venue = venueRepository.findById(upcomingMoviesFilterParams.getVenue());
-        Specification<Movie> filters = Specification.where(StringUtils.isBlank(upcomingMoviesFilterParams.getNameLike()) ? null : nameLike(upcomingMoviesFilterParams.getNameLike()))
+        Specification<Movie> filters = Specification.where(StringUtils.isBlank(upcomingMoviesFilterParams.getContains()) ? null : nameLike(upcomingMoviesFilterParams.getContains()))
                 .and(CollectionUtils.isEmpty(upcomingMoviesFilterParams.getGenres()) ? null : hasGenreIn(upcomingMoviesFilterParams.getGenres()))
                 .and(city.map(MovieSpecification::hasProjectionInCities).orElse(null))
                 .and(venue.map(MovieSpecification::hasProjectionInCinemas).orElse(null))

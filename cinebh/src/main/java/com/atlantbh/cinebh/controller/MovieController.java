@@ -12,6 +12,7 @@ import com.atlantbh.cinebh.request.PaginationParams;
 import com.atlantbh.cinebh.request.PhotoRequest;
 import com.atlantbh.cinebh.request.ActorRequest;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
+import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.atlantbh.cinebh.request.ProjectionRequest;
 import com.atlantbh.cinebh.request.WriterRequest;
 import com.atlantbh.cinebh.request.MovieRequest;
@@ -46,7 +47,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,11 +98,11 @@ public class MovieController {
     }
 
     @GetMapping("/search-currently")
-    public ResponseEntity<Page<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
+    public ResponseEntity<Page<Movie>> getCurrentlyMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
 
-    @GetMapping("/upcoming")
+    @GetMapping("/search-upcoming")
     public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
     }

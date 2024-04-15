@@ -15,8 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieSpecification {
-    public static Specification<Movie> nameLike(String nameLike) {
-        return (root, query, builder) -> builder.like(builder.lower(root.get("name")), "%" + nameLike.toLowerCase() + "%");
+    public static Specification<Movie> nameLike(String contains) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+            return builder.like(builder.lower(root.get("name")), "%" + contains.toLowerCase() + "%");
+        };
     }
 
     public static Specification<Movie> projectionStartLessThenDate(Date date) {
@@ -32,19 +35,13 @@ public class MovieSpecification {
     }
 
     public static Specification<Movie> projectionBetweenDates(Date date1, Date date2){
-        if (date1 == null) date1 = Date.valueOf(LocalDate.now().plusDays(10));
+        date1 = Date.valueOf(LocalDate.now().plusDays(10));
         Date finalDate1 = date1;
         if(date2 == null) return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionStart"), finalDate1);
         else {
             return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("projectionStart"), finalDate1, date2);
         }
 
-    }
-
-    public static Specification<Movie> projectionStartGreaterThenDate(Date date) {
-        if (date == null) date = Date.valueOf(LocalDate.now().plusDays(10));
-        Date finalDate = date;
-        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionStart"), finalDate);
     }
 
     public static Specification<Movie> hasGenreIn(List<Long> genreIds) {

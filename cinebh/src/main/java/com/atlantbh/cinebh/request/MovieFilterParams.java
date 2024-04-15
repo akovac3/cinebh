@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MovieFilterParams {
-    private String nameLike;
+    private String contains;
     private List<Long> genres;
     private Long venue = 0L;
     private Long city = 0L;

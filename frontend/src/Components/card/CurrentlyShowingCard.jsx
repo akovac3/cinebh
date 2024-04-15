@@ -4,10 +4,13 @@ import { format } from "date-fns"
 import Card from "../Card";
 import Badge from "../Badge";
 
-const CurrentlyShowingCard = (props) => {
+import { createClassName } from "../../utils/utils";
+
+const CurrentlyShowingCard = ({ className, ...props }) => {
     const movie = props.movie;
     const photos = props.photos;
     const movieProjections = props.projections;
+    const genres = props.genres;
     const [cover, setCover] = useState();
 
     function getCover() {
@@ -19,13 +22,11 @@ const CurrentlyShowingCard = (props) => {
     }
 
     function getProjectionTimes() {
-        let array = []
-        movieProjections.map((projection) => {
-            if (array.indexOf(projection.time) === -1) {
-                array.push(projection.time);
-            }
-        })
-        return array;
+        return [...new Set(movieProjections.map(projection => projection.time))].sort()
+    }
+
+    function getGenres() {
+        return genres.map((genre) => genre.name).sort()
     }
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const CurrentlyShowingCard = (props) => {
     }, [movie])
 
     return (
-        <Card className="lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8 my-12">
+        <Card className={ createClassName("lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8", className) }>
             <div className="grid lg:grid-cols-4 gap-24 p-[10px]">
                 <img className="w-[96%] h-[287px] rounded-16" src={ cover } alt="Movie cover" />
                 <div className="text-neutral-800 mr-24 relative">
@@ -44,8 +45,8 @@ const CurrentlyShowingCard = (props) => {
                         <p className="pl-12">{ movie.duration } Min</p>
                     </div>
                     <div className="flex gap-16 py-8">
-                        { movie.genres.map((genre, index) => {
-                            return <Badge key={ index }>{ genre.name }</Badge>
+                        { getGenres().map((genre, index) => {
+                            return <Badge key={ index }>{ genre }</Badge>
                         }) }
                     </div>
                     <p className="absolute bottom-0 text-body-m italic text-neutral-500">Playing in cinema until { format(movie.projectionEnd, "dd.MM.yyyy.") }</p>

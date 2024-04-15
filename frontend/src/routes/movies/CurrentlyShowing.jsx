@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom"
+import { format } from "date-fns";
 
 import { Dropdown, DropdownItem } from "../../components/Dropdown";
 import CurrentlyShowingCard from "../../components/card/CurrentlyShowingCard";
@@ -33,6 +34,8 @@ const CurrentlyShowing = () => {
     const [venueValue, setVenueValue] = useState(null);
     const [nameLikeValue, setNameLikeValue] = useState(null);
     const [dateValue, setDateValue] = useState(new Date());
+    const dateParam = searchParams.get('startDate');
+    const nameLikeParam = searchParams.get('nameLike');
     const citiesParam = searchParams.get('city');
     const venuesParams = searchParams.get('venue');
     const genresParams = searchParams.get('genres');
@@ -52,7 +55,7 @@ const CurrentlyShowing = () => {
 
     const getGenres = async () => {
         try {
-            let response = await axios.get(url + genres + "/")
+            let response = await axios.get(url + genres)
             setGenreList(response.data)
             if (genresParams) {
                 const genre = response.data.find(item => item.id === parseInt(genresParams));
@@ -67,7 +70,7 @@ const CurrentlyShowing = () => {
 
     const getCities = async () => {
         try {
-            let response = await axios.get(url + cities + "/")
+            let response = await axios.get(url + cities)
             setCityList(response.data)
             if (citiesParam) {
                 const city = response.data.find(item => item.cityId === parseInt(citiesParam));
@@ -81,14 +84,20 @@ const CurrentlyShowing = () => {
 
     const getTimes = async () => {
         try {
-            let response = await axios.get(url + projections + "/times")
+            //let response = await axios.get(url + projections + "/times")
             const array = []
-            for (const t of response.data) {
+            for (let i = 10; i <= 22; i += 1) {
                 array.push({
-                    id: t,
-                    name: t
-                })
+                    id: i + ":" + "00",
+                    name: i + ":" + "00",
+                },
+                    {
+                        id: i + ":" + "30",
+                        name: i + ":" + "30",
+                    }
+                )
             }
+            console.log(array)
             setTimes(array)
             if (timesParams) {
                 const time = array.find(item => item.id + ":00" === decodeURIComponent(timesParams));
@@ -109,6 +118,7 @@ const CurrentlyShowing = () => {
             date = new Date(new Date(date).setDate(date.getDate() + 1));
         }
         setDates(array)
+        if (dateParam) setDateValue(new Date(dateParam + "T00:00:00"))
     }
 
     const getVenues = async () => {
@@ -129,8 +139,7 @@ const CurrentlyShowing = () => {
 
     const loadMovies = async () => {
         let route = url + movies + searchCurrently + "?";
-        let month = dateValue.getMonth() + 1;
-        if (dateValue) route = route.concat("startDate=" + dateValue.getFullYear() + "-" + month + "-" + dateValue.getDate())
+        if (dateValue) route = route.concat("startDate=" + format(dateValue, "yyyy-MM-dd"))
         if (nameLikeValue) route = route.concat("&nameLike=" + nameLikeValue)
         if (cityValue) route = route.concat("&city=" + cityValue.cityId)
         if (venueValue) route = route.concat("&venue=" + venueValue.venueId)
@@ -142,7 +151,7 @@ const CurrentlyShowing = () => {
             if (currentPage > 1)
                 setMovieList(pre => [...pre, ...response.data.content])
             else setMovieList(response.data.content)
-            setTotalPages(response.data.totalPages + 1)
+            setTotalPages(response.data.totalPages)
         } catch (err) {
             console.log(err);
         }
@@ -150,12 +159,12 @@ const CurrentlyShowing = () => {
 
     const updateSearchParams = () => {
         const newSearchParams = new URLSearchParams();
-
+        if (dateValue) newSearchParams.append('startDate', format(dateValue, "yyyy-MM-dd"))
+        if (nameLikeValue) newSearchParams.append('nameLike', nameLikeValue)
         if (cityValue) newSearchParams.append('city', cityValue.cityId)
         if (venueValue) newSearchParams.append('venue', venueValue.venueId)
         if (genreValue) newSearchParams.append('genres', genreValue.id)
         if (timeValue) newSearchParams.append('times', timeValue.id + ':00')
-
         setSearchParams(newSearchParams);
     };
 
@@ -179,19 +188,56 @@ const CurrentlyShowing = () => {
         getCities()
         getGenres()
         getDates()
+        if (nameLikeParam && nameLikeParam.length >= 3) setNameLikeValue(nameLikeParam);
     }, [])
+
+    const citiesLabel = (
+        <Label
+            placeholder="All cities"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> } />
+    )
+
+    const venuesLabel = (
+        <Label
+            placeholder="All venues"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+
+        />
+    )
+
+    const genreLabel = (
+        <Label
+            placeholder="All genres"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faFilm } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+        />
+    )
+
+    const timesLabel = (
+        <Label
+            placeholder="All times"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faClock } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+        />
+    )
 
     return (
         <div className="font-body px-[118px] pt-40">
-            <p className="text-neutral-800 text-heading-h4 pb-24">Currently Showing ({ movieList.length })</p>
-            <Input text="Search movies" open={ focused } leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> } className="w-full" onChange={ handleChange } onFocus={ onFocus } onBlur={ onBlur }></Input>
+            <p className="text-neutral-800 text-heading-h4 pb-24">Currently Showing ({ movieList?.length })</p>
+            <Input
+                text="Search movies"
+                open={ focused }
+                placeholder={ nameLikeValue }
+                leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
+                className="w-full"
+                onChange={ handleChange }
+                onFocus={ onFocus }
+                onBlur={ onBlur }
+            />
             <div className="grid lg:grid-cols-4 md:grid-cols-2 py-[18px] gap-8">
-                <Dropdown
-                    placeholder="All cities"
-                    value={ cityValue }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-                >
+                <Dropdown label={ citiesLabel } value={ cityValue?.name }>
                     <DropdownItem
                         onClick={ () => { setCityValue(null) } }
                         className={ `${cityValue === null ? "font-semibold" : "font-normal"}` }
@@ -210,12 +256,7 @@ const CurrentlyShowing = () => {
                         )
                     }) }
                 </Dropdown>
-                <Dropdown
-                    placeholder="All venues"
-                    value={ venueValue }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-                >
+                <Dropdown label={ venuesLabel } value={ venueValue?.name }>
                     <DropdownItem
                         onClick={ () => { setVenueValue(null) } }
                         className={ `${venueValue === null ? "font-semibold" : "font-normal"}` }
@@ -234,12 +275,7 @@ const CurrentlyShowing = () => {
                         )
                     }) }
                 </Dropdown>
-                <Dropdown
-                    placeholder="All genres"
-                    value={ genreValue }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faFilm } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-                >
+                <Dropdown label={ genreLabel } value={ genreValue?.name }>
                     <DropdownItem
                         onClick={ () => { setGenreValue(null) } }
                         className={ `${genreValue === null ? "font-semibold" : "font-normal"}` }
@@ -258,11 +294,7 @@ const CurrentlyShowing = () => {
                         )
                     }) }
                 </Dropdown>
-                <Dropdown
-                    placeholder="All times"
-                    value={ timeValue }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faClock } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> } >
+                <Dropdown label={ timesLabel } value={ timeValue?.name }>
                     <DropdownItem
                         onClick={ () => { setTimeValue(null) } }
                         className={ `${timeValue === null ? "font-semibold" : "font-normal"}` }
@@ -290,7 +322,7 @@ const CurrentlyShowing = () => {
                                 value={ dateValue }
                                 key={ index }
                                 date={ date }
-                                className={ `${date === dateValue ? "bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
+                                className={ `${date.getDate() === dateValue.getDate() && date.getMonth() === dateValue.getMonth() ? "!bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
                                 onClick={ () => { setDateValue(date) } }
                             />
                         )
@@ -300,7 +332,7 @@ const CurrentlyShowing = () => {
             <p className="text-body-m font-normal italic text-neutral-500">Quick reminder that our cinema schedule is on a ten-day update cycle.</p>
 
             <div>
-                { movieList.length != 0 ? movieList.map((item, index) => {
+                { movieList?.length != 0 ? movieList?.map((item, index) => {
                     return (
                         <CurrentlyShowingCard
                             key={ index }
@@ -308,6 +340,9 @@ const CurrentlyShowing = () => {
                             projections={ item.projections }
                             endDate={ item.projectionEnd }
                             photos={ item.photos }
+                            genres={ item.genres }
+                            venue={ venueValue }
+                            className="my-[20px]"
                         />
                     )
                 }) :
@@ -322,7 +357,7 @@ const CurrentlyShowing = () => {
                     </Card> }
             </div>
             <div className="flex items-center justify-center pt-16 pb-32">
-                { currentPage < (totalPages - 1) &&
+                { currentPage < totalPages &&
                     <Button variant="tertiary" onClick={ () => { setCurrentPage(currentPage + 1) } }>Load More</Button>
                 }
             </div>

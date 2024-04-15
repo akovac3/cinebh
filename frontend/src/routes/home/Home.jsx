@@ -53,7 +53,7 @@ const Home = () => {
         <MovieList route={ routeUpcoming } />
       </div>
       <div className="gap-[10px] px-[118px] py-[20px] w-full">
-        <ContentLabel title="VenueList" />
+        <ContentLabel title="Venues" />
         <VenueList route={ routeVenueList } />
       </div>
     </div>

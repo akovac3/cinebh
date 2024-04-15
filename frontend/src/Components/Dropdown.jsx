@@ -17,7 +17,7 @@ const Dropdown = ({ className, children, label, placeholder, value, rightIcon, l
                 </Label>
             </div>
             { open && (
-                <div className="absolute top-[110%] left-2 w-full bg-neutral-0 z-50 border border-neutral-200 rounded-12 text-neutral-900">
+                <div className="absolute top-[110%] w-full bg-neutral-0 z-50 border border-neutral-200 rounded-12 text-neutral-900">
                     <div className="gap-2 pt-8 px-8 max-h-[220px] overflow-y-scroll" onClick={ () => setOpen(!open) }>
                         { children }
                     </div>
@@ -29,7 +29,7 @@ const Dropdown = ({ className, children, label, placeholder, value, rightIcon, l
 
 const DropdownItem = ({ className, children }) => {
     return (
-        <div className={ className }>{ children }</div>
+        <div className={ createClassName("", className) }>{ children }</div>
     )
 }
 

@@ -6,6 +6,7 @@ import AboutUs from './routes/about/AboutUs'
 import Tickets from './routes/tickets/Tickets'
 import Layout from './components/Layout'
 import CurrentlyShowing from './routes/movies/CurrentlyShowing'
+import UpcomingMovies from './routes/movies/UpcomingMovies'
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route path='/tickets' element={ <Tickets /> } />
           <Route path='/aboutus' element={ <AboutUs /> } />
           <Route path='/currently-showing' element={ <CurrentlyShowing /> } />
+          <Route path='/upcoming-movies' element={ <UpcomingMovies /> } />
         </Route>
       </Routes>
     </Router>

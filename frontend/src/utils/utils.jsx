@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { format } from 'date-fns';
 
 export const createClassName = (...classes) => {
     let finalClass = ''

@@ -31,6 +31,22 @@ public class MovieSpecification {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionEnd"), finalDate);
     }
 
+    public static Specification<Movie> projectionBetweenDates(Date date1, Date date2){
+        if (date1 == null) date1 = Date.valueOf(LocalDate.now().plusDays(10));
+        Date finalDate1 = date1;
+        if(date2 == null) return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionStart"), finalDate1);
+        else {
+            return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("projectionStart"), finalDate1, date2);
+        }
+
+    }
+
+    public static Specification<Movie> projectionStartGreaterThenDate(Date date) {
+        if (date == null) date = Date.valueOf(LocalDate.now().plusDays(10));
+        Date finalDate = date;
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("projectionStart"), finalDate);
+    }
+
     public static Specification<Movie> hasGenreIn(List<Long> genreIds) {
         return (root, query, builder) -> {
             query.distinct(true);

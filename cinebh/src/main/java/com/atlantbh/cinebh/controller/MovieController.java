@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,6 +100,11 @@ public class MovieController {
     @GetMapping("/search-currently")
     public ResponseEntity<Page<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
     }
 
     @PostMapping("/")

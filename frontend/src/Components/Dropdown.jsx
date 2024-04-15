@@ -2,7 +2,7 @@ import { useState, cloneElement } from "react";
 
 import { createClassName, useOutsideClick } from "../utils/utils";
 
-const Dropdown = ({ className, children, label, placeholder, value, rightIcon, leftIcon }) => {
+const Dropdown = ({ className, children, label, value }) => {
     const [open, setOpen] = useState(false);
 
     const ref = useOutsideClick(() => { setOpen(false) })

@@ -1,3 +1,5 @@
+import { useRef, useEffect } from 'react';
+
 export const createClassName = (...classes) => {
     let finalClass = ''
     for (const c of classes) {
@@ -7,3 +9,25 @@ export const createClassName = (...classes) => {
     }
     return finalClass;
 }
+
+export const useOutsideClick = (callback) => {
+    const ref = useRef();
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (ref.current && !ref.current.contains(event.target)) {
+                callback();
+            }
+        };
+
+        document.addEventListener('mouseup', handleClickOutside);
+        document.addEventListener('touchend', handleClickOutside);
+
+        return () => {
+            document.addEventListener('mouseup', handleClickOutside);
+            document.addEventListener('touchend', handleClickOutside);
+        };
+    }, [ref]);
+
+    return ref;
+};

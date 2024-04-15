@@ -17,10 +17,10 @@ const Carousel = ({ className, children, covers = false, navigation = false, aut
         <div className={ createClassName("w-full h-full relative overflow-hidden cursor-default", className) }>
             { !covers && (
                 <div className="w-full h-full flex whitespace-nowrap">
-                    <div className="flex w-full h-full pr-[30px] py-8 gap-40 items-center justify-center animate-infinite-scroll">
+                    <div className="flex w-full h-full py-8 gap-40 items-center justify-center animate-infinite-scroll">
                         { children }
                     </div>
-                    <div className="flex w-full h-full py-8 gap-40 items-center justify-center animate-infinite-scroll">
+                    <div className="flex w-full h-full pl-[100px] py-8 gap-40 items-center justify-center animate-infinite-scroll">
                         { children }
                     </div>
                 </div>

@@ -4,7 +4,7 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
     const sizeClassName = {
         lg: "text-body-l",
         md: "text-body-m",
-        sm: "text-body-s"
+        sm: "text-body-s px-16 py-8"
     }
 
     const variantClassName = {

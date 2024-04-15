@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class MovieFilterParams {
     private String nameLike;
-    List<Long> genres;
-    Long venue = 0L;
-    Long city = 0L;
-    Date startDate;
+    private List<Long> genres;
+    private Long venue = 0L;
+    private Long city = 0L;
+    private Date startDate;
 }

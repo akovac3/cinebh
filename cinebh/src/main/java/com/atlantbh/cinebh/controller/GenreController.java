@@ -17,7 +17,7 @@ public class GenreController {
 
     private GenreService genreService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Genre>> getAll() {
         return ResponseEntity.ok(genreService.getAll());
     }

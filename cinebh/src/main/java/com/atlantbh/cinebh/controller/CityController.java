@@ -17,7 +17,7 @@ public class CityController {
 
     private CityService cityService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<City>> getAll() {
         return ResponseEntity.ok(cityService.getAll());
     }

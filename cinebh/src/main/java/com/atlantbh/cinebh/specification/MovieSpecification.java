@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieSpecification {
-
     public static Specification<Movie> nameLike(String nameLike) {
         return (root, query, builder) -> builder.like(builder.lower(root.get("name")), "%" + nameLike.toLowerCase() + "%");
     }
@@ -42,6 +41,7 @@ public class MovieSpecification {
 
     public static Specification<Movie> inProjectionTimes(List<String> time) {
         return (root, query, builder) -> {
+            query.distinct(true);
             Join<Projection, Movie> movieProjections = root.join("projections");
             List<Time> times = new ArrayList<>();
             for (String s : time) {

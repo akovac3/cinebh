@@ -33,7 +33,7 @@ public class PhotoController {
     @Autowired
     private PhotoService photoService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Photo>> getAll() {
         return ResponseEntity.ok(photoService.getAll());
     }

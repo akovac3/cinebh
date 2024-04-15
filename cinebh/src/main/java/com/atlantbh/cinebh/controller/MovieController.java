@@ -8,16 +8,22 @@ import com.atlantbh.cinebh.model.Photo;
 import com.atlantbh.cinebh.model.Writer;
 import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.repository.GenreRepository;
-import com.atlantbh.cinebh.request.MovieRequest;
 import com.atlantbh.cinebh.request.PaginationParams;
-import com.atlantbh.cinebh.request.WriterRequest;
-import com.atlantbh.cinebh.request.ActorRequest;
 import com.atlantbh.cinebh.request.PhotoRequest;
+import com.atlantbh.cinebh.request.ActorRequest;
+import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
+import com.atlantbh.cinebh.request.ProjectionRequest;
+import com.atlantbh.cinebh.request.WriterRequest;
+import com.atlantbh.cinebh.request.MovieRequest;
 import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
 import com.atlantbh.cinebh.service.PhotoService;
 import com.atlantbh.cinebh.service.WriterService;
+import com.atlantbh.cinebh.service.VenueService;
+import com.atlantbh.cinebh.service.ProjectionService;
+import com.atlantbh.cinebh.model.Projection;
+import com.atlantbh.cinebh.model.Venue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +31,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,6 +58,9 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
+    @Autowired
+    private VenueService venueService;
+
     private GenreRepository genreRepository;
 
     private PhotoService photoService;
@@ -60,6 +70,8 @@ public class MovieController {
     private ActorService actorService;
 
     private WriterService writerService;
+
+    private ProjectionService projectionService;
 
     ObjectMapper objectMapper;
 
@@ -82,6 +94,11 @@ public class MovieController {
     @GetMapping("/upcoming")
     public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
+    }
+
+    @GetMapping("/search-currently")
+    public ResponseEntity<Page<Movie>> getMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
 
     @PostMapping("/")
@@ -132,7 +149,7 @@ public class MovieController {
         return new ResponseEntity<>("Movie with id = " + id + " successfully updated!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/photos/{id}")
+    @PostMapping(path = "/{id}/photos")
     public ResponseEntity<String> addPhotos(@PathVariable long id, @Validated @RequestBody PhotoRequest[] photoRequests) {
         Movie movie = movieService.findById(id);
         Set<Photo> photos = Arrays.stream(photoRequests).
@@ -142,7 +159,21 @@ public class MovieController {
         return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/writers/{id}")
+    @PostMapping(path = "/{id}/projection")
+    public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
+        Movie movie = movieService.findById(id);
+        Set<Projection> projections = movie.getProjections();
+        projections.addAll(Arrays.stream(projectionRequests)
+                .map(projectionRequest -> {
+                    Venue venue = venueService.findById(projectionRequest.getVenueId());
+                    return projectionService.save(new Projection(projectionRequest.getTime(), movie, venue));
+                }).collect(Collectors.toSet()));
+        movie.setProjections(projections);
+        movieService.save(movie);
+        return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/{id}/writers")
     public ResponseEntity<String> addWriters(@PathVariable long id, @Validated @RequestBody WriterRequest[] writerRequests) {
         Movie movie = movieService.findById(id);
         Set<Writer> writers = Arrays.stream(writerRequests)
@@ -159,7 +190,7 @@ public class MovieController {
         return new ResponseEntity<>("Successfully added writers for movie with id=" + id + "!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/actors/{id}")
+    @PostMapping(path = "/{id}/actors")
     public ResponseEntity<String> addActors(@PathVariable long id, @Validated @RequestBody ActorRequest[] actorRequests) {
         Movie movie = movieService.findById(id);
         Set<MovieActor> actors = Arrays.stream(actorRequests).map(
@@ -197,12 +228,6 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMovie(@PathVariable long id) throws JsonProcessingException {
-        movieService.remove(id);
-        return new ResponseEntity<>("Movie successfully deleted!", HttpStatus.OK);
-    }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
         movieService.remove(id);
         return new ResponseEntity<>("Movie successfully deleted!", HttpStatus.OK);
     }

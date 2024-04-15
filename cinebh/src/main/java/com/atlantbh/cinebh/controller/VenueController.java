@@ -40,14 +40,14 @@ public class VenueController {
     @Autowired
     private CityService cityService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
 
     @GetMapping("/all")
     public ResponseEntity<Iterable<Venue>> getAll() {
         return ResponseEntity.ok(venueService.getAll());
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Page<Venue>> getVenues(PaginationParams paginationParams) {
         return ResponseEntity.ok(venueService.getVenues(paginationParams.getPage(), paginationParams.getSize()));
     }
@@ -56,6 +56,12 @@ public class VenueController {
     public ResponseEntity<Venue> getVenueById(@PathVariable("id") Long id) {
         Venue venue = venueService.findById(id);
         return ResponseEntity.ok().body(venue);
+    }
+
+    @GetMapping("/city/{id}")
+    public ResponseEntity<Iterable<Venue>> getVenuesByCity(@PathVariable("id") Long id) {
+        City city = cityService.findById(id);
+        return ResponseEntity.ok(venueService.getVenuesByCity(city));
     }
 
     @PostMapping("/")
@@ -99,12 +105,6 @@ public class VenueController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVenue(@PathVariable long id) throws JsonProcessingException {
-        venueService.remove(id);
-        return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
-    }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
         venueService.remove(id);
         return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
     }

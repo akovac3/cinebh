@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,10 +103,20 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
     }
 
-    /*@GetMapping("/upcoming")
+    @GetMapping("/currently/{id}")
+    public ResponseEntity<List<Movie>> getMoviesForVenue(@PathVariable Long id) {
+        return ResponseEntity.ok(movieService.getMoviesForVenue(id));
+    }
+
+    @GetMapping("/currently/city/{id}")
+    public ResponseEntity<List<Movie>> getMoviesForCity(@PathVariable Long id) {
+        return ResponseEntity.ok(movieService.getMoviesForCity(id));
+    }
+
+    @GetMapping("/upcoming")
     public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
-    }*/
+    }
 
     @PostMapping("/")
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {

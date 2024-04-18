@@ -1,6 +1,6 @@
 import { createClassName } from "../utils/utils"
 
-const Label = ({ className, label, active, value, children, placeholder, rightIcon, leftIcon, variant = 'default', size = 'lg' }) => {
+const Label = ({ className, label, active, value, children, rightIcon, leftIcon, variant = 'default', size = 'lg' }) => {
     const varianClassName = {
         default: "bg-neutral-0 border rounded-8 border-neutral-200 gap-16 flex shadow-light-50 text-neutral-500 px-12 py-12 focus:border-solid focus:border-primary-600 focus:outline focus:outline-primary-200",
         focused: "border-solid border-primary-600 outline outline-primary-200",
@@ -23,7 +23,6 @@ const Label = ({ className, label, active, value, children, placeholder, rightIc
                     <div className={ `${active || value ? "text-primary-600" : "text-neutral-700"} pr-8` }>
                         { leftIcon ? leftIcon : null }
                     </div>
-                    { value ? value : placeholder }
                     { children }
                     <div className="absolute right-4">
                         { rightIcon ? <div className={ `transition-all ${active ? "rotate-180 text-primary-600" : "rotate-0 text-neutral-500"}` }> { rightIcon } </div> : null }

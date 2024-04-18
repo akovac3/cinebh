@@ -14,7 +14,7 @@ import MovieCard from "../../components/card/MovieCard";
 import DateRangePicker from "../../components/DateRangePicker";
 
 import { url, movies, venues, genres, cities, searchUpcoming } from "../../utils/api";
-
+import { getFilterParams, getPaginationParams, handleFilterChange, handlePageChange } from "../../utils/utils";
 
 const UpcomingmovieList = () => {
     const navigate = useNavigate();
@@ -23,163 +23,153 @@ const UpcomingmovieList = () => {
     const [genreList, setGenreList] = useState([]);
     const [venueList, setVenueList] = useState([]);
     const [movieList, setMovieList] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [postsPerPage, setPostsPerPage] = useState(4);
     const [totalPages, setTotalPages] = useState(1);
-    const [startDateValue, setStartDateValue] = useState(null);
-    const [endDateValue, setEndDateValue] = useState(null);
-    const [cityValue, setCityValue] = useState(null);
-    const [genreValue, setGenreValue] = useState(null);
-    const [venueValue, setVenueValue] = useState(null);
-    const [containsValue, setContainsValue] = useState(null);
-    const cityListParam = searchParams.get('city');
-    const venueListParams = searchParams.get('venue');
-    const genreListParams = searchParams.get('genreList');
-    const startDateParam = searchParams.get('startDate');
-    const endDateParam = searchParams.get('endDate');
+
+    const [pagination, setPagination] = useState({ page: 1, size: 4 });
+
+    const [filterParams, setFilterParams] = useState({ city: null, genre: null, venue: null, time: null, startDate: null, endDate: null })
+
     const [focused, setFocused] = useState(false)
     const onFocus = () => setFocused(true)
     const onBlur = () => setFocused(false)
 
-    function handleChange(event) {
+    function handleSearchChange(event) {
         if (event.target.value.length >= 3) {
-            setContainsValue(event.target.value)
+            handleFilterChange(searchParams, setSearchParams, 'contains', event.target.value);
         }
         else {
-            setContainsValue(null)
+            handleFilterChange(searchParams, setSearchParams, 'contains', null);
         }
+    }
+
+    function _handleFilterChange(field, value) {
+        _handlePageChange()
+        if (field === 'city') {
+            handleFilterChange(searchParams, setSearchParams, 'venue', null);
+            getVenueList(value)
+        }
+        handleFilterChange(searchParams, setSearchParams, field, value);
+    }
+
+    function _handlePageChange(page) {
+        handlePageChange(searchParams, setSearchParams, { page: page });
     }
 
     const getGenreList = async () => {
-        try {
-            let response = await axios.get(url + genres)
-            setGenreList(response.data)
-            if (genreListParams) {
-                const genre = response.data.find(item => item.id === parseInt(genreListParams));
-                setGenreValue(genre)
-            }
-
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+        axios.get(`${url}${genres}`)
+            .then(response => {
+                setGenreList(response.data)
+            }).catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
-    const getCityList = async () => {
-        try {
-            let response = await axios.get(url + cities)
-            setCityList(response.data)
-            if (cityListParam) {
-                const city = response.data.find(item => item.cityId === parseInt(cityListParam));
-                setCityValue(city)
-            }
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+    const getCityList = () => {
+        axios.get(`${url}${cities}`)
+            .then(response => {
+                setCityList(response.data)
+            }).catch(error => {
+                {
+                    console.log(error)
+                    console.warning(error.response.data.message)
+                }
+            })
     }
 
-    const getVenueList = async () => {
-        try {
-            let response;
-            if (cityValue) response = await axios.get(url + venues + "/city/" + cityValue.cityId)
-            else response = await axios.get(url + venues + "/all")
-            setVenueList(response.data)
-            if (venueListParams) {
-                const venue = response.data.find(item => item.venueId === parseInt(venuesParams));
-                setVenueValue(venue)
-            }
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+    const getVenueList = async (city) => {
+        const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`
+        axios.get(fullUrl)
+            .then(response => setVenueList(response.data))
+            .catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
     const loadMovieList = async () => {
-        let route = url + movies + searchUpcoming + "?";
-        if (startDateValue) {
-            route = route.concat("startDate=" + format(startDateValue, "yyyy-MM-dd") + "&endDate=" + format(endDateValue, "yyyy-MM-dd"))
-        }
-        if (containsValue) route = route.concat("&contains=" + containsValue)
-        if (cityValue) route = route.concat("&city=" + cityValue.cityId)
-        if (venueValue) route = route.concat("&venue=" + venueValue.venueId)
-        if (genreValue) route = route.concat("&genreList=" + genreValue.id)
-        route = route.concat("&page=" + currentPage + "&size=" + postsPerPage)
-        try {
-            const response = await axios.get(route)
-            if (currentPage > 1)
-                setMovieList(pre => [...pre, ...response.data.content])
-            else setMovieList(response.data.content)
-            setTotalPages(response.data.totalPages)
-        } catch (err) {
-            console.log(err);
-        }
+        let route = url + movies + searchUpcoming;
+        const search = searchParams.size > 0 ? decodeURIComponent(`?${searchParams}`) : ''
+        const pagination = getPaginationParams(searchParams)
+        setPagination(pagination)
+        axios.get(`${route}${search}`)
+            .then(response => {
+                if (parseInt(pagination.page) > 1)
+                    setMovieList(pre => [...pre, ...response.data.content])
+                else {
+                    setTotalPages(response.data.totalPages)
+                    setMovieList(response.data.content)
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
-    const updateSearchParams = () => {
-        const newSearchParams = new URLSearchParams();
-
-        if (cityValue) newSearchParams.append('city', cityValue.cityId)
-        if (venueValue) newSearchParams.append('venue', venueValue.venueId)
-        if (genreValue) newSearchParams.append('genreList', genreValue.id)
-        if (containsValue) newSearchParams.append('contains', containsValue)
-        if (startDateValue) {
-            newSearchParams.append('startDate', format(startDateValue, "yyyy-MM-dd"))
-            newSearchParams.append('endDate', format(endDateValue, "yyyy-MM-dd"))
-        }
-        setSearchParams(newSearchParams);
-    };
-
     useEffect(() => {
-        setCurrentPage(1);
+        const filterParams = getFilterParams(searchParams)
+        setFilterParams(filterParams)
         loadMovieList();
-        updateSearchParams();
-    }, [containsValue, cityValue, venueValue, genreValue, startDateValue])
+    }, [searchParams])
 
     useEffect(() => {
-        loadMovieList();
-    }, [currentPage])
+        _handlePageChange()
 
-    useEffect(() => {
-        getVenueList()
-    }, [cityValue])
+        const pagination = getPaginationParams(searchParams)
+        setPagination(pagination)
 
-    useEffect(() => {
         getCityList()
+        getVenueList()
         getGenreList()
-        if (startDateParam) setStartDateValue(new Date(startDateParam))
-        if (endDateParam) setEndDateValue(new Date(endDateParam))
     }, [])
+
+    function getCityName(id) {
+        return cityList?.find(c => c.cityId.toString() === id)?.name
+    }
+
+    function getVenueName(id) {
+        return venueList?.find(c => c.venueId.toString() === id)?.name
+    }
+
+    function getGenreName(id) {
+        return genreList?.find(c => c.id.toString() === id)?.name
+    }
 
     const cityListLabel = (
         <Label
-            placeholder="All Cities"
             leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> } />
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+        >
+            { getCityName(filterParams.city) || "All cities" }
+        </Label>
     )
 
     const venueListLabel = (
         <Label
-            placeholder="All Venues"
             leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-        />
+        >
+            { getVenueName(filterParams.venue) || "All venues" }
+        </Label>
     )
 
     const genreLabel = (
         <Label
-            placeholder="All Genres"
             leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faFilm } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-        />
+        >
+            { getGenreName(filterParams.genre) || "All genres" }
+        </Label>
     )
 
     const dateRangeLabel = (
         <Label
-            placeholder="Date Range"
             leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faCalendarDays } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-        />
+        >
+            { filterParams.startDate ? `${format(filterParams.startDate, 'yyyy/MM/dd')} - ${format(filterParams.endDate, 'yyyy/MM/dd')}` : "Date Range" }
+        </Label>
     )
 
     return (
@@ -188,19 +178,20 @@ const UpcomingmovieList = () => {
             <Input
                 text="Search Movies"
                 open={ focused }
-                placeholder={ containsValue }
+                placeholder={ filterParams.contains }
                 leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
                 className="w-full"
-                onChange={ handleChange }
+                onChange={ handleSearchChange }
                 onFocus={ onFocus }
                 onBlur={ onBlur }
             />
             <div className="grid grid-cols-4 pt-16 pb-32 gap-8">
                 <Dropdown
                     label={ cityListLabel }
-                    value={ cityValue?.name } >
-                    <DropdownItem onClick={ () => { setCityValue(null) } }
-                        className={ `${cityValue === null ? "font-semibold" : "font-normal"}` }
+                    value={ getCityName(filterParams.city) } >
+                    <DropdownItem
+                        onClick={ () => _handleFilterChange('city', null) }
+                        className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All Cities
                     </DropdownItem>
@@ -208,46 +199,52 @@ const UpcomingmovieList = () => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setCityValue(city) } }
-                                className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city === cityValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
+                                className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
                             </DropdownItem>
                         )
                     }) }
                 </Dropdown>
-                <Dropdown label={ venueListLabel } value={ venueValue?.name }>
+                <Dropdown
+                    value={ getVenueName(filterParams.venue) }
+                    label={ venueListLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setVenueValue(null) } }
-                        className={ `${venueValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('venue', null) }
+                        className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
-                        All Venues
+                        All venues
                     </DropdownItem>
                     { venueList.map((venue, index) => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setVenueValue(venue) } }
-                                className={ `${venue === venueValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => _handleFilterChange('venue', venue.venueId) }
+                                className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
                             </DropdownItem>
                         )
                     }) }
                 </Dropdown>
-                <Dropdown label={ genreLabel } value={ genreValue?.name }>
+                <Dropdown
+                    value={ getGenreName(filterParams.genre) }
+                    label={ genreLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setGenreValue(null) } }
-                        className={ `${genreValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('genre', null) }
+                        className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
-                        All Genres
+                        All genres
                     </DropdownItem>
                     { genreList.map((genre, index) => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setGenreValue(genre) } }
-                                className={ `${genre === genreValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => _handleFilterChange('genre', genre.id) }
+                                className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
                             </DropdownItem>
@@ -255,18 +252,16 @@ const UpcomingmovieList = () => {
                     }) }
                 </Dropdown>
                 <DateRangePicker
-                    start={ startDateValue }
-                    end={ endDateValue }
                     label={ dateRangeLabel }
                     onClickApply={
                         (valueStart, valueEnd) => {
-                            setStartDateValue(valueStart)
-                            setEndDateValue(valueEnd)
+                            _handleFilterChange('startDate', format(valueStart, 'yyyy-MM-dd'))
+                            _handleFilterChange('endDate', format(valueEnd, 'yyyy-MM-dd'))
                         } }
                     onClickCancel={
                         () => {
-                            setStartDateValue(null)
-                            setEndDateValue(null)
+                            _handleFilterChange('startDate', null)
+                            _handleFilterChange('endDate', null)
                         } }
                 />
             </div>
@@ -287,8 +282,8 @@ const UpcomingmovieList = () => {
                 </Card>
             }
             <div className="flex items-center justify-center pt-16 pb-32">
-                { currentPage < totalPages &&
-                    <Button variant="tertiary" onClick={ () => { setCurrentPage(currentPage + 1) } }>Load More</Button>
+                { pagination.page < totalPages &&
+                    <Button variant="tertiary" onClick={ () => { _handlePageChange(parseInt(pagination.page) + 1) } }>Load More</Button>
                 }
             </div>
         </div>

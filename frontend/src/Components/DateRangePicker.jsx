@@ -24,7 +24,7 @@ const DateRangePicker = ({ className, onClickApply, onClickCancel, label }) => {
     return (
         <div className={ createClassName("relative", className) }>
             <div onClick={ () => { setOpen(!open) } }>
-                { cloneElement(label, { active: open, value: state[0].startDate ? format(state[0].startDate, "yyyy/MM/dd") + " - " + format(state[0].endDate, "yyyy/MM/dd") : null }) }
+                { cloneElement(label, { active: open, value: state[0].startDate }) }
             </div>
             { open && (
                 <div className='flex flex-col absolute top-[110%] h-[415px] bg-neutral-0 rounded-12 z-50 shadow-light-200 border border-neutral-200'>

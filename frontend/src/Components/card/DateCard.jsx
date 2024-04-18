@@ -16,7 +16,7 @@ const DateCard = ({ className, onClick, ...props }) => {
                 &nbsp;
                 <p className="text-body-l font-semibold">{ date.getDate() }</p>
             </div>
-            <p className={ `${value.getDate() === date.getDate() && value.getMonth() === date.getMonth() ? "text-primary-25" : "text-neutral-500"}` }>{ date.getDate() === today.getDate() && date.getMonth() === today.getMonth() ? "Today" : format(date, "EEE") }</p>
+            <p>{ date.getDate() === today.getDate() && date.getMonth() === today.getMonth() ? "Today" : format(date, "EEE") }</p>
         </Card>
     )
 }

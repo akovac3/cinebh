@@ -8,5 +8,6 @@ const cities = '/api/cities'
 const currently = '/currently'
 const upcoming = '/upcoming'
 const searchCurrently = '/search-currently'
+const searchUpcoming = '/search-upcoming'
 
-export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently }
+export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently, searchUpcoming }

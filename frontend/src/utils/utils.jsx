@@ -30,4 +30,4 @@ export const useOutsideClick = (callback) => {
     }, [ref]);
 
     return ref;
-};
+}

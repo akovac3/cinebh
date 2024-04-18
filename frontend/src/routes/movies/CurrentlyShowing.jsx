@@ -12,9 +12,9 @@ import Input from "../../components/Input";
 import DateCard from "../../components/card/DateCard";
 import Button from "../../components/Button";
 import Card from "../../components/Card";
-
-import { url, movies, venues, genres, cities, searchCurrently, projections } from "../../utils/api";
 import Label from "../../components/Label";
+
+import { url, movies, venues, genres, cities, searchCurrently } from "../../utils/api";
 
 const CurrentlyShowing = () => {
     const navigate = useNavigate();
@@ -32,10 +32,10 @@ const CurrentlyShowing = () => {
     const [genreValue, setGenreValue] = useState(null);
     const [timeValue, setTimeValue] = useState(null);
     const [venueValue, setVenueValue] = useState(null);
-    const [nameLikeValue, setNameLikeValue] = useState(null);
+    const [containsValue, setContainsValue] = useState(null);
     const [dateValue, setDateValue] = useState(new Date());
     const dateParam = searchParams.get('startDate');
-    const nameLikeParam = searchParams.get('nameLike');
+    const containsParam = searchParams.get('contains');
     const citiesParam = searchParams.get('city');
     const venuesParams = searchParams.get('venue');
     const genresParams = searchParams.get('genres');
@@ -46,10 +46,10 @@ const CurrentlyShowing = () => {
 
     function handleChange(event) {
         if (event.target.value.length >= 3) {
-            setNameLikeValue(event.target.value)
+            setContainsValue(event.target.value)
         }
         else {
-            setNameLikeValue(null)
+            setContainsValue(null)
         }
     }
 
@@ -84,7 +84,6 @@ const CurrentlyShowing = () => {
 
     const getTimes = async () => {
         try {
-            //let response = await axios.get(url + projections + "/times")
             const array = []
             for (let i = 10; i <= 22; i += 1) {
                 array.push({
@@ -140,7 +139,7 @@ const CurrentlyShowing = () => {
     const loadMovies = async () => {
         let route = url + movies + searchCurrently + "?";
         if (dateValue) route = route.concat("startDate=" + format(dateValue, "yyyy-MM-dd"))
-        if (nameLikeValue) route = route.concat("&nameLike=" + nameLikeValue)
+        if (containsValue) route = route.concat("&contains=" + containsValue)
         if (cityValue) route = route.concat("&city=" + cityValue.cityId)
         if (venueValue) route = route.concat("&venue=" + venueValue.venueId)
         if (genreValue) route = route.concat("&genres=" + genreValue.id)
@@ -160,7 +159,7 @@ const CurrentlyShowing = () => {
     const updateSearchParams = () => {
         const newSearchParams = new URLSearchParams();
         if (dateValue) newSearchParams.append('startDate', format(dateValue, "yyyy-MM-dd"))
-        if (nameLikeValue) newSearchParams.append('nameLike', nameLikeValue)
+        if (containsValue) newSearchParams.append('contains', containsValue)
         if (cityValue) newSearchParams.append('city', cityValue.cityId)
         if (venueValue) newSearchParams.append('venue', venueValue.venueId)
         if (genreValue) newSearchParams.append('genres', genreValue.id)
@@ -172,7 +171,7 @@ const CurrentlyShowing = () => {
         setCurrentPage(1);
         loadMovies();
         updateSearchParams();
-    }, [nameLikeValue, dateValue, cityValue, venueValue, genreValue, timeValue])
+    }, [containsValue, dateValue, cityValue, venueValue, genreValue, timeValue])
 
     useEffect(() => {
         loadMovies();
@@ -188,7 +187,7 @@ const CurrentlyShowing = () => {
         getCities()
         getGenres()
         getDates()
-        if (nameLikeParam && nameLikeParam.length >= 3) setNameLikeValue(nameLikeParam);
+        if (containsParam && containsParam.length >= 3) setContainsValue(containsParam);
     }, [])
 
     const citiesLabel = (
@@ -229,7 +228,7 @@ const CurrentlyShowing = () => {
             <Input
                 text="Search movies"
                 open={ focused }
-                placeholder={ nameLikeValue }
+                placeholder={ containsValue }
                 leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
                 className="w-full"
                 onChange={ handleChange }
@@ -341,7 +340,6 @@ const CurrentlyShowing = () => {
                             endDate={ item.projectionEnd }
                             photos={ item.photos }
                             genres={ item.genres }
-                            venue={ venueValue }
                             className="my-[20px]"
                         />
                     )
@@ -354,7 +352,8 @@ const CurrentlyShowing = () => {
                                 Stay tuned for amazing movie experience or explore our other exciting cinema features in the meantime!</div>
                             <Button variant="tertiary" onClick={ () => { navigate('/upcoming') } }>Explore Upcoming Movies</Button>
                         </div>
-                    </Card> }
+                    </Card>
+                }
             </div>
             <div className="flex items-center justify-center pt-16 pb-32">
                 { currentPage < totalPages &&

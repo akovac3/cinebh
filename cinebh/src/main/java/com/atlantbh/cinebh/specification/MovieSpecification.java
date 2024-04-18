@@ -11,8 +11,6 @@ import org.springframework.data.jpa.domain.Specification;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MovieSpecification {
     public static Specification<Movie> nameLike(String contains) {
@@ -41,38 +39,32 @@ public class MovieSpecification {
         else {
             return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("projectionStart"), finalDate1, date2);
         }
-
     }
 
-    public static Specification<Movie> hasGenreIn(List<Long> genreIds) {
+    public static Specification<Movie> hasGenre(Genre genre) {
         return (root, query, builder) -> {
             query.distinct(true);
             Join<Genre, Movie> movieGenres = root.join("genres");
-            return builder.and(movieGenres.get("id").in(genreIds));
+            return builder.and(movieGenres.in(genre));
         };
     }
 
-    public static Specification<Movie> inProjectionTimes(List<String> time) {
+    public static Specification<Movie> hasProjectionTime(String time) {
         return (root, query, builder) -> {
             query.distinct(true);
             Join<Projection, Movie> movieProjections = root.join("projections");
-            List<Time> times = new ArrayList<>();
-            for (String s : time) {
-                Time newTime = Time.valueOf(s);
-                times.add(newTime);
-            }
-            return builder.and(movieProjections.get("time").in(times));
+            return builder.and(movieProjections.get("time").in(Time.valueOf(time)));
         };
     }
 
-    public static Specification<Movie> hasProjectionInCinemas(Venue venue) {
+    public static Specification<Movie> hasProjectionInVenue(Venue venue) {
         return (root, query, builder) -> {
             query.distinct(true);
             return builder.and(root.get("projections").get("venue").in(venue));
         };
     }
 
-    public static Specification<Movie> hasProjectionInCities(City city) {
+    public static Specification<Movie> hasProjectionInCity(City city) {
         return (root, query, builder) -> {
             query.distinct(true);
             return builder.and(root.get("projections").get("venue").get("city").in(city));

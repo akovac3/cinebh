@@ -99,12 +99,12 @@ public class MovieController {
 
     @GetMapping("/search-currently")
     public ResponseEntity<Page<Movie>> getCurrentlyMovies(CurrentlyMoviesFilterParams filterParams, PaginationParams paginationParams) {
-        return ResponseEntity.ok(movieService.getCurrentlyShowingMovies(filterParams, paginationParams));
+        return ResponseEntity.ok(movieService.getCurrentlyShowingForFilter(filterParams, paginationParams));
     }
 
     @GetMapping("/search-upcoming")
     public ResponseEntity<Page<Movie>> getUpcomingMovies(UpcomingMoviesFilterParams filterParams, PaginationParams paginationParams) {
-        return ResponseEntity.ok(movieService.getUpcoming(filterParams, paginationParams));
+        return ResponseEntity.ok(movieService.getUpcomingForFilter(filterParams, paginationParams));
     }
 
     @PostMapping("/")

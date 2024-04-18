@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MovieFilterParams {
     private String contains;
-    private List<Long> genres;
+    private Long genre = 0L;
     private Long venue = 0L;
     private Long city = 0L;
     private Date startDate;

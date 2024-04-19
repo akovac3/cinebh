@@ -76,7 +76,7 @@ public class MovieController {
 
     ObjectMapper objectMapper;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Movie>> getAll() {
         return ResponseEntity.ok(movieService.getAll());
     }
@@ -107,7 +107,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getUpcomingForFilter(filterParams, paginationParams));
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
         Movie movie = new Movie(movieRequest.getName(),
                 movieRequest.getYear(),

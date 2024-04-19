@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fas } from '@fortawesome/free-solid-svg-icons'
+import { fas } from "@fortawesome/free-solid-svg-icons"
 import axios from "axios";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";

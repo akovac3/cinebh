@@ -1,14 +1,13 @@
-import { useState, cloneElement } from 'react'
-import { DateRange } from 'react-date-range';
-import format from "date-fns/format"
-import { addDays } from 'date-fns';
+import { useState, cloneElement } from "react"
+import { DateRange } from "react-date-range"
+import { addDays } from "date-fns"
 
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
+import "react-date-range/dist/styles.css"
+import "react-date-range/dist/theme/default.css"
 
-import Button from './Button';
+import Button from "./Button"
 
-import { createClassName } from '../utils/utils';
+import { createClassName } from "../utils/utils"
 
 const DateRangePicker = ({ className, onClickApply, onClickCancel, label }) => {
     const [open, setOpen] = useState(false);
@@ -16,8 +15,8 @@ const DateRangePicker = ({ className, onClickApply, onClickCancel, label }) => {
         {
             startDate: null,
             endDate: new Date(""),
-            key: 'selection',
-            color: '#B22222'
+            key: "selection",
+            color: "#B22222"
         }
     ])
 
@@ -27,9 +26,9 @@ const DateRangePicker = ({ className, onClickApply, onClickCancel, label }) => {
                 { cloneElement(label, { active: open, value: state[0].startDate }) }
             </div>
             { open && (
-                <div className='flex flex-col absolute top-[110%] h-[415px] bg-neutral-0 rounded-12 z-50 shadow-light-200 border border-neutral-200'>
+                <div className="flex flex-col absolute top-[110%] h-[415px] bg-neutral-0 rounded-12 z-50 shadow-light-200 border border-neutral-200">
                     <div className="pt-8">
-                        <DateRange className='rounded-8 font-body'
+                        <DateRange className="rounded-8 font-body"
                             editableDateInputs={ true }
                             dateDisplayFormat="yyyy/MM/dd"
                             moveRangeOnFirstSelection={ false }
@@ -39,15 +38,15 @@ const DateRangePicker = ({ className, onClickApply, onClickCancel, label }) => {
                         />
                         <Button
                             className="absolute top-[355px] right-16"
-                            size='sm'
+                            size="sm"
                             onClick={ () => { onClickApply(state[0].startDate, state[0].endDate); setOpen(false) } }
                         >
                             Apply
                         </Button>
                         <Button
                             className="absolute top-[355px] right-96"
-                            variant='secondary'
-                            size='sm'
+                            variant="secondary"
+                            size="sm"
                             onClick={ () => {
                                 setState([{
                                     startDate: null,

@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fas } from '@fortawesome/free-solid-svg-icons'
+import { fas } from "@fortawesome/free-solid-svg-icons"
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import Card from "../../components/Card";
 import Label from "../../components/Label";
 
 import { url, movies, venues, genres, cities, searchCurrently } from "../../utils/api";
+import { getFilterParams, getPaginationParams, handleFilterChange, handlePageChange } from "../../utils/utils";
 
 const CurrentlyShowing = () => {
     const navigate = useNavigate();
@@ -25,83 +26,67 @@ const CurrentlyShowing = () => {
     const [venueList, setVenueList] = useState([]);
     const [movieList, setMovieList] = useState([]);
     const [dates, setDates] = useState([])
-    const [currentPage, setCurrentPage] = useState(1);
-    const [postsPerPage, setPostsPerPage] = useState(4);
-    const [totalPages, setTotalPages] = useState(2);
-    const [cityValue, setCityValue] = useState(null);
-    const [genreValue, setGenreValue] = useState(null);
-    const [timeValue, setTimeValue] = useState(null);
-    const [venueValue, setVenueValue] = useState(null);
-    const [containsValue, setContainsValue] = useState(null);
-    const [dateValue, setDateValue] = useState(new Date());
-    const dateParam = searchParams.get('startDate');
-    const containsParam = searchParams.get('contains');
-    const citiesParam = searchParams.get('city');
-    const venuesParams = searchParams.get('venue');
-    const genresParams = searchParams.get('genres');
-    const timesParams = searchParams.get('times');
+    const [totalPages, setTotalPages] = useState(1);
+
+    const [pagination, setPagination] = useState({ page: 1, size: 4 });
+
+    const [filterParams, setFilterParams] = useState({ city: null, genre: null, venue: null, time: null, startDate: null })
+
     const [focused, setFocused] = useState(false)
     const onFocus = () => setFocused(true)
     const onBlur = () => setFocused(false)
 
-    function handleChange(event) {
+    function handleSearchChange(event) {
         if (event.target.value.length >= 3) {
-            setContainsValue(event.target.value)
+            handleFilterChange(searchParams, setSearchParams, 'contains', event.target.value);
         }
         else {
-            setContainsValue(null)
+            handleFilterChange(searchParams, setSearchParams, 'contains', null);
         }
+    }
+
+    function _handleFilterChange(field, value) {
+        _handlePageChange()
+        if (field === 'city') {
+            handleFilterChange(searchParams, setSearchParams, 'venue', null);
+            getVenues(value)
+        }
+        handleFilterChange(searchParams, setSearchParams, field, value);
+    }
+
+    function _handlePageChange(page) {
+        handlePageChange(searchParams, setSearchParams, { page: page });
     }
 
     const getGenres = async () => {
-        try {
-            let response = await axios.get(url + genres)
-            setGenreList(response.data)
-            if (genresParams) {
-                const genre = response.data.find(item => item.id === parseInt(genresParams));
-                setGenreValue(genre)
-            }
-
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+        axios.get(`${url}${genres}`)
+            .then(response => {
+                setGenreList(response.data)
+            }).catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
-    const getCities = async () => {
-        try {
-            let response = await axios.get(url + cities)
-            setCityList(response.data)
-            if (citiesParam) {
-                const city = response.data.find(item => item.cityId === parseInt(citiesParam));
-                setCityValue(city)
-            }
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+    const getCities = () => {
+        axios.get(`${url}${cities}`)
+            .then(response => {
+                setCityList(response.data)
+            }).catch(error => {
+                {
+                    console.log(error)
+                    console.warning(error.response.data.message)
+                }
+            })
     }
 
     const getTimes = async () => {
         try {
             const array = []
-            for (let i = 10; i <= 22; i += 1) {
-                array.push({
-                    id: i + ":" + "00",
-                    name: i + ":" + "00",
-                },
-                    {
-                        id: i + ":" + "30",
-                        name: i + ":" + "30",
-                    }
-                )
+            for (let i = 10; i <= 23; i += 1) {
+                array.push(i + ":" + "00", i + ":" + "30")
             }
-            console.log(array)
             setTimes(array)
-            if (timesParams) {
-                const time = array.find(item => item.id + ":00" === decodeURIComponent(timesParams));
-                setTimeValue(time)
-            }
         } catch (error) {
             console.log(error)
             console.warning(error.response.data.message)
@@ -110,116 +95,110 @@ const CurrentlyShowing = () => {
 
     const getDates = () => {
         let date = new Date();
-        setDateValue(date)
         let array = [];
         for (let i = 0; i < 10; i++) {
             array.push(date)
             date = new Date(new Date(date).setDate(date.getDate() + 1));
         }
         setDates(array)
-        if (dateParam) setDateValue(new Date(dateParam + "T00:00:00"))
     }
 
-    const getVenues = async () => {
-        try {
-            let response;
-            if (cityValue) response = await axios.get(url + venues + "/city/" + cityValue.cityId)
-            else response = await axios.get(url + venues + "/all")
-            setVenueList(response.data)
-            if (venuesParams) {
-                const venue = response.data.find(item => item.venueId === parseInt(venuesParams));
-                setVenueValue(venue)
-            }
-        } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
-        }
+    const getVenues = async (city) => {
+        const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`
+        axios.get(fullUrl)
+            .then(response => setVenueList(response.data))
+            .catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
     const loadMovies = async () => {
-        let route = url + movies + searchCurrently + "?";
-        if (dateValue) route = route.concat("startDate=" + format(dateValue, "yyyy-MM-dd"))
-        if (containsValue) route = route.concat("&contains=" + containsValue)
-        if (cityValue) route = route.concat("&city=" + cityValue.cityId)
-        if (venueValue) route = route.concat("&venue=" + venueValue.venueId)
-        if (genreValue) route = route.concat("&genres=" + genreValue.id)
-        if (timeValue) route = route.concat("&times=" + timeValue.id + ":00")
-        route = route.concat("&page=" + currentPage + "&size=" + postsPerPage)
-        try {
-            const response = await axios.get(route)
-            if (currentPage > 1)
-                setMovieList(pre => [...pre, ...response.data.content])
-            else setMovieList(response.data.content)
-            setTotalPages(response.data.totalPages)
-        } catch (err) {
-            console.log(err);
-        }
+        let route = url + movies + searchCurrently;
+        const search = searchParams.size > 0 ? decodeURIComponent(`?${searchParams}`) : ''
+        const pagination = getPaginationParams(searchParams)
+        setPagination(pagination)
+        axios.get(`${route}${search}`)
+            .then(response => {
+                if (parseInt(pagination.page) > 1)
+                    setMovieList(pre => [...pre, ...response.data.content])
+                else {
+                    setTotalPages(response.data.totalPages)
+                    setMovieList(response.data.content)
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
     }
 
-    const updateSearchParams = () => {
-        const newSearchParams = new URLSearchParams();
-        if (dateValue) newSearchParams.append('startDate', format(dateValue, "yyyy-MM-dd"))
-        if (containsValue) newSearchParams.append('contains', containsValue)
-        if (cityValue) newSearchParams.append('city', cityValue.cityId)
-        if (venueValue) newSearchParams.append('venue', venueValue.venueId)
-        if (genreValue) newSearchParams.append('genres', genreValue.id)
-        if (timeValue) newSearchParams.append('times', timeValue.id + ':00')
-        setSearchParams(newSearchParams);
-    };
-
     useEffect(() => {
-        setCurrentPage(1);
+        const filterParams = getFilterParams(searchParams)
+        setFilterParams(filterParams)
+        if (filterParams.startDate === null) _handleFilterChange('startDate', format(new Date(), 'yyyy-MM-dd'))
         loadMovies();
-        updateSearchParams();
-    }, [containsValue, dateValue, cityValue, venueValue, genreValue, timeValue])
+    }, [searchParams])
 
     useEffect(() => {
-        loadMovies();
-    }, [currentPage])
+        _handlePageChange()
 
-    useEffect(() => {
-        getVenues()
-    }, [cityValue])
+        const pagination = getPaginationParams(searchParams)
+        setPagination(pagination)
 
-    useEffect(() => {
-        getVenues()
-        getTimes()
         getCities()
+        getVenues()
         getGenres()
         getDates()
-        if (containsParam && containsParam.length >= 3) setContainsValue(containsParam);
+        getTimes()
     }, [])
 
-    const citiesLabel = (
+    function getCityName(id) {
+        return cityList?.find(c => c.cityId.toString() === id)?.name
+    }
+
+    function getVenueName(id) {
+        return venueList?.find(c => c.venueId.toString() === id)?.name
+    }
+
+    function getGenreName(id) {
+        return genreList?.find(c => c.id.toString() === id)?.name
+    }
+
+    const cityLabel = (
         <Label
-            placeholder="All cities"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> } />
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faLocationPin } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+        >
+            { getCityName(filterParams.city) || "All cities" }
+        </Label>
     )
 
-    const venuesLabel = (
+    const venueLabel = (
         <Label
-            placeholder="All venues"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLocationPin } /> }
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faLocationPin } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-
-        />
+        >
+            { getVenueName(filterParams.venue) || "All venues" }
+        </Label>
     )
 
     const genreLabel = (
         <Label
-            placeholder="All genres"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faFilm } /> }
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faFilm } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-        />
+        >
+            { getGenreName(filterParams.genre) || "All genres" }
+        </Label>
     )
 
-    const timesLabel = (
+    const timeLabel = (
         <Label
-            placeholder="All times"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faClock } /> }
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faClock } /> }
             rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
-        />
+        >
+            { filterParams.time?.slice(0, 5) || "All projection times" }
+        </Label>
     )
 
     return (
@@ -228,18 +207,21 @@ const CurrentlyShowing = () => {
             <Input
                 text="Search movies"
                 open={ focused }
-                placeholder={ containsValue }
+                placeholder={ filterParams.contains }
                 leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
                 className="w-full"
-                onChange={ handleChange }
+                onChange={ handleSearchChange }
                 onFocus={ onFocus }
                 onBlur={ onBlur }
             />
             <div className="grid lg:grid-cols-4 md:grid-cols-2 py-[18px] gap-8">
-                <Dropdown label={ citiesLabel } value={ cityValue?.name }>
+                <Dropdown
+                    value={ getCityName(filterParams.city) }
+                    label={ cityLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setCityValue(null) } }
-                        className={ `${cityValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('city', null) }
+                        className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All cities
                     </DropdownItem>
@@ -247,18 +229,21 @@ const CurrentlyShowing = () => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setCityValue(city) } }
-                                className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city === cityValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
+                                className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
                             </DropdownItem>
                         )
                     }) }
                 </Dropdown>
-                <Dropdown label={ venuesLabel } value={ venueValue?.name }>
+                <Dropdown
+                    value={ getVenueName(filterParams.venue) }
+                    label={ venueLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setVenueValue(null) } }
-                        className={ `${venueValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('venue', null) }
+                        className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
                     </DropdownItem>
@@ -266,18 +251,21 @@ const CurrentlyShowing = () => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setVenueValue(venue) } }
-                                className={ `${venue === venueValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => _handleFilterChange('venue', venue.venueId) }
+                                className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
                             </DropdownItem>
                         )
                     }) }
                 </Dropdown>
-                <Dropdown label={ genreLabel } value={ genreValue?.name }>
+                <Dropdown
+                    value={ getGenreName(filterParams.genre) }
+                    label={ genreLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setGenreValue(null) } }
-                        className={ `${genreValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('genre', null) }
+                        className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
                         All genres
                     </DropdownItem>
@@ -285,29 +273,32 @@ const CurrentlyShowing = () => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setGenreValue(genre) } }
-                                className={ `${genre === genreValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => _handleFilterChange('genre', genre.id) }
+                                className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
                             </DropdownItem>
                         )
                     }) }
                 </Dropdown>
-                <Dropdown label={ timesLabel } value={ timeValue?.name }>
+                <Dropdown
+                    value={ filterParams.time }
+                    label={ timeLabel }
+                >
                     <DropdownItem
-                        onClick={ () => { setTimeValue(null) } }
-                        className={ `${timeValue === null ? "font-semibold" : "font-normal"}` }
+                        onClick={ () => _handleFilterChange('time', null) }
+                        className={ `${filterParams.time === null ? "font-semibold" : "font-normal"}` }
                     >
-                        All times
+                        All projection times
                     </DropdownItem>
                     { times.map((time, index) => {
                         return (
                             <DropdownItem
                                 key={ index }
-                                onClick={ () => { setTimeValue(time) } }
-                                className={ `${time === timeValue ? "font-semibold" : "font-normal"}` }
+                                onClick={ () => _handleFilterChange('time', decodeURIComponent(time + ":00")) }
+                                className={ `${time === filterParams.time ? "font-semibold" : "font-normal"}` }
                             >
-                                { time.name }
+                                { time }
                             </DropdownItem>
                         )
                     }) }
@@ -316,13 +307,14 @@ const CurrentlyShowing = () => {
             <div className="grid lg:grid-cols-10 md:grid-cols-5 sm:grid-cols-3 gap-16 pb-[20px]">
                 {
                     dates.map((date, index) => {
+                        const formattedDate = format(date, 'yyyy-MM-dd')
                         return (
                             <DateCard
-                                value={ dateValue }
+                                value={ filterParams.startDate }
                                 key={ index }
                                 date={ date }
-                                className={ `${date.getDate() === dateValue.getDate() && date.getMonth() === dateValue.getMonth() ? "!bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
-                                onClick={ () => { setDateValue(date) } }
+                                className={ `${formattedDate === filterParams.startDate ? "bg-primary-600 !text-neutral-0" : "bg-neutral-0 !text-neutral-800"} cursor-pointer` }
+                                onClick={ () => _handleFilterChange('startDate', formattedDate) }
                             />
                         )
                     })
@@ -330,16 +322,16 @@ const CurrentlyShowing = () => {
             </div>
             <p className="text-body-m font-normal italic text-neutral-500">Quick reminder that our cinema schedule is on a ten-day update cycle.</p>
 
-            <div>
-                { movieList?.length != 0 ? movieList?.map((item, index) => {
+            <div className="gap-24">
+                { movieList.length != 0 ? movieList.map((item, index) => {
                     return (
                         <CurrentlyShowingCard
                             key={ index }
                             movie={ item }
                             projections={ item.projections }
+                            genres={ item.genres }
                             endDate={ item.projectionEnd }
                             photos={ item.photos }
-                            genres={ item.genres }
                             className="my-[20px]"
                         />
                     )
@@ -352,12 +344,11 @@ const CurrentlyShowing = () => {
                                 Stay tuned for amazing movie experience or explore our other exciting cinema features in the meantime!</div>
                             <Button variant="tertiary" onClick={ () => { navigate('/upcoming') } }>Explore Upcoming Movies</Button>
                         </div>
-                    </Card>
-                }
+                    </Card> }
             </div>
             <div className="flex items-center justify-center pt-16 pb-32">
-                { currentPage < totalPages &&
-                    <Button variant="tertiary" onClick={ () => { setCurrentPage(currentPage + 1) } }>Load More</Button>
+                { pagination.page < totalPages &&
+                    <Button variant="tertiary" onClick={ () => _handlePageChange(parseInt(pagination.page) + 1) }>Load More</Button>
                 }
             </div>
         </div >

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { createClassName } from '../utils/utils'
+import { useEffect, useState } from "react"
+import { createClassName } from "../utils/utils"
 
 const Carousel = ({ className, children, covers = false, navigation = false, autoSlide = true, autoSlideInterval = 7000 }) => {
     const [current, setCurrent] = useState(0)

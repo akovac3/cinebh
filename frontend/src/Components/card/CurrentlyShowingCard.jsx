@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"
 import { format } from "date-fns"
 
 import Card from "../Card";
@@ -7,6 +8,7 @@ import Badge from "../Badge";
 import { createClassName } from "../../utils/utils";
 
 const CurrentlyShowingCard = ({ className, ...props }) => {
+    const navigate = useNavigate();
     const movie = props.movie;
     const photos = props.photos;
     const movieProjections = props.projections;
@@ -34,7 +36,7 @@ const CurrentlyShowingCard = ({ className, ...props }) => {
     }, [movie])
 
     return (
-        <Card className={ createClassName("lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8", className) }>
+        <Card className={ createClassName("lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8 cursor-pointer", className) } onClick={ () => { navigate('/movie-details', { state: { movie } }) } }>
             <div className="grid lg:grid-cols-4 gap-24 p-[10px]">
                 <img className="w-[96%] h-[287px] rounded-16" src={ cover } alt="Movie cover" />
                 <div className="text-neutral-800 mr-24 relative">

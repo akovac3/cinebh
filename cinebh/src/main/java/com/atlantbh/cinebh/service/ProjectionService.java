@@ -2,7 +2,11 @@ package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.Projection;
+import com.atlantbh.cinebh.model.Venue;
+import com.atlantbh.cinebh.model.Movie;
 import com.atlantbh.cinebh.repository.ProjectionRepository;
+import com.atlantbh.cinebh.repository.MovieRepository;
+import com.atlantbh.cinebh.repository.VenueRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,10 @@ public class ProjectionService {
             strings.add(newString);
         }
         return strings;
+    }
+
+    public List<Projection> getProjectionsForMovie(Movie movie, Venue venue) {
+        return projectionRepository.getProjectionsForMovieAndVenue(movie, venue);
     }
 
     public void remove(Long id) throws JsonProcessingException {

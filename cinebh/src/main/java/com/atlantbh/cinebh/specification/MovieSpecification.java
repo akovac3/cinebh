@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.util.Set;
 
 public class MovieSpecification {
     public static Specification<Movie> nameLike(String contains) {
@@ -39,6 +40,17 @@ public class MovieSpecification {
         else {
             return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("projectionStart"), finalDate1, date2);
         }
+    }
+
+    public static Specification<Movie> hasSimilarGenres(Long id, Set<Genre> genres) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+            Join<Movie, Genre> genreJoin = root.join("genres");
+            return builder.and(
+                    genreJoin.in(genres),
+                    builder.notEqual(root.get("movieId"), id)
+            );
+        };
     }
 
     public static Specification<Movie> hasGenre(Genre genre) {

@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class MovieController {
 
     ObjectMapper objectMapper;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Movie>> getAll() {
         return ResponseEntity.ok(movieService.getAll());
     }
@@ -107,7 +108,13 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getUpcomingForFilter(filterParams, paginationParams));
     }
 
-    @PostMapping("/")
+    @GetMapping("/similar")
+    public ResponseEntity<Page<Movie>> findSimilarMovies(@RequestParam Long movie, PaginationParams paginationParams) {
+        Movie movieObj = movieService.findById(movie);
+        return ResponseEntity.ok(movieService.findAllSimilarMoviesByGenre(movieObj, paginationParams));
+    }
+
+    @PostMapping
     public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
         Movie movie = new Movie(movieRequest.getName(),
                 movieRequest.getYear(),

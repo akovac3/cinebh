@@ -15,6 +15,7 @@ import Pagination from "../../components/Pagination";
 import Button from "../../components/Button";
 
 import { url, movies, cities, venues, projections } from "../../utils/api";
+import Player from "../../components/Player";
 
 const MovieDetails = () => {
     const location = useLocation()
@@ -191,8 +192,8 @@ const MovieDetails = () => {
     return (
         <div className="px-[118px] py-40 font-body text-neutral-800 text-body-l">
             <p className="text-heading-h5 pb-16">Movie Details</p>
-            <div className="grid grid-cols-2 gap-16">
-                <img className="h-[366px] w-full" src={ movie.photos[0].link } />
+            <div className="grid lg:grid-cols-2 gap-16">
+                <Player video={ movie.trailer } />
                 <div className="grid grid-cols-2 gap-16 rounded-8">
                     { movie.photos.map((photo, index) => {
                         return (

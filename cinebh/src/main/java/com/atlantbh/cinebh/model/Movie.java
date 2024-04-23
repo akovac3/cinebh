@@ -51,18 +51,23 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private Set<Photo> photos = new HashSet<>();
 
+    @OneToMany(mappedBy = "movie")
+    private Set<Projection> projections = new HashSet<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "genre_movies",
             joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
     private Set<Genre> genres = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "writer_movie",
             joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "writer_id"))
+            inverseJoinColumns = @JoinColumn(name = "writer_id")
+    )
     private Set<Writer> writers = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)

@@ -4,16 +4,17 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
     const sizeClassName = {
         lg: "text-body-l",
         md: "text-body-m",
-        sm: "text-body-s"
+        sm: "text-body-s px-16 py-8"
     }
 
     const variantClassName = {
-        primary: "bg-primary-600 text-neutral-25 font-semibold px-[20px] py-12 disabled:bg-neutral-300 disabled:text-neutral-25",
-        secondary: "text-primary-600 border border-primary-600 font-semibold px-[20px] py-12 disabled:text-neutral-300 disabled:border-neutral-300"
+        primary: "bg-primary-600 text-neutral-25 disabled:bg-neutral-300 disabled:text-neutral-25",
+        secondary: "text-primary-600 border border-primary-600 disabled:text-neutral-300 disabled:border-neutral-300",
+        tertiary: "underline text-primary-600 disabled:text-neutral-300"
     }
 
     const defaultClassName = {
-        default: "max-w-fit rounded-8 gap-16 flex items-center justify-center font-body"
+        default: "max-w-fit font-semibold px-[20px] py-12 rounded-8 gap-16 flex items-center justify-center font-body"
     }
 
     return (

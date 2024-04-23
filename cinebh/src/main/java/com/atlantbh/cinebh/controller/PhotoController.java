@@ -33,7 +33,7 @@ public class PhotoController {
     @Autowired
     private PhotoService photoService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Photo>> getAll() {
         return ResponseEntity.ok(photoService.getAll());
     }
@@ -76,12 +76,6 @@ public class PhotoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePhoto(@PathVariable long id) throws JsonProcessingException {
         photoService.remove(id);
-        return new ResponseEntity<>("Photo successfully deleted!", HttpStatus.OK);
-    }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<String> deletePostMovie(@PathVariable long id) throws JsonProcessingException {
-        movieService.remove(id);
         return new ResponseEntity<>("Photo successfully deleted!", HttpStatus.OK);
     }
 }

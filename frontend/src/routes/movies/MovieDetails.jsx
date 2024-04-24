@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from 'react-router-dom';
 
 import Badge from "../../components/Badge";
 import Label from "../../components/Label";
@@ -12,13 +13,16 @@ import MovieCard from "../../components/card/MovieCard";
 import { Dropdown, DropdownItem } from "../../components/Dropdown";
 import { List, ListItem } from "../../components/List"
 import Pagination from "../../components/Pagination";
+import Image from "../../components/Image";
 import Button from "../../components/Button";
+import VideoPlayer from "../../components/VideoPlayer";
 
 import { url, movies, cities, venues, projections } from "../../utils/api";
 
 const MovieDetails = () => {
     const location = useLocation()
-    const movie = location.state.movie
+    const { id } = useParams();
+    const [movie, setMovie] = useState()
     const [cityList, setCityList] = useState([])
     const [venueList, setVenueList] = useState([])
     const [projectionList, setProjectionList] = useState([])
@@ -31,7 +35,7 @@ const MovieDetails = () => {
     const [filterParams, setFilterParams] = useState({ city: null, venue: null, time: null, startDate: null })
 
     const allFieldsNotNull = Object.values(filterParams).every((value) => value !== null);
-    const upcoming = new Date(format(movie.projectionStart, "yyyy-MM-dd")) >= add(new Date(), 10);
+    const [upcoming, setUpcoming] = useState(false)
 
     const handleNextPage = () => {
         _handlePaginationChange(setDatePagination, { page: datePagination.page + 1 })
@@ -70,9 +74,8 @@ const MovieDetails = () => {
             array.push(new Date(date));
             date.setDate(date.getDate() + 1);
         }
-        array.push(endDate);
         setDates(array);
-    };
+    }
 
     const getVenues = async (city) => {
         const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`
@@ -84,7 +87,19 @@ const MovieDetails = () => {
             })
     }
 
-    const getMovies = async () => {
+    const getMovie = async () => {
+        axios.get(`${url}${movies}/${id}`)
+            .then(response => {
+                setMovie(response.data)
+                setUpcoming(new Date(format(response.data.projectionStart, "yyyy-MM-dd")) >= add(new Date(), 10))
+            })
+            .catch(error => {
+                console.log(error)
+                console.warning(error.response.data.message)
+            })
+    }
+
+    const getSeeAlsoMovies = async () => {
         const fullUrl = `${url}${movies}/similar?movie=${movie.movieId}&page=${moviePagination.page}&size=${moviePagination.size}`
         axios.get(fullUrl)
             .then(response => {
@@ -113,15 +128,9 @@ const MovieDetails = () => {
         }));
     }
 
-    function _handleFilterChange(field, value) {
-        if (field === 'city') {
-            getVenues(value);
-            setFilterParams({ ...filterParams, [field]: value, venue: null, time: null });
-        } else if (field === 'venue') {
-            setFilterParams({ ...filterParams, [field]: value, time: null });
-        } else {
-            setFilterParams({ ...filterParams, [field]: value });
-        }
+    function _handleFilterChange(fieldsToUpdate) {
+        const updatedParams = { ...filterParams, ...fieldsToUpdate };
+        setFilterParams(updatedParams);
     }
 
     function getProjectionTimes() {
@@ -142,23 +151,21 @@ const MovieDetails = () => {
     }
 
     useEffect(() => {
+        getMovie()
         getCities()
         getVenues()
-    }, [])
+        _handlePaginationChange(setMoviePagination, { page: 1, size: 6 })
+        _handleFilterChange({ city: null, venue: null, time: null, startDate: null })
+        _handlePaginationChange(setDatePagination, { page: 0, size: 6 })
+    }, [id])
 
     useEffect(() => {
-        if (!upcoming) getDates()
-        _handlePaginationChange(setMoviePagination, { page: 1, size: 6 })
+        if (movie && !upcoming) getDates()
     }, [movie])
 
     useEffect(() => {
-        getMovies();
+        if (movie) getSeeAlsoMovies();
     }, [moviePagination.page, movie])
-
-    useEffect(() => {
-        _handlePaginationChange(setDatePagination, { page: 0, size: 6 })
-        _handleFilterChange('startDate', null)
-    }, [dates]);
 
     useEffect(() => {
         const startIndex = datePagination.page * datePagination.size;
@@ -188,15 +195,21 @@ const MovieDetails = () => {
         </Label>
     )
 
+    if (!movie) {
+        return (
+            <div className="text-heading-h6 text-neutral-600 pl-[118px] pt-80">Loading...</div>
+        )
+    }
+
     return (
         <div className="px-[118px] py-40 font-body text-neutral-800 text-body-l">
             <p className="text-heading-h5 pb-16">Movie Details</p>
-            <div className="grid grid-cols-2 gap-16">
-                <img className="h-[366px] w-full" src={ movie.photos[0].link } />
+            <div className="grid lg:grid-cols-2 gap-16 min-h-[366px]">
+                <VideoPlayer width="100%" height="100%" className="aspect-video" video={ movie.trailer } />
                 <div className="grid grid-cols-2 gap-16 rounded-8">
                     { movie.photos.map((photo, index) => {
                         return (
-                            <img key={ index } src={ photo.link } className="h-[175px] w-full"></img>
+                            <Image key={ index } src={ photo.link } width="100%" height="100%" className="object-cover h-[175px]"></Image>
                         )
                     }) }
                 </div>
@@ -245,7 +258,7 @@ const MovieDetails = () => {
                                 label={ cityLabel }
                             >
                                 <DropdownItem
-                                    onClick={ () => _handleFilterChange('city', null) }
+                                    onClick={ () => { _handleFilterChange({ city: null, venue: null, time: null }); getVenues(null) } }
                                     className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                                 >
                                     All cities
@@ -254,7 +267,7 @@ const MovieDetails = () => {
                                     return (
                                         <DropdownItem
                                             key={ index }
-                                            onClick={ () => { _handleFilterChange('city', city.cityId) } }
+                                            onClick={ () => { _handleFilterChange({ city: city.cityId, venue: null, time: null }); getVenues(city.cityId) } }
                                             className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                                         >
                                             { city.name }
@@ -267,7 +280,7 @@ const MovieDetails = () => {
                                 label={ venueLabel }
                             >
                                 <DropdownItem
-                                    onClick={ () => _handleFilterChange('venue', null) }
+                                    onClick={ () => _handleFilterChange({ venue: null, time: null }) }
                                     className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                                 >
                                     All venues
@@ -276,7 +289,7 @@ const MovieDetails = () => {
                                     return (
                                         <DropdownItem
                                             key={ index }
-                                            onClick={ () => _handleFilterChange('venue', venue.venueId) }
+                                            onClick={ () => _handleFilterChange({ venue: venue.venueId, time: null }) }
                                             className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                                         >
                                             { venue.name }
@@ -295,7 +308,7 @@ const MovieDetails = () => {
                                             key={ datePagination.page + index }
                                             date={ date }
                                             className={ `${formattedDate === filterParams.startDate ? "!bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
-                                            onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange('startDate', null) : _handleFilterChange('startDate', formattedDate) } }
+                                            onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange({ startDate: null }) : _handleFilterChange({ startDate: formattedDate }) } }
                                         />
                                     )
                                 }) }
@@ -318,7 +331,7 @@ const MovieDetails = () => {
                                 return (
                                     <div
                                         key={ index }
-                                        onClick={ () => { projection.time === filterParams.time ? _handleFilterChange('time', null) : _handleFilterChange('time', projection.time) } }
+                                        onClick={ () => { projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time }) } }
                                         className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time ? "bg-primary-600 text-neutral-25 border-primary-600" : "bg-neutral-0 border-neutral-200 text-neutral-800"} cursor-pointer` }
                                     >
                                         { projection.time.slice(0, 5) }

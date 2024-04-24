@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom"
 
 import Logo from "./Logo";
 import Button from "./Button";
@@ -9,7 +8,6 @@ import Button from "./Button";
 import { createClassName } from "../utils/utils";
 
 const Nav = (className) => {
-  const navigate = useNavigate();
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
 

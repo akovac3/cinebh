@@ -1,6 +1,6 @@
-const VideoPlayer = ({ className, width, height, video }) => {
+const VideoPlayer = ({ className, width = "100%", height = "100%", src, props }) => {
     return (
-        <iframe className={ className } width={ width } height={ height } src={ video } />
+        <iframe className={ className } width={ width } height={ height } src={ src } { ...props } />
     )
 };
 

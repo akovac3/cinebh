@@ -5,10 +5,10 @@ import Button from "./Button";
 
 import { createClassName } from "../utils/utils";
 
-const Pagination = ({ className, movies = true, postsPerPage, totalPosts, paginateFront, paginateBack, currentPage, maxPages }) => {
+const Pagination = ({ className, displayCount = true, postsPerPage, totalPosts, paginateFront, paginateBack, currentPage, maxPages }) => {
   return (
     <div className={ createClassName("gap-16 flex items-end justify-end", className) }>
-      { movies &&
+      { displayCount &&
         <div className="h-[48px] text-body-l font-normal flex items-center justify-center">
           <p>
             Showing &nbsp;

@@ -1,9 +1,7 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Genre;
-import com.atlantbh.cinebh.repository.CityRepository;
 import com.atlantbh.cinebh.repository.GenreRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;

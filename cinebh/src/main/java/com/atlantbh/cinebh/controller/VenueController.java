@@ -64,7 +64,7 @@ public class VenueController {
         return ResponseEntity.ok(venueService.getVenuesByCity(city));
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> createVenue(@Validated @RequestBody VenueRequest venueRequest) {
         City city = cityService.findByName(venueRequest.getCityName());
         Venue venue = new Venue(venueRequest.getName(), venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);

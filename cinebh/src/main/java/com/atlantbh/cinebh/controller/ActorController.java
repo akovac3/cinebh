@@ -24,7 +24,7 @@ public class ActorController {
     @Autowired
     private ActorService actorService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Iterable<Actor>> getAll() {
         return ResponseEntity.ok(actorService.getAll());
     }
@@ -35,7 +35,7 @@ public class ActorController {
         return ResponseEntity.ok().body(newActor);
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> createActor(@Validated @RequestBody ActorRequest actorRequest) {
         actorService.save(new Actor(actorRequest.getFirstName(), actorRequest.getLastName()));
         return new ResponseEntity<>("Actor successfully added!", HttpStatus.CREATED);

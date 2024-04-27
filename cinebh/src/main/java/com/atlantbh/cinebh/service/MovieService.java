@@ -23,12 +23,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.atlantbh.cinebh.specification.MovieSpecification.nameLike;
 import static com.atlantbh.cinebh.specification.MovieSpecification.hasProjectionTime;
 import static com.atlantbh.cinebh.specification.MovieSpecification.projectionStartLessThenDate;
 import static com.atlantbh.cinebh.specification.MovieSpecification.projectionEndGreaterThenDate;
 import static com.atlantbh.cinebh.specification.MovieSpecification.projectionBetweenDates;
+import static com.atlantbh.cinebh.specification.MovieSpecification.hasSimilarGenres;
 
 @Service
 @AllArgsConstructor
@@ -72,6 +74,13 @@ public class MovieService {
         return movieRepository.findUpcoming(PageRequest.of(pageNumber-1, size));
     }
 
+    public Page<Movie> findAllSimilarMoviesByGenre(Movie movie, PaginationParams paginationParams){
+        Set<Genre> genreList = movie.getGenres();
+        Specification<Movie> filters = Specification.where(hasSimilarGenres(movie.getMovieId(), genreList))
+                .and(projectionEndGreaterThenDate(null));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
+    }
+
     public Page<Movie> getCurrentlyShowingForFilter(CurrentlyMoviesFilterParams currentlyMoviesFilterParams, PaginationParams paginationParams) {
         Optional<City> city = cityRepository.findById(currentlyMoviesFilterParams.getCity());
         Optional<Venue> venue = venueRepository.findById(currentlyMoviesFilterParams.getVenue());
@@ -81,7 +90,7 @@ public class MovieService {
                 .and(genre.map(MovieSpecification::hasGenre).orElse(null))
                 .and(city.map(MovieSpecification::hasProjectionInCity).orElse(null))
                 .and(venue.map(MovieSpecification::hasProjectionInVenue).orElse(null))
-                .and(projectionStartLessThenDate((currentlyMoviesFilterParams.getStartDate())))
+                .and(projectionStartLessThenDate(currentlyMoviesFilterParams.getStartDate()))
                 .and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
         return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
     }

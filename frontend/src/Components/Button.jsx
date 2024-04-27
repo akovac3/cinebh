@@ -14,7 +14,7 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
     }
 
     const defaultClassName = {
-        default: "max-w-fit font-semibold px-[20px] py-12 rounded-8 gap-16 flex items-center justify-center font-body"
+        default: "font-semibold px-[20px] py-12 rounded-8 gap-16 flex items-center justify-center font-body"
     }
 
     return (

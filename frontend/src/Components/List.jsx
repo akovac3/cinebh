@@ -4,25 +4,23 @@ import { createClassName } from "../utils/utils";
 
 const List = ({ className, children, postsPerPage, totalPosts, paginateBack, paginateFront, currentPage, maxPages }) => {
   return (
-    <div className={ createClassName("pb-[20px]", className) }>
-      <div className="gap-16 py-40 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        { children }
-      </div>
-
+    <div className={ createClassName("pb-[30px]", className) }>
+      { children }
       <Pagination
         postsPerPage={ postsPerPage }
         totalPosts={ totalPosts }
         paginateBack={ paginateBack }
         paginateFront={ paginateFront }
         currentPage={ currentPage }
-        maxPages={ maxPages } />
+        maxPages={ maxPages }
+      />
     </div>
   )
 }
 
-const ListItem = ({ children }) => {
+const ListItem = ({ className, children }) => {
   return (
-    <div>{ children }</div>
+    <div className={ className }>{ children }</div>
   )
 }
 

@@ -37,13 +37,15 @@ const MovieList = (props) => {
 
     return (
         <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
-            { data.map((item, index) => {
-                return (
-                    <ListItem key={ index }>
-                        <MovieCard key={ index } movie={ item } photos={ item.photos } />
-                    </ListItem>
-                )
-            }) }
+            <div className="grid gap-16 py-32 lg:grid-cols-4 sm:grid-cols-1 md:grid-cols-2">
+                { data.map((item, index) => {
+                    return (
+                        <ListItem key={ index }>
+                            <MovieCard key={ index } movie={ item } photos={ item.photos } />
+                        </ListItem>
+                    )
+                }) }
+            </div>
         </List>
     )
 }

@@ -37,13 +37,15 @@ const VenueList = (props) => {
 
     return (
         <List postsPerPage={ postsPerPage } totalPosts={ totalPosts } paginateBack={ paginateBack } paginateFront={ paginateFront } currentPage={ currentPage } maxPages={ maxPages }>
-            { venues.map((item, index) => {
-                return (
-                    <ListItem key={ index }>
-                        <VenueCard key={ index } venue={ item } />
-                    </ListItem>
-                )
-            }) }
+            <div className="grid gap-16 py-32 lg:grid-cols-4 sm:grid-cols-1 md:grid-cols-2">
+                { venues.map((item, index) => {
+                    return (
+                        <ListItem key={ index }>
+                            <VenueCard key={ index } venue={ item } />
+                        </ListItem>
+                    )
+                }) }
+            </div>
         </List>
     )
 }

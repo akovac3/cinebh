@@ -40,10 +40,11 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
         let endDate = new Date(format(movie.projectionEnd, "yyyy-MM-dd"));
         let array = [];
 
-        while (date.getTime() <= endDate.getTime()) {
+        while (date.valueOf() < endDate.valueOf()) {
             array.push(new Date(date));
             date.setDate(date.getDate() + 1);
         }
+        array.push(endDate)
         setDates(array)
         setCurrentDates(array.slice(0, datePagination.size));
     }
@@ -60,6 +61,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
         const startIndex = datePagination.page * datePagination.size;
         const endIndex = startIndex + datePagination.size;
         setCurrentDates(dates.slice(startIndex, endIndex));
+        if (filterParams.startDate === null) _handleFilterChange({ startDate: format(new Date(), 'yyyy-MM-dd') })
     }, [datePagination])
 
     useEffect(() => {
@@ -162,19 +164,22 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 </div>
             </div>
             <p className="text-heading-h6 text-primary-600 pt-32 pb-12 px-24">Showtimes</p>
-            <div className="flex gap-12 px-24">
-                { projectionList.map((projection, index) => {
-                    return (
-                        <div
-                            key={ index }
-                            onClick={ () => { projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time }) } }
-                            className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time ? "bg-primary-600 text-neutral-25 border-primary-600" : "bg-neutral-0 border-neutral-200 text-neutral-800"} cursor-pointer` }
-                        >
-                            { projection.time.slice(0, 5) }
-                        </div>
-                    )
-                }) }
-            </div>
+            { filterParams.city === null || filterParams.venue === null ?
+                <p className="text-neutral-600 text-body-l px-24">Please select city and venue.</p> :
+                <div className="flex gap-12 px-24">
+                    { projectionList.length !== 0 ? projectionList.map((projection, index) => {
+                        return (
+                            <div
+                                key={ index }
+                                onClick={ () => { projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time }) } }
+                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time ? "bg-primary-600 text-neutral-25 border-primary-600" : "bg-neutral-0 border-neutral-200 text-neutral-800"} cursor-pointer` }
+                            >
+                                { projection.time.slice(0, 5) }
+                            </div>
+                        )
+                    }) : <p className="text-neutral-600 text-body-l">No projections for selected venue!</p> }
+                </div>
+            }
             <div className="absolute bottom-0 border-t border-neutral-200 grid grid-cols-2 py-24 gap-16 px-[20px] w-full">
                 <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull }>
                     Reserve Ticket

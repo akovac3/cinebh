@@ -24,7 +24,6 @@ public class CinebhApplication implements CommandLineRunner {
 		User adminAccount = userRepository.findByRole(Role.ADMIN);
 		if(adminAccount == null) {
 			User user = new User();
-
 			user.setEmail("admin@gmail.com");
 			user.setFirstName("admin");
 			user.setLastName("admin");

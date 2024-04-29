@@ -30,7 +30,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET, "api/movies/**", "api/venues/**", "api/genres", "api/cities")
+                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET, "api/movies/**", "api/venues/**", "api/projections/**", "api/genres", "api/cities")
                         .permitAll()
                         .requestMatchers("api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "api/movies", "api/venues", "api/actors", "api/writers", "api/photos").hasAuthority("ROLE_ADMIN")

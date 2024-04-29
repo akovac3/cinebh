@@ -42,6 +42,8 @@ public class AuthenticationService {
         JWTAuthenticationResponse authenticationResponse = new JWTAuthenticationResponse();
         authenticationResponse.setToken(jwt);
         authenticationResponse.setRefreshToken(refreshToken);
+        authenticationResponse.setFirstName(user.getFirstName());
+        authenticationResponse.setLastName(user.getLastName());
         return authenticationResponse;
     }
 
@@ -53,6 +55,8 @@ public class AuthenticationService {
             JWTAuthenticationResponse authenticationResponse = new JWTAuthenticationResponse();
             authenticationResponse.setToken(jwt);
             authenticationResponse.setRefreshToken(request.getToken());
+            authenticationResponse.setFirstName(user.getFirstName());
+            authenticationResponse.setLastName(user.getLastName());
             return authenticationResponse;
         }
         return null;

@@ -6,4 +6,6 @@ import lombok.Data;
 public class JWTAuthenticationResponse {
     private String token;
     private String refreshToken;
+    private String firstName;
+    private String lastName;
 }

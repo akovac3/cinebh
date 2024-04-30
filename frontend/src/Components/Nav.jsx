@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 import Logo from "./Logo";
 import Button from "./Button";
+import LogIn from "../routes/login/LogIn";
 
 import { createClassName } from "../utils/utils";
 
-const Nav = (className) => {
+const Nav = ({ className, toggleSidebar }) => {
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
+  const [userClick, setUserClick] = useState(false);
+  const handleUserClick = () => setUserClick(!userClick);
+  const signedIn = localStorage.getItem("loggedIn")
+  const name = localStorage.getItem("firstName") + " " + localStorage.getItem("lastName")
 
   const list = (
     <>
@@ -50,9 +55,23 @@ const Nav = (className) => {
             { list }
           </ul>
         </div>
-        <Button variant="secondary" className="!text-neutral-25 !border-neutral-25">
-          Sign in
-        </Button>
+        { signedIn ?
+          <Button
+            variant="secondary"
+            className="!text-neutral-25 !border-neutral-25"
+            onClick={ handleUserClick }
+          >
+            { name }
+            <FontAwesomeIcon icon={ userClick ? faChevronDown : faChevronUp } className="h-[14px]" />
+          </Button>
+          : <Button
+            variant="secondary"
+            className="!text-neutral-25 !border-neutral-25"
+            onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) }
+          >
+            Sign in
+          </Button>
+        }
         { click && content }
         <button className="block md:hidden transition" onClick={ handleClick }>
           <FontAwesomeIcon icon={ click ? faXmark : faBars } />

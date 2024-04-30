@@ -9,5 +9,7 @@ const currently = '/currently'
 const upcoming = '/upcoming'
 const searchCurrently = '/search-currently'
 const searchUpcoming = '/search-upcoming'
+const signin = '/api/auth/signin'
+const signup = '/api/auth/signup'
 
-export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently, searchUpcoming }
+export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently, searchUpcoming, signin, signup }

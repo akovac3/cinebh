@@ -54,7 +54,6 @@ import java.util.stream.Collectors;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/movies")
-@CrossOrigin(origins = "http://localhost:5173/")
 public class MovieController {
 
     @Autowired

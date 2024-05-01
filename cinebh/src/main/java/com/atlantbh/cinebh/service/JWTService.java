@@ -1,10 +1,12 @@
 package com.atlantbh.cinebh.service;
 
+import com.atlantbh.cinebh.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,12 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JWTService {
 
     @Value("${jwt.secret}")
     private String secret;
+    private final TokenRepository tokenRepository;
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder().setSubject(userDetails.getUsername())
@@ -52,7 +56,8 @@ public class JWTService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        boolean isValid = tokenRepository.findByToken(token).map(t->!t.getLoggedOut()).orElseThrow();
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && isValid);
     }
 
     private boolean isTokenExpired(String token) {

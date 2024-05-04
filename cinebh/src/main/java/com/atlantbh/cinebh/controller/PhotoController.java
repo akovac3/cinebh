@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +24,6 @@ import java.util.Set;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/photos")
-@CrossOrigin(origins = "http://localhost:5173/")
 public class PhotoController {
     @Autowired
     private MovieService movieService;

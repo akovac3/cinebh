@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,9 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -41,10 +37,10 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.GET, "api/movies/**", "api/venues/**", "api/projections/**", "api/genres", "api/cities")
                         .permitAll()
-                        .requestMatchers("api/auth/**").permitAll()
+                        .requestMatchers("api/auth/**", "api/password-reset/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "api/movies", "api/venues", "api/actors", "api/writers", "api/photos").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
-                        .requestMatchers("api/user").hasAnyAuthority(Role.USER.name())
+                        .requestMatchers("/api/user").hasAnyAuthority(Role.USER.name())
                         .anyRequest().authenticated())
                 .exceptionHandling(e->e.accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

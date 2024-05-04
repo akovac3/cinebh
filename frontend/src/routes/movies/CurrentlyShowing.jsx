@@ -201,14 +201,21 @@ const CurrentlyShowing = () => {
         </Label>
     )
 
+    const searchLabel = (
+        <Label
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
+        >
+            { filterParams.contains || "Search Movies" }
+        </Label>
+    )
+
     return (
-        <div className="font-body px-[118px] pt-40">
+        <div className="font-body px-[118px] pt-[110px]">
             <p className="text-neutral-800 text-heading-h4 pb-24">Currently Showing ({ movieList?.length })</p>
             <Input
-                text="Search movies"
+                label={ searchLabel }
+                text="Search Movies"
                 open={ focused }
-                placeholder={ filterParams.contains }
-                leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
                 className="w-full"
                 onChange={ handleSearchChange }
                 onFocus={ onFocus }

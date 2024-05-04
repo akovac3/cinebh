@@ -6,38 +6,55 @@ import axios from "axios";
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import SignUp from "./SignUp";
-import SignInSuccess from "../../components/SignInSuccess"
+import Success from "../../components/Success"
 import Input from "../../components/Input"
+import Label from "../../components/Label";
 
 import { url, signin } from "../../utils/api";
+import PasswordReset from "./PasswordReset";
 
 const LogIn = ({ toggleSidebar }) => {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false)
     const [passwordFocused, setPasswordFocused] = useState(false)
+    const [validData, setValidData] = useState(true)
+    const [validEmail, setValidEmail] = useState(true)
+    const [passwordVisibility, setPasswordVisibility] = useState(false);
 
     const onFocus = (setFocused) => setFocused(true)
     const onBlur = (setFocused) => setFocused(false)
 
+    const validateEmail = (email) => {
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+        setValidEmail(isValid);
+    };
+
     const success = () => {
-        toggleSidebar(<SignInSuccess toggleSidebar={ toggleSidebar } />)
+        toggleSidebar(<Success text={ "Sign In Successful! 🎉" } toggleSidebar={ toggleSidebar } />)
     }
 
     const onFinish = async (values) => {
         try {
             const response = await axios.post(url + signin, values)
-            console.log('Successfully logged in')
-            localStorage.setItem('token', response.data.token)
-            localStorage.setItem('refreshToken', response.data.refreshToken)
-            localStorage.setItem("firstName", response.data.firstName)
-            localStorage.setItem("lastName", response.data.lastName)
-            localStorage.setItem("loggedIn", email)
-            success()
+            if (response.status === 200) {
+                localStorage.setItem('token', response.data.token)
+                localStorage.setItem('refreshToken', response.data.refreshToken)
+                localStorage.setItem("firstName", response.data.firstName)
+                localStorage.setItem("lastName", response.data.lastName)
+                localStorage.setItem("loggedIn", email)
+                success()
+            }
         } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
+            if (error.response && error.response.status === 401) {
+                setValidData(false)
+                console.log('Incorrect email or password');
+            } else if (error.response && error.response.status === 500) {
+                console.log('Internal Server Error');
+            } else {
+                console.log('An error occurred');
+            }
         }
     }
 
@@ -46,67 +63,111 @@ const LogIn = ({ toggleSidebar }) => {
         if (email && password) {
             const values = {
                 email: email,
-                password: password,
+                password: password
             }
             onFinish(values)
         }
     }
 
-    function handleEmailChange(event) {
+    const handleEmailChange = (event) => {
+        setValidData(true)
         setEmail(event.target.value)
+        validateEmail(event.target.value);
     }
 
-    function handlePasswordChange(event) {
+    const handlePasswordChange = (event) => {
+        setValidData(true)
         setPassword(event.target.value)
     }
 
     const handleRememberMeChange = () => setRememberMe(!rememberMe);
 
+    const emailLabel = (
+        <Label
+            label="Email"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+            variant={ (!validEmail || !validEmail) ? 'error' : 'default' }
+            errorMessage={ validEmail ? null : "Enter valid email address" }
+        >
+            { email || "Email Address" }
+        </Label>
+    )
+
+    const passwordLabel = (
+        <Label
+            label="Password"
+            password
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+            variant={ !validData ? 'error' : 'default' }
+            errorMessage="Email or Password that you've entered is incorrect."
+        >
+            { password || "Password" }
+        </Label>
+    )
+
     return (
         <div className="flex flex-col items-center justify-center text-neutral-25 pt-80">
             <Logo />
-            <p className="py-40 text-heading-h5 text-neutral-300">Welcome Back</p>
-            <div className="w-[70%] pb-24">
+            <div className="flex py-32">
+                <Button variant="secondary" disabled className="!bg-[#FCFCFD1A] !text-neutral-300 !border-none !shadow-light-25 w-[36px] h-40 absolute left-[70px]">
+                    <FontAwesomeIcon icon={ fas.faArrowLeft } className="h-[20px]" />
+                </Button>
+                <p className="text-heading-h5 text-neutral-300">Welcome Back</p>
+            </div>
+            <div className="w-[70%]">
                 <Input
-                    label="Email"
                     text="Email Address"
+                    label={ emailLabel }
                     open={ emailFocused }
-                    placeholder={ email }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
                     className="w-full pb-16"
+                    error={ !validData || !validEmail }
                     onChange={ handleEmailChange }
                     onFocus={ () => onFocus(setEmailFocused) }
                     onBlur={ () => onBlur(setEmailFocused) }
                 />
 
                 <Input
-                    label="Password"
+                    label={ passwordLabel }
                     text="Password"
                     open={ passwordFocused }
-                    placeholder={ password }
-                    type="password"
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } /> }
+                    type={ passwordVisibility ? "text" : "password" }
                     className="w-full pb-24"
+                    error={ !validData }
                     onChange={ handlePasswordChange }
                     onFocus={ () => onFocus(setPasswordFocused) }
                     onBlur={ () => onBlur(setPasswordFocused) }
                 />
 
-                <label htmlFor="rememberMe">
-                    <input
-                        type="checkbox"
-                        id="rememberMe"
-                        checked={ rememberMe }
-                        onChange={ handleRememberMeChange }
-                    />
-                    Remember Me
-                </label>
-
-                <Button className="w-full" onClick={ handleSubmit }>Sign In</Button>
+                <div className="flex items-center justify-center pb-32">
+                    <label htmlFor="rememberMe" className="flex-1 text-neutral-400 font-semibold">
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                            className="mr-4 checked:bg-primary-600"
+                            checked={ rememberMe }
+                            onChange={ handleRememberMeChange }
+                        />
+                        Remember Me
+                    </label>
+                    <Button
+                        variant="tertiary"
+                        onClick={ () => toggleSidebar(<PasswordReset toggleSidebar={ toggleSidebar } />) }
+                        className="!text-neutral-400 font-semibold no-underline !p-0"
+                    >
+                        Forgot Password?
+                    </Button>
+                </div>
+                <Button
+                    className="w-full disabled:bg-primary-200"
+                    disabled={ email === "" || password === "" || !validEmail || !validData }
+                    onClick={ handleSubmit }
+                >
+                    Sign In
+                </Button>
             </div>
 
-            <div className="text-body-l flex items-center justify-center pb-80">
+            <div className="text-body-l flex items-center justify-center pt-32 pb-80">
                 Don't have an account yet?
                 <Button
                     variant="tertiary"

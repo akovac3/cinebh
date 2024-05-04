@@ -5,6 +5,7 @@ import { faBars, faXmark, faChevronUp, faChevronDown } from "@fortawesome/free-s
 import Logo from "./Logo";
 import Button from "./Button";
 import LogIn from "../routes/login/LogIn";
+import LogOut from "../routes/login/LogOut";
 
 import { createClassName } from "../utils/utils";
 
@@ -12,7 +13,11 @@ const Nav = ({ className, toggleSidebar }) => {
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
   const [userClick, setUserClick] = useState(false);
-  const handleUserClick = () => setUserClick(!userClick);
+  const handleUserClick = () => {
+    setUserClick(!userClick);
+    toggleSidebar(<LogOut toggleSidebar={ toggleSidebar } />)
+  }
+
   const signedIn = localStorage.getItem("loggedIn")
   const name = localStorage.getItem("firstName") + " " + localStorage.getItem("lastName")
 
@@ -46,7 +51,7 @@ const Nav = ({ className, toggleSidebar }) => {
 
   return (
     <nav>
-      <div className={ createClassName("font-body bg-neutral-800 h-[80px] flex justify-between items-baseline z-50 text-neutral-0 lg:py-16 px-[118px] py-16 border-b border-neutral-500", className) }>
+      <div className={ createClassName("font-body bg-neutral-800 h-[80px] fixed w-full flex justify-between items-baseline z-50 text-neutral-0 lg:py-16 px-[118px] py-16 border-b border-neutral-500", className) }>
         <a href="/">
           <Logo />
         </a>
@@ -58,15 +63,15 @@ const Nav = ({ className, toggleSidebar }) => {
         { signedIn ?
           <Button
             variant="secondary"
-            className="!text-neutral-25 !border-neutral-25"
+            className="!text-neutral-25 !border-neutral-25 hover:!bg-neutral-800"
             onClick={ handleUserClick }
           >
             { name }
-            <FontAwesomeIcon icon={ userClick ? faChevronDown : faChevronUp } className="h-[14px]" />
+            <FontAwesomeIcon icon={ userClick ? faChevronUp : faChevronDown } className="h-[14px]" />
           </Button>
           : <Button
             variant="secondary"
-            className="!text-neutral-25 !border-neutral-25"
+            className="!text-neutral-25 !border-neutral-25 hover:!bg-neutral-800"
             onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) }
           >
             Sign in
@@ -77,7 +82,7 @@ const Nav = ({ className, toggleSidebar }) => {
           <FontAwesomeIcon icon={ click ? faXmark : faBars } />
         </button>
       </div>
-    </nav>
+    </nav >
   )
 }
 

@@ -12,6 +12,7 @@ const Layout = () => {
   const toggleSidebar = (content) => {
     setIsSidebarOpen(!isSidebarOpen);
     setSidebarContent(content);
+    if (content === null) setIsSidebarOpen(false)
   };
 
   return (

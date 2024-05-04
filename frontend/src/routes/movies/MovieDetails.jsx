@@ -128,7 +128,7 @@ const MovieDetails = () => {
     }
 
     return (
-        <div className="px-[118px] py-40 font-body text-neutral-800 text-body-l">
+        <div className="px-[118px] pb-40 pt-[110px] font-body text-neutral-800 text-body-l">
             <p className="text-heading-h5 pb-16">Movie Details</p>
             <div className="grid lg:grid-cols-2 gap-16 min-h-[356px]">
                 <VideoPlayer className="aspect-video rounded-l-16" src={ movie.trailer } />

@@ -7,18 +7,21 @@ import Logo from "../../components/Logo";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import LogIn from "./LogIn";
-import SignUpSuccess from "../../components/SignUpSuccess";
+import Success from "../../components/Success";
+import Label from "../../components/Label";
 
 import { url, signup } from "../../utils/api";
 
 const SignUp = ({ toggleSidebar }) => {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [retypePassword, setRetypePassword] = useState();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [retypePassword, setRetypePassword] = useState("");
     const [firstName, setFirstName] = useState();
     const [lastName, setLastName] = useState();
-    const [rememberMe, setRememberMe] = useState(false);
     const [passwordsNotMatch, setPasswordsNotMatch] = useState(false);
+    const [passwordVisibility, setPasswordVisibility] = useState(false);
+    const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(false);
+    const [validEmail, setValidEmail] = useState(true);
 
     const [emailFocused, setEmailFocused] = useState(false)
     const [passwordFocused, setPasswordFocused] = useState(false)
@@ -29,21 +32,21 @@ const SignUp = ({ toggleSidebar }) => {
     const onFocus = (setFocused) => setFocused(true)
     const onBlur = (setFocused) => setFocused(false)
 
+    const validateEmail = (email) => {
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+        setValidEmail(isValid);
+    };
+
     const success = () => {
-        toggleSidebar(<SignUpSuccess toggleSidebar={ toggleSidebar } />)
+        toggleSidebar(<Success text="You're all set! 🎉" toggleSidebar={ toggleSidebar } />)
     }
 
     const onFinish = async (values) => {
         try {
             const response = await axios.post(url + signup, values)
-            console.log(response)
-            console.log('Successfully logged in')
-            localStorage.setItem('token', response.data.token)
-            localStorage.setItem('refreshToken', response.data.refreshToken)
-            localStorage.setItem("email", email)
-            localStorage.setItem("password", password)
-            localStorage.setItem("loggedIn", email)
-            success()
+            if (response.status === 200) {
+                success()
+            }
         } catch (error) {
             console.log(error)
             console.warning(error.response.data.message)
@@ -54,11 +57,10 @@ const SignUp = ({ toggleSidebar }) => {
         event.preventDefault()
         if (password !== retypePassword) {
             setPasswordsNotMatch(true)
-            console.log(password)
             return;
         }
 
-        if (email && password && !passwordsNotMatch) {
+        if (email && validEmail && password && !passwordsNotMatch) {
             const values = {
                 email: email,
                 password: password,
@@ -71,13 +73,16 @@ const SignUp = ({ toggleSidebar }) => {
 
     function handleEmailChange(event) {
         setEmail(event.target.value)
+        validateEmail(event.target.value);
     }
 
     function handlePasswordChange(event) {
+        setPasswordsNotMatch(false)
         setPassword(event.target.value)
     }
 
     function handleRetypePasswordChange(event) {
+        setPasswordsNotMatch(false)
         setRetypePassword(event.target.value)
     }
 
@@ -89,31 +94,88 @@ const SignUp = ({ toggleSidebar }) => {
         setLastName(event.target.value)
     }
 
-    const handleRememberMeChange = () => setRememberMe(!rememberMe);
+    const emailLabel = (
+        <Label
+            label="Email"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+            variant={ (!validEmail) ? 'error' : 'default' }
+            errorMessage={ "Enter valid email address" }
+        >
+            { email || "Email Address" }
+        </Label>
+    )
+
+    const firstNameLabel = (
+        <Label
+            label="First Name"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
+        >
+            { firstName || "First Name" }
+        </Label>
+    )
+
+    const lastNameLabel = (
+        <Label
+            label="Last Name"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
+        >
+            { lastName || "Last Name" }
+        </Label>
+    )
+
+    const retypePasswordLabel = (
+        <Label
+            label="Confirm Password"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
+            variant={ passwordsNotMatch ? 'error' : 'default' }
+            errorMessage="Passwords do not match"
+        >
+            { retypePassword || "Retype Password" }
+        </Label>
+    )
+
+    const passwordLabel = (
+        <Label
+            label="New Password"
+            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+            variant={ passwordsNotMatch ? 'error' : 'default' }
+            errorMessage="Passwords do not match"
+        >
+            { password || "Password" }
+        </Label>
+    )
 
     return (
         <div className="flex flex-col items-center justify-center text-neutral-0 py-80">
             <Logo />
-            <p className="py-40 text-heading-h5 text-neutral-300">Hello</p>
+            <div className="flex py-32">
+                <Button
+                    variant="secondary"
+                    onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) }
+                    className="!bg-[#FCFCFD1A] !text-neutral-300 !border-none !shadow-light-25 w-[36px] h-40 absolute left-[70px]"
+                >
+                    <FontAwesomeIcon icon={ fas.faArrowLeft } className="h-[20px]" />
+                </Button>
+                <p className="text-heading-h5 text-neutral-300">Hello</p>
+            </div>
             <div className="w-[70%] pb-24">
                 <Input
-                    label="Email"
                     text="Email Address"
+                    label={ emailLabel }
                     open={ emailFocused }
-                    placeholder={ email }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
                     className="w-full pb-16"
+                    error={ !validEmail }
                     onChange={ handleEmailChange }
                     onFocus={ () => onFocus(setEmailFocused) }
                     onBlur={ () => onBlur(setEmailFocused) }
                 />
 
                 <Input
-                    label="First name"
+                    label={ firstNameLabel }
                     text="First name"
                     open={ firstNameFocused }
-                    placeholder={ firstName }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
                     className="w-full pb-16"
                     onChange={ handleFirstNameChange }
                     onFocus={ () => onFocus(setFirstNameFocused) }
@@ -121,11 +183,10 @@ const SignUp = ({ toggleSidebar }) => {
                 />
 
                 <Input
-                    label="Last name"
+                    label={ lastNameLabel }
                     text="Last name"
                     open={ lastNameFocused }
                     placeholder={ lastName }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
                     className="w-full pb-16"
                     onChange={ handleLastNameChange }
                     onFocus={ () => onFocus(setLastNameFocused) }
@@ -133,41 +194,47 @@ const SignUp = ({ toggleSidebar }) => {
                 />
 
                 <Input
-                    label="Password"
+                    label={ passwordLabel }
                     text="Password"
                     open={ passwordFocused }
-                    placeholder={ password }
-                    error={ passwordsNotMatch }
-                    type="password"
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } /> }
+                    type={ passwordVisibility ? "text" : "password" }
                     className="w-full pb-24"
+                    error={ passwordsNotMatch }
                     onChange={ handlePasswordChange }
                     onFocus={ () => onFocus(setPasswordFocused) }
                     onBlur={ () => onBlur(setPasswordFocused) }
                 />
 
                 <Input
-                    label="Confirm Password"
+                    label={ retypePasswordLabel }
                     text="Retype Password"
                     open={ retypePasswordFocused }
                     placeholder={ retypePassword }
-                    error={ passwordsNotMatch }
-                    type="password"
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } /> }
+                    type={ confirmPasswordVisibility ? "text" : "password" }
                     className="w-full pb-24"
+                    error={ passwordsNotMatch }
                     onChange={ handleRetypePasswordChange }
                     onFocus={ () => onFocus(setRetypePasswordFocused) }
                     onBlur={ () => onBlur(setRetypePasswordFocused) }
                 />
 
-                <Button className="w-full mt-32" onClick={ handleSubmit }>Sign Up</Button>
+                <Button
+                    className="w-full mt-8 disabled:bg-primary-200"
+                    disabled={ !validEmail || email === "" || password === "" || retypePassword === "" || passwordsNotMatch }
+                    onClick={ handleSubmit }
+                >
+                    Sign Up</Button>
             </div>
 
-            <div className="text-body-l flex items-center justify-center">
+            <div className="text-body-l flex items-center justify-center pb-32">
                 Already have an account?
-                <Button variant="tertiary" className="!text-neutral-25" onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) } >Sign In</Button>
+                <Button
+                    variant="tertiary"
+                    className="!text-neutral-25"
+                    onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) }
+                >
+                    Sign In
+                </Button>
             </div>
         </div>
     )

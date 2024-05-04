@@ -1,5 +1,4 @@
 const url = 'http://localhost:8080'
-
 const movies = '/api/movies'
 const venues = '/api/venues'
 const projections = '/api/projections'
@@ -11,5 +10,8 @@ const searchCurrently = '/search-currently'
 const searchUpcoming = '/search-upcoming'
 const signin = '/api/auth/signin'
 const signup = '/api/auth/signup'
+const logout = '/logout'
+const user = '/api/user'
+const passwordReset = '/api/password-reset'
 
-export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently, searchUpcoming, signin, signup }
+export { url, movies, venues, projections, genres, cities, currently, upcoming, searchCurrently, searchUpcoming, signin, signup, logout, user, passwordReset }

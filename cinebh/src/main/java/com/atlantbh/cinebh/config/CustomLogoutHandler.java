@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class CustomLogoutHandler implements LogoutHandler {
 
     private final TokenRepository tokenRepository;
+
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         final String authHeader = request.getHeader("Authorization");
@@ -22,19 +23,10 @@ public class CustomLogoutHandler implements LogoutHandler {
             return;
         }
         String token = authHeader.substring(7);
-
         Token storedToken = tokenRepository.findByToken(token).orElse(null);
         if(storedToken!=null) {
             storedToken.setLoggedOut(true);
             tokenRepository.save(storedToken);
-            /* refreshToken = storedToken.getRefreshToken();
-            if (StringUtils.isNotBlank(refreshToken)) {
-                Token storedRefreshToken = tokenRepository.findByToken(refreshToken).orElse(null);
-                if (storedRefreshToken != null) {
-                    storedRefreshToken.setLoggedOut(true);
-                    tokenRepository.save(storedRefreshToken);
-                }
-            }*/
         }
     }
 }

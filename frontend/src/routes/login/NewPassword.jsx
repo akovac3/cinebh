@@ -12,7 +12,6 @@ import EnterCode from "./EnterCode";
 
 import { url, passwordReset } from "../../utils/api";
 
-
 const NewPassword = ({ toggleSidebar }) => {
     const [password, setPassword] = useState("");
     const [retypePassword, setRetypePassword] = useState("");
@@ -73,30 +72,6 @@ const NewPassword = ({ toggleSidebar }) => {
         setRetypePassword(event.target.value)
     }
 
-    const retypePasswordLabel = (
-        <Label
-            label="Repeat Password"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
-            variant={ passwordsNotMatch ? 'error' : 'default' }
-            errorMessage="Passwords do not match"
-        >
-            { retypePassword || "Retype Password" }
-        </Label>
-    )
-
-    const passwordLabel = (
-        <Label
-            label="New Password"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
-            variant={ passwordsNotMatch ? 'error' : 'default' }
-            errorMessage="Passwords do not match"
-        >
-            { password || "Password" }
-        </Label>
-    )
-
     return (
         <div className="flex flex-col items-center justify-center text-neutral-0 py-80">
             <Logo />
@@ -112,32 +87,48 @@ const NewPassword = ({ toggleSidebar }) => {
             </div>
             <p className="text-center text-body-m text-neutral-400 w-1/2">Please, enter and confirm your new password.</p>
             <div className="w-[70%] py-24">
-                <Input
-                    label={ passwordLabel }
-                    text="Password"
-                    open={ passwordFocused }
-                    type={ passwordVisibility ? "text" : "password" }
-                    className="w-full pb-24"
+                <Label
+                    label="New Password"
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+                    variant={ passwordsNotMatch ? 'error' : 'default' }
+                    errorMessage="Passwords do not match"
+                    active={ passwordFocused }
                     error={ passwordsNotMatch }
-                    onChange={ handlePasswordChange }
-                    onFocus={ () => onFocus(setPasswordFocused) }
-                    onBlur={ () => onBlur(setPasswordFocused) }
-                />
-                <Input
-                    label={ retypePasswordLabel }
-                    text="Repeat Password"
-                    open={ retypePasswordFocused }
-                    placeholder={ retypePassword }
+                >
+                    <Input
+                        text="Password"
+                        type={ passwordVisibility ? "text" : "password" }
+                        className="w-full pb-24"
+                        error={ passwordsNotMatch }
+                        onChange={ handlePasswordChange }
+                        onFocus={ () => onFocus(setPasswordFocused) }
+                        onBlur={ () => onBlur(setPasswordFocused) }
+                    />
+                </Label>
+
+                <Label
+                    label="Repeat Password"
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
+                    variant={ passwordsNotMatch ? 'error' : 'default' }
+                    active={ retypePasswordFocused }
                     error={ passwordsNotMatch }
-                    type={ confirmPasswordVisibility ? "text" : "password" }
-                    className="w-full pb-24"
-                    onChange={ handleRetypePasswordChange }
-                    onFocus={ () => onFocus(setRetypePasswordFocused) }
-                    onBlur={ () => onBlur(setRetypePasswordFocused) }
-                />
+                    errorMessage="Passwords do not match"
+                >
+                    <Input
+                        text="Repeat Password"
+                        error={ passwordsNotMatch }
+                        type={ confirmPasswordVisibility ? "text" : "password" }
+                        className="w-full pb-24"
+                        onChange={ handleRetypePasswordChange }
+                        onFocus={ () => onFocus(setRetypePasswordFocused) }
+                        onBlur={ () => onBlur(setRetypePasswordFocused) }
+                    />
+                </Label>
 
                 <Button
-                    className="w-full mt-8"
+                    className="w-full mt-24 disabled:bg-primary-200"
                     disabled={ password === "" || retypePassword === "" || passwordsNotMatch }
                     onClick={ handleSubmit }
                 >

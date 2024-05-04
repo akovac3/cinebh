@@ -18,7 +18,7 @@ const Layout = () => {
   return (
     <div className="relative min-h-lvh">
       <Nav toggleSidebar={ toggleSidebar } sidebarContent={ sidebarContent } />
-      <div className="pb-[212px]">
+      <div className="pb-[212px] pt-80">
         <Outlet />
         { isSidebarOpen && <SideBar> { sidebarContent } </SideBar> }
       </div>

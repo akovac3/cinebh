@@ -37,7 +37,7 @@ const Home = () => {
   }, [])
 
   return (
-    <div className="bg-neutral-25 text-neutral-800 flex flex-col items-start justify-start pt-80 pb-40 font-body">
+    <div className="bg-neutral-25 text-neutral-800 flex flex-col items-start justify-start pb-40 font-body">
       <div className="w-full h-[730px]">
         <CoverCarousel movies={ coverMovies } />
       </div>

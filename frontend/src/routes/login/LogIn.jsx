@@ -82,30 +82,6 @@ const LogIn = ({ toggleSidebar }) => {
 
     const handleRememberMeChange = () => setRememberMe(!rememberMe);
 
-    const emailLabel = (
-        <Label
-            label="Email"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
-            variant={ (!validEmail || !validEmail) ? 'error' : 'default' }
-            errorMessage={ validEmail ? null : "Enter valid email address" }
-        >
-            { email || "Email Address" }
-        </Label>
-    )
-
-    const passwordLabel = (
-        <Label
-            label="Password"
-            password
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
-            variant={ !validData ? 'error' : 'default' }
-            errorMessage="Email or Password that you've entered is incorrect."
-        >
-            { password || "Password" }
-        </Label>
-    )
-
     return (
         <div className="flex flex-col items-center justify-center text-neutral-25 pt-80">
             <Logo />
@@ -116,30 +92,45 @@ const LogIn = ({ toggleSidebar }) => {
                 <p className="text-heading-h5 text-neutral-300">Welcome Back</p>
             </div>
             <div className="w-[70%]">
-                <Input
-                    text="Email Address"
-                    label={ emailLabel }
-                    open={ emailFocused }
-                    className="w-full pb-16"
+                <Label
+                    label="Email"
+                    active={ emailFocused }
                     error={ !validData || !validEmail }
-                    onChange={ handleEmailChange }
-                    onFocus={ () => onFocus(setEmailFocused) }
-                    onBlur={ () => onBlur(setEmailFocused) }
-                />
-
-                <Input
-                    label={ passwordLabel }
-                    text="Password"
-                    open={ passwordFocused }
-                    type={ passwordVisibility ? "text" : "password" }
-                    className="w-full pb-24"
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+                    variant={ (!validEmail || !validEmail) ? 'error' : 'default' }
+                    errorMessage={ validEmail ? null : "Enter valid email address" }
+                >
+                    <Input
+                        text="Email Address"
+                        className="w-full pb-16"
+                        error={ !validData || !validEmail }
+                        onChange={ handleEmailChange }
+                        onFocus={ () => onFocus(setEmailFocused) }
+                        onBlur={ () => onBlur(setEmailFocused) }
+                    />
+                </Label>
+                <Label
+                    label="Password"
+                    active={ passwordFocused }
+                    password
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+                    variant={ !validData ? 'error' : 'default' }
                     error={ !validData }
-                    onChange={ handlePasswordChange }
-                    onFocus={ () => onFocus(setPasswordFocused) }
-                    onBlur={ () => onBlur(setPasswordFocused) }
-                />
+                    errorMessage="Email or Password that you've entered is incorrect."
+                >
+                    <Input
+                        text="Password"
+                        type={ passwordVisibility ? "text" : "password" }
+                        className="w-full pb-24"
+                        error={ !validData }
+                        onChange={ handlePasswordChange }
+                        onFocus={ () => onFocus(setPasswordFocused) }
+                        onBlur={ () => onBlur(setPasswordFocused) }
+                    />
+                </Label>
 
-                <div className="flex items-center justify-center pb-32">
+                <div className="flex items-center justify-center pt-8 pb-32">
                     <label htmlFor="rememberMe" className="flex-1 text-neutral-400 font-semibold">
                         <input
                             type="checkbox"

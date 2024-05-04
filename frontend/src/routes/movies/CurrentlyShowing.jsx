@@ -210,7 +210,7 @@ const CurrentlyShowing = () => {
     )
 
     return (
-        <div className="font-body px-[118px] pt-[110px]">
+        <div className="font-body px-[118px] pt-32">
             <p className="text-neutral-800 text-heading-h4 pb-24">Currently Showing ({ movieList?.length })</p>
             <Input
                 label={ searchLabel }

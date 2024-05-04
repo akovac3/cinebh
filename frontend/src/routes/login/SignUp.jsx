@@ -48,8 +48,11 @@ const SignUp = ({ toggleSidebar }) => {
                 success()
             }
         } catch (error) {
+            if (error.response && error.response.status === 401) {
+                setValidEmail(false)
+            }
             console.log(error)
-            console.warning(error.response.data.message)
+            console.log(error.response.data.message)
         }
     }
 
@@ -94,59 +97,6 @@ const SignUp = ({ toggleSidebar }) => {
         setLastName(event.target.value)
     }
 
-    const emailLabel = (
-        <Label
-            label="Email"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
-            variant={ (!validEmail) ? 'error' : 'default' }
-            errorMessage={ "Enter valid email address" }
-        >
-            { email || "Email Address" }
-        </Label>
-    )
-
-    const firstNameLabel = (
-        <Label
-            label="First Name"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
-        >
-            { firstName || "First Name" }
-        </Label>
-    )
-
-    const lastNameLabel = (
-        <Label
-            label="Last Name"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
-        >
-            { lastName || "Last Name" }
-        </Label>
-    )
-
-    const retypePasswordLabel = (
-        <Label
-            label="Confirm Password"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
-            variant={ passwordsNotMatch ? 'error' : 'default' }
-            errorMessage="Passwords do not match"
-        >
-            { retypePassword || "Retype Password" }
-        </Label>
-    )
-
-    const passwordLabel = (
-        <Label
-            label="New Password"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
-            variant={ passwordsNotMatch ? 'error' : 'default' }
-            errorMessage="Passwords do not match"
-        >
-            { password || "Password" }
-        </Label>
-    )
-
     return (
         <div className="flex flex-col items-center justify-center text-neutral-0 py-80">
             <Logo />
@@ -161,65 +111,91 @@ const SignUp = ({ toggleSidebar }) => {
                 <p className="text-heading-h5 text-neutral-300">Hello</p>
             </div>
             <div className="w-[70%] pb-24">
-                <Input
-                    text="Email Address"
-                    label={ emailLabel }
-                    open={ emailFocused }
-                    className="w-full pb-16"
+                <Label
+                    label="Email"
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+                    variant={ (!validEmail) ? 'error' : 'default' }
+                    active={ emailFocused }
                     error={ !validEmail }
-                    onChange={ handleEmailChange }
-                    onFocus={ () => onFocus(setEmailFocused) }
-                    onBlur={ () => onBlur(setEmailFocused) }
-                />
+                    errorMessage={ "Enter valid email address" }
+                >
+                    <Input
+                        text="Email Address"
+                        className="w-full pb-16"
+                        error={ !validEmail }
+                        onChange={ handleEmailChange }
+                        onFocus={ () => onFocus(setEmailFocused) }
+                        onBlur={ () => onBlur(setEmailFocused) }
+                    />
+                </Label>
 
-                <Input
-                    label={ firstNameLabel }
-                    text="First name"
-                    open={ firstNameFocused }
-                    className="w-full pb-16"
-                    onChange={ handleFirstNameChange }
-                    onFocus={ () => onFocus(setFirstNameFocused) }
-                    onBlur={ () => onBlur(setFirstNameFocused) }
-                />
-
-                <Input
-                    label={ lastNameLabel }
-                    text="Last name"
-                    open={ lastNameFocused }
-                    placeholder={ lastName }
-                    className="w-full pb-16"
-                    onChange={ handleLastNameChange }
-                    onFocus={ () => onFocus(setLastNameFocused) }
-                    onBlur={ () => onBlur(setLastNameFocused) }
-                />
-
-                <Input
-                    label={ passwordLabel }
-                    text="Password"
-                    open={ passwordFocused }
-                    type={ passwordVisibility ? "text" : "password" }
-                    className="w-full pb-24"
+                <Label
+                    label="First Name"
+                    active={ firstNameFocused }
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
+                >
+                    <Input
+                        text="First name"
+                        className="w-full pb-16"
+                        onChange={ handleFirstNameChange }
+                        onFocus={ () => onFocus(setFirstNameFocused) }
+                        onBlur={ () => onBlur(setFirstNameFocused) }
+                    />
+                </Label>
+                <Label
+                    label="Last Name"
+                    active={ lastNameFocused }
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
+                >
+                    <Input
+                        text="Last name"
+                        className="w-full pb-16"
+                        onChange={ handleLastNameChange }
+                        onFocus={ () => onFocus(setLastNameFocused) }
+                        onBlur={ () => onBlur(setLastNameFocused) }
+                    />
+                </Label>
+                <Label
+                    label="New Password"
+                    active={ passwordFocused }
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+                    variant={ passwordsNotMatch ? 'error' : 'default' }
                     error={ passwordsNotMatch }
-                    onChange={ handlePasswordChange }
-                    onFocus={ () => onFocus(setPasswordFocused) }
-                    onBlur={ () => onBlur(setPasswordFocused) }
-                />
+                    errorMessage="Passwords do not match"
+                >
+                    <Input
+                        text="Password"
+                        type={ passwordVisibility ? "text" : "password" }
+                        className="w-full pb-24"
+                        error={ passwordsNotMatch }
+                        onChange={ handlePasswordChange }
+                        onFocus={ () => onFocus(setPasswordFocused) }
+                        onBlur={ () => onBlur(setPasswordFocused) }
+                    />
+                </Label>
 
-                <Input
-                    label={ retypePasswordLabel }
-                    text="Retype Password"
-                    open={ retypePasswordFocused }
-                    placeholder={ retypePassword }
-                    type={ confirmPasswordVisibility ? "text" : "password" }
-                    className="w-full pb-24"
+                <Label
+                    label="Confirm Password"
+                    active={ retypePasswordFocused }
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
+                    variant={ passwordsNotMatch ? 'error' : 'default' }
                     error={ passwordsNotMatch }
-                    onChange={ handleRetypePasswordChange }
-                    onFocus={ () => onFocus(setRetypePasswordFocused) }
-                    onBlur={ () => onBlur(setRetypePasswordFocused) }
-                />
-
+                    errorMessage="Passwords do not match"
+                >
+                    <Input
+                        text="Retype Password"
+                        type={ confirmPasswordVisibility ? "text" : "password" }
+                        className="w-full pb-24"
+                        error={ passwordsNotMatch }
+                        onChange={ handleRetypePasswordChange }
+                        onFocus={ () => onFocus(setRetypePasswordFocused) }
+                        onBlur={ () => onBlur(setRetypePasswordFocused) }
+                    />
+                </Label>
                 <Button
-                    className="w-full mt-8 disabled:bg-primary-200"
+                    className="w-full mt-[20px] disabled:bg-primary-200"
                     disabled={ !validEmail || email === "" || password === "" || retypePassword === "" || passwordsNotMatch }
                     onClick={ handleSubmit }
                 >

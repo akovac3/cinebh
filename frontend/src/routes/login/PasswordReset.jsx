@@ -68,17 +68,6 @@ const PasswordReset = ({ toggleSidebar }) => {
         validateEmail(event.target.value);
     }
 
-    const emailLabel = (
-        <Label
-            label="Email"
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
-            variant={ (!validEmail || noAccount) ? 'error' : 'default' }
-            errorMessage={ noAccount ? "No account found" : "Enter valid email address" }
-        >
-            { email || "Email Address" }
-        </Label>
-    )
-
     return (
         <div className="flex flex-col items-center justify-center text-neutral-25 py-80">
             <Logo />
@@ -94,18 +83,25 @@ const PasswordReset = ({ toggleSidebar }) => {
             </div>
             <p className="text-center text-body-m text-neutral-400 w-1/2">Provide your account's email for which you want to reset your password.</p>
             <div className="w-[70%] pt-40">
-                <Input
-                    text="Email Address"
-                    label={ emailLabel }
-                    open={ emailFocused }
-                    className="w-full pb-16"
+                <Label
+                    label="Email"
+                    active={ emailFocused }
+                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+                    variant={ (!validEmail || noAccount) ? 'error' : 'default' }
+                    errorMessage={ noAccount ? "No account found" : "Enter valid email address" }
                     error={ (!validEmail || noAccount) }
-                    onChange={ handleEmailChange }
-                    onFocus={ () => onFocus(setEmailFocused) }
-                    onBlur={ () => onBlur(setEmailFocused) }
-                />
+                >
+                    <Input
+                        text="Email Address"
+                        className="w-full pb-16"
+                        error={ (!validEmail || noAccount) }
+                        onChange={ handleEmailChange }
+                        onFocus={ () => onFocus(setEmailFocused) }
+                        onBlur={ () => onBlur(setEmailFocused) }
+                    />
+                </Label>
                 <Button
-                    className="w-full mt-12 disabled:bg-primary-200"
+                    className="w-full mt-16 disabled:bg-primary-200"
                     disabled={ noAccount || !validEmail || email === "" || disableButton }
                     onClick={ handleSubmit }
                 >

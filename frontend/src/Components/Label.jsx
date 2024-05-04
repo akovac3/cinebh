@@ -16,10 +16,10 @@ const Label = ({ className, label, active, value, error, children, errorMessage,
     }
 
     return (
-        <div className={ createClassName(sizeClassName[size], "relative text-neutral-700 cursor-pointer w-full") }>
+        <div className={ createClassName(sizeClassName[size], "relative text-neutral-700 w-full py-8") }>
             { label ? <p className={ `font-semibold pb-4 ${error ? "text-error-300" : "text-neutral-25"}` }>{ label }</p> : null }
             <div className={ active ? createClassName(varianClassName[variant], varianClassName["focused"], className) : createClassName(varianClassName[variant], className) }>
-                <div className="flex w-full relative h-full items-center capitalize">
+                <div className="flex w-full relative h-full items-center capitalize cursor-pointer">
                     <div className={ `${active || value ? "text-primary-600" : "text-neutral-700"} ${error ? "!text-error-600" : ""} pr-8` }>
                         { leftIcon ? leftIcon : null }
                     </div>

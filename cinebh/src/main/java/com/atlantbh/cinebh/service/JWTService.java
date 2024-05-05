@@ -36,10 +36,6 @@ public class JWTService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public Date getExpirationDateFromToken(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
     private <T> T extractClaim(String token, Function<Claims, T> claimsTFunction) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsTFunction.apply(claims);

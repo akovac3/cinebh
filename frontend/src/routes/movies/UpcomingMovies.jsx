@@ -173,18 +173,21 @@ const UpcomingmovieList = () => {
     )
 
     return (
-        <div className="font-body px-[118px] pt-40">
+        <div className="font-body px-[118px] pt-32">
             <p className="text-neutral-800 text-heading-h4 pb-32">Upcoming Movies ({ movieList.length })</p>
-            <Input
-                text="Search Movies"
-                open={ focused }
-                placeholder={ filterParams.contains }
+            <Label
+                value={ filterParams.contains }
+                active={ focused }
                 leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
-                className="w-full"
-                onChange={ handleSearchChange }
-                onFocus={ onFocus }
-                onBlur={ onBlur }
-            />
+            >
+                <Input
+                    text="Search Movies"
+                    onChange={ handleSearchChange }
+                    onFocus={ onFocus }
+                    onBlur={ onBlur }
+                />
+            </Label>
+
             <div className="grid grid-cols-4 pt-16 pb-32 gap-8">
                 <Dropdown
                     label={ cityListLabel }

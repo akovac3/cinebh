@@ -85,7 +85,9 @@ const PasswordReset = ({ toggleSidebar }) => {
             <div className="w-[70%] pt-40">
                 <Label
                     label="Email"
+                    className="mb-24"
                     active={ emailFocused }
+                    value={ email }
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
                     variant={ (!validEmail || noAccount) ? 'error' : 'default' }
                     errorMessage={ noAccount ? "No account found" : "Enter valid email address" }
@@ -93,7 +95,6 @@ const PasswordReset = ({ toggleSidebar }) => {
                 >
                     <Input
                         text="Email Address"
-                        className="w-full pb-16"
                         error={ (!validEmail || noAccount) }
                         onChange={ handleEmailChange }
                         onFocus={ () => onFocus(setEmailFocused) }

@@ -201,26 +201,22 @@ const CurrentlyShowing = () => {
         </Label>
     )
 
-    const searchLabel = (
-        <Label
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
-        >
-            { filterParams.contains || "Search Movies" }
-        </Label>
-    )
-
     return (
         <div className="font-body px-[118px] pt-32">
             <p className="text-neutral-800 text-heading-h4 pb-24">Currently Showing ({ movieList?.length })</p>
-            <Input
-                label={ searchLabel }
-                text="Search Movies"
-                open={ focused }
-                className="w-full"
-                onChange={ handleSearchChange }
-                onFocus={ onFocus }
-                onBlur={ onBlur }
-            />
+            <Label
+                value={ filterParams.contains }
+                active={ focused }
+                leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faMagnifyingGlass } /> }
+            >
+                <Input
+                    text="Search Movies"
+                    onChange={ handleSearchChange }
+                    onFocus={ onFocus }
+                    onBlur={ onBlur }
+                />
+            </Label>
+
             <div className="grid lg:grid-cols-4 md:grid-cols-2 py-[18px] gap-8">
                 <Dropdown
                     value={ getCityName(filterParams.city) }

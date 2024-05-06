@@ -10,6 +10,7 @@ import PasswordReset from "./PasswordReset";
 
 import { url, passwordReset } from "../../utils/api";
 import { useCountDown } from "../../utils/utils";
+import Input from "../../components/Input";
 
 const EnterCode = ({ toggleSidebar }) => {
     const [code, setCode] = useState(new Array(4).fill(""))
@@ -71,6 +72,7 @@ const EnterCode = ({ toggleSidebar }) => {
         if (e.target.value && e.target.nextSibling) {
             e.target.nextSibling.focus();
         }
+
         else if (e.target.value === "" && e.target.previousSibling) {
             e.target.previousSibling.focus()
         }
@@ -107,7 +109,7 @@ const EnterCode = ({ toggleSidebar }) => {
                             value={ data }
                             maxLength={ 1 }
                             onChange={ (e) => handleChange(e, i) }
-                            className="w-[48px] h-[64px] bg-[#FCFCFD1A] border border-neutral-200 focus:outline-[3px] focus:outline-neutral-200 rounded-16 text-center text-heading-h3 text-neutral-25"
+                            className="!w-[48px] !h-[64px] bg-[#FCFCFD1A] border border-neutral-200 focus:outline-[3px] focus:outline-neutral-200 rounded-16 text-center text-heading-h3 !text-neutral-25"
                             type="text"
                         />
                     })

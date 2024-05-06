@@ -113,6 +113,8 @@ const SignUp = ({ toggleSidebar }) => {
             <div className="w-[70%] pb-24">
                 <Label
                     label="Email"
+                    value={ email }
+                    className="mb-16"
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
                     variant={ (!validEmail) ? 'error' : 'default' }
                     active={ emailFocused }
@@ -121,7 +123,6 @@ const SignUp = ({ toggleSidebar }) => {
                 >
                     <Input
                         text="Email Address"
-                        className="w-full pb-16"
                         error={ !validEmail }
                         onChange={ handleEmailChange }
                         onFocus={ () => onFocus(setEmailFocused) }
@@ -131,12 +132,13 @@ const SignUp = ({ toggleSidebar }) => {
 
                 <Label
                     label="First Name"
+                    className="mb-16"
+                    value={ firstName }
                     active={ firstNameFocused }
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
                 >
                     <Input
                         text="First name"
-                        className="w-full pb-16"
                         onChange={ handleFirstNameChange }
                         onFocus={ () => onFocus(setFirstNameFocused) }
                         onBlur={ () => onBlur(setFirstNameFocused) }
@@ -144,19 +146,23 @@ const SignUp = ({ toggleSidebar }) => {
                 </Label>
                 <Label
                     label="Last Name"
+                    className="mb-16"
+                    value={ lastName }
                     active={ lastNameFocused }
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faUserPlus } /> }
                 >
                     <Input
                         text="Last name"
-                        className="w-full pb-16"
                         onChange={ handleLastNameChange }
                         onFocus={ () => onFocus(setLastNameFocused) }
                         onBlur={ () => onBlur(setLastNameFocused) }
                     />
                 </Label>
                 <Label
-                    label="New Password"
+                    label="Password"
+                    className="mb-16"
+                    value={ password }
+                    password
                     active={ passwordFocused }
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
                     rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
@@ -167,7 +173,6 @@ const SignUp = ({ toggleSidebar }) => {
                     <Input
                         text="Password"
                         type={ passwordVisibility ? "text" : "password" }
-                        className="w-full pb-24"
                         error={ passwordsNotMatch }
                         onChange={ handlePasswordChange }
                         onFocus={ () => onFocus(setPasswordFocused) }
@@ -178,6 +183,9 @@ const SignUp = ({ toggleSidebar }) => {
                 <Label
                     label="Confirm Password"
                     active={ retypePasswordFocused }
+                    value={ retypePassword }
+                    className="mb-24"
+                    password
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
                     rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
                     variant={ passwordsNotMatch ? 'error' : 'default' }
@@ -187,7 +195,6 @@ const SignUp = ({ toggleSidebar }) => {
                     <Input
                         text="Retype Password"
                         type={ confirmPasswordVisibility ? "text" : "password" }
-                        className="w-full pb-24"
                         error={ passwordsNotMatch }
                         onChange={ handleRetypePasswordChange }
                         onFocus={ () => onFocus(setRetypePasswordFocused) }
@@ -195,7 +202,7 @@ const SignUp = ({ toggleSidebar }) => {
                     />
                 </Label>
                 <Button
-                    className="w-full mt-[20px] disabled:bg-primary-200"
+                    className="w-full mt-32 disabled:bg-primary-200"
                     disabled={ !validEmail || email === "" || password === "" || retypePassword === "" || passwordsNotMatch }
                     onClick={ handleSubmit }
                 >

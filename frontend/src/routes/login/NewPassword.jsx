@@ -89,6 +89,9 @@ const NewPassword = ({ toggleSidebar }) => {
             <div className="w-[70%] py-24">
                 <Label
                     label="New Password"
+                    value={ password }
+                    className="mb-16"
+                    password
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
                     rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
                     variant={ passwordsNotMatch ? 'error' : 'default' }
@@ -99,7 +102,6 @@ const NewPassword = ({ toggleSidebar }) => {
                     <Input
                         text="Password"
                         type={ passwordVisibility ? "text" : "password" }
-                        className="w-full pb-24"
                         error={ passwordsNotMatch }
                         onChange={ handlePasswordChange }
                         onFocus={ () => onFocus(setPasswordFocused) }
@@ -109,6 +111,8 @@ const NewPassword = ({ toggleSidebar }) => {
 
                 <Label
                     label="Repeat Password"
+                    value={ retypePassword }
+                    password
                     leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
                     rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setConfirmPasswordVisibility(!confirmPasswordVisibility) } /> }
                     variant={ passwordsNotMatch ? 'error' : 'default' }
@@ -120,7 +124,6 @@ const NewPassword = ({ toggleSidebar }) => {
                         text="Repeat Password"
                         error={ passwordsNotMatch }
                         type={ confirmPasswordVisibility ? "text" : "password" }
-                        className="w-full pb-24"
                         onChange={ handleRetypePasswordChange }
                         onFocus={ () => onFocus(setRetypePasswordFocused) }
                         onBlur={ () => onBlur(setRetypePasswordFocused) }
@@ -128,7 +131,7 @@ const NewPassword = ({ toggleSidebar }) => {
                 </Label>
 
                 <Button
-                    className="w-full mt-24 disabled:bg-primary-200"
+                    className="w-full mt-32 disabled:bg-primary-200"
                     disabled={ password === "" || retypePassword === "" || passwordsNotMatch }
                     onClick={ handleSubmit }
                 >

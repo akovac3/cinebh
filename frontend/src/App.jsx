@@ -8,6 +8,7 @@ import Layout from './components/Layout'
 import CurrentlyShowing from './routes/movies/CurrentlyShowing'
 import UpcomingMovies from './routes/movies/UpcomingMovies'
 import MovieDetails from './routes/movies/MovieDetails'
+import Reservation from './routes/reservations/Reservation'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path='/movie-details/:id' element={ <MovieDetails /> } />
           <Route path='/currently-showing' element={ <CurrentlyShowing /> } />
           <Route path='/upcoming-movies' element={ <UpcomingMovies /> } />
+          <Route path='/reservation' element={ <Reservation /> } />
         </Route>
       </Routes>
     </Router>

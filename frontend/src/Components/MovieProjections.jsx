@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,8 +9,10 @@ import DateCard from "./card/DateCard";
 import Pagination from "./Pagination";
 import Button from "./Button";
 import Label from "./Label";
+import LogIn from "../routes/login/LogIn";
 
-const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionList, filterParams, setFilterParams }) => {
+const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionList, filterParams, toggleSidebar, setFilterParams }) => {
+    const navigate = useNavigate();
     const [datePagination, setDatePagination] = useState({ page: 0, size: 6 })
     const [dates, setDates] = useState([])
     const [currentDates, setCurrentDates] = useState([])
@@ -57,6 +60,36 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
         return venueList?.find(c => c.venueId === id)?.name
     }
 
+    const handleReservation = () => {
+        const projection = getProjectionFromTime();
+        console.log(projection)
+        if (!localStorage.getItem("token")) {
+            toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } reservation />);
+        } else {
+            navigate("/reservation", {
+                state: {
+                    movie: movie,
+                    projection: projection,
+                    date: filterParams.startDate,
+                }
+            });
+        }
+    };
+
+    const getProjectionFromTime = () => {
+        const foundProjection = projectionList.find(
+            (projection) => projection.time === filterParams.time
+        );
+
+        if (foundProjection) {
+            console.log(foundProjection);
+            return foundProjection;
+        } else {
+            console.log('Projection not found');
+            return null;
+        }
+    };
+
     useEffect(() => {
         const startIndex = datePagination.page * datePagination.size;
         const endIndex = startIndex + datePagination.size;
@@ -72,8 +105,8 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
 
     const cityLabel = (
         <Label
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faLocationPin } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+            leftIcon={ <FontAwesomeIcon className="mr-8" icon={ fas.faLocationPin } /> }
+            rightIcon={ <FontAwesomeIcon icon={ fas.faChevronDown } /> }
         >
             { getCityName(filterParams.city) || "Choose city" }
         </Label>
@@ -81,8 +114,8 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
 
     const venueLabel = (
         <Label
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faBuilding } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+            leftIcon={ <FontAwesomeIcon className="mr-8" icon={ fas.faBuilding } /> }
+            rightIcon={ <FontAwesomeIcon icon={ fas.faChevronDown } /> }
         >
             { getVenueName(filterParams.venue) || "Choose venue" }
         </Label>
@@ -181,7 +214,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 </div>
             }
             <div className="absolute bottom-0 border-t border-neutral-200 grid grid-cols-2 py-24 gap-16 px-[20px] w-full">
-                <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull }>
+                <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull } onClick={ handleReservation }>
                     Reserve Ticket
                 </Button>
                 <Button className="w-full" disabled={ !allFieldsNotNull }>

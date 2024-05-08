@@ -1,6 +1,6 @@
 import axios from "axios";
 import { add, format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams } from 'react-router-dom';
 
 import Badge from "../../components/Badge";
@@ -13,7 +13,12 @@ import { url, movies, cities, venues, projections } from "../../utils/api";
 import Coming from "../../components/Coming";
 import MovieProjections from "../../components/MovieProjections";
 
+import { ToggleSidebarContext } from "../../components/Layout";
+
 const MovieDetails = () => {
+
+    const toggleSidebar = useContext(ToggleSidebarContext);
+
     const { id } = useParams();
     const [movie, setMovie] = useState()
     const [cityList, setCityList] = useState([])
@@ -179,6 +184,7 @@ const MovieDetails = () => {
                 <div className="rounded-16 border border-neutral-200 shadow-light-400 h-full relative lg:min-h-[560px] sm:min-h-[650px]">
                     { !upcoming ?
                         <MovieProjections
+                            toggleSidebar={ toggleSidebar }
                             movie={ movie }
                             cityList={ cityList }
                             venueList={ venueList }

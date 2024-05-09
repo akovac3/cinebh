@@ -7,6 +7,7 @@ import com.atlantbh.cinebh.model.Type;
 import com.atlantbh.cinebh.model.User;
 import com.atlantbh.cinebh.repository.ProjectionRepository;
 import com.atlantbh.cinebh.repository.ReservationRepository;
+import com.atlantbh.cinebh.request.EmailRequest;
 import com.atlantbh.cinebh.request.ReservationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ReservationService {
 
     @Autowired
     private ProjectionRepository projectionRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public String create(ReservationRequest request, User user){
         Projection projection = projectionRepository.findById(request.getProjectionId()).orElseThrow(()-> new ResourceNotFoundException("Invalid projection id!"));
@@ -43,6 +47,15 @@ public class ReservationService {
             projection.setPurchasedSeats(purchasedSeats);
         }
         projectionRepository.save(projection);
-        return "Reservation saved successfully";
+        return emailService.sendEmail(
+                new EmailRequest(
+                        user.getEmail(),
+                        "Reservation Confirmation",
+                        "Hi "+user.getFirstName()+" "+user.getLastName()+", \n\nWe are pleased to confirm your reservation for the following details:\n\n" +
+                              "Movie: "+projection.getMovie().getName() + "\nDate: "+ request.getDate()+"\nTime: "+projection.getTime().toString().substring(0,5)+"\nVenue: "+
+                                projection.getVenue().getName() +", " + projection.getVenue().getAddress() + "\nSeats: "+ String.join(", ",request.getSeats())+
+                                "\n\nPlease note that your reservation will expire if the tickets are not purchased at least one hour before the showtime. \nTo ensure your seats are secured, we recommend completing your purchase well in advance."+
+                                "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
+                                "\n -The Cinebh Team"));
     }
 }

@@ -20,6 +20,7 @@ const Reservation = () => {
     const [modal, setModal] = useState(false)
     const [cover, setCover] = useState();
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const reservedSeats = projection.reservedSeats.concat(projection.purchasedSeats);
 
     const calculateSeatPrice = (seatId) => {
         if (seatId.startsWith("I")) {
@@ -107,7 +108,7 @@ const Reservation = () => {
                 </div>
             </div>
             <div className="grid lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-1 pt-12 pb-40 px-[118px]">
-                <CinemaSeats selectedSeats={ selectedSeats } reservedSeats={ projection.reservedSeats } setSelectedSeats={ setSelectedSeats } />
+                <CinemaSeats selectedSeats={ selectedSeats } reservedSeats={ reservedSeats } setSelectedSeats={ setSelectedSeats } />
                 <SeatGuide selectedSeats={ selectedSeats } totalPrice={ totalPrice } onClick={ makeReservationClick } />
             </div>
             { modal && <Modal>

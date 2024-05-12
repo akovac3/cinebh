@@ -7,7 +7,7 @@ import Button from "./Button"
 
 import { createClassName } from "../utils/utils"
 
-const SeatGuide = ({ className, selectedSeats, totalPrice, onClick }) => {
+const SeatGuide = ({ className, selectedSeats, payment = false, totalPrice, onClick }) => {
     const [disableButton, setDisableButton] = useState(false)
 
     return (
@@ -52,7 +52,7 @@ const SeatGuide = ({ className, selectedSeats, totalPrice, onClick }) => {
                 <p className="flex-1">{ selectedSeats.join(",") }</p>
                 <p> { totalPrice } KM</p>
             </div>
-            <Button className="w-full" onClick={ () => { onClick(); setDisableButton(true) } } disabled={ selectedSeats.length === 0 || disableButton }>Make reservation</Button>
+            <Button className="w-full" onClick={ () => { onClick(); setDisableButton(true) } } disabled={ selectedSeats.length === 0 || disableButton }>{ payment ? "Continue to Payment" : "Make reservation" }</Button>
         </div>
     )
 }

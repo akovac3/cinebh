@@ -12,6 +12,7 @@ import RequireAuth from './routes/auth/RequireAuth'
 import Unauthorized from './routes/unauthorized/Unauthorized'
 
 import { ROLES } from './utils/constants'
+import PaymentDetails from './routes/reservations/PaymentDetails'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
             <Route path='/reservation' element={ <Reservation /> } />
           </Route>
 
+          <Route path='/payment-details' element={ <PaymentDetails /> } />
         </Route>
       </Routes>
     </Router>

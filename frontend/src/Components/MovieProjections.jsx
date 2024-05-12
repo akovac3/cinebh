@@ -71,6 +71,23 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                     movie: movie,
                     projection: projection,
                     date: filterParams.startDate,
+                    payment: false
+                }
+            });
+        }
+    };
+
+    const handlePayment = () => {
+        const projection = getProjectionFromTime();
+        if (!localStorage.getItem("token")) {
+            toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } reservation />);
+        } else {
+            navigate("/reservation", {
+                state: {
+                    movie: movie,
+                    projection: projection,
+                    date: filterParams.startDate,
+                    payment: true
                 }
             });
         }
@@ -217,7 +234,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull } onClick={ handleReservation }>
                     Reserve Ticket
                 </Button>
-                <Button className="w-full" disabled={ !allFieldsNotNull }>
+                <Button className="w-full" disabled={ !allFieldsNotNull } onClick={ handlePayment }>
                     Buy Ticket
                 </Button>
             </div>

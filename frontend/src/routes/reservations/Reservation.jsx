@@ -17,6 +17,7 @@ const Reservation = () => {
     const movie = location.state.movie;
     const projection = location.state.projection;
     const date = location.state.date;
+    const payment = location.state.payment;
     const [modal, setModal] = useState(false)
     const [cover, setCover] = useState();
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -50,7 +51,6 @@ const Reservation = () => {
 
     const onFinish = async (values) => {
         try {
-            console.log(values)
             const token = localStorage.getItem("token")
             const response = await axios.post(url + reservation, values, {
                 headers: {
@@ -77,6 +77,21 @@ const Reservation = () => {
                 type: "RESERVATION"
             }
             onFinish(values)
+        }
+    }
+
+    const makePaymentClick = () => {
+        if (selectedSeats.length !== 0) {
+            navigate("/payment-details", {
+                state: {
+                    movie: movie,
+                    cover: cover,
+                    projection: projection,
+                    date: date,
+                    totalPrice: totalPrice,
+                    selectedSeats: selectedSeats
+                }
+            });
         }
     }
 
@@ -109,11 +124,12 @@ const Reservation = () => {
             </div>
             <div className="grid lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-1 pt-12 pb-40 px-[118px]">
                 <CinemaSeats selectedSeats={ selectedSeats } reservedSeats={ reservedSeats } setSelectedSeats={ setSelectedSeats } />
-                <SeatGuide selectedSeats={ selectedSeats } totalPrice={ totalPrice } onClick={ makeReservationClick } />
+                <SeatGuide selectedSeats={ selectedSeats } payment={ payment } totalPrice={ totalPrice } onClick={ payment ? makePaymentClick : makeReservationClick } />
             </div>
             { modal && <Modal>
                 <p className="text-heading-h6 text-neutral-900 pb-16">Seats Reserved!</p>
-                <p className="text-body-m text-neutral-500 text-justify">Your reservation confirmation has been sent to your email. You can also see your reservation details on your User profile and set a reminder for ticket purchasing.</p>
+                <p className="text-body-m text-neutral-500 text-justify">
+                    Your reservation confirmation has been sent to your email. You can also see your reservation details on your User profile and set a reminder for ticket purchasing.</p>
                 <div className="flex pt-32 gap-8 justify-end">
                     <Button variant="secondary" size="sm" onClick={ () => navigate("/") }>Back to Home</Button>
                     <Button size="sm">See Reservation</Button>

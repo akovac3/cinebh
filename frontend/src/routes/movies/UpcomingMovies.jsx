@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
-import { Dropdown, DropdownItem } from "../../components/Dropdown";
+import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
 import Label from "../../components/Label";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
@@ -189,71 +189,71 @@ const UpcomingmovieList = () => {
             </Label>
 
             <div className="grid grid-cols-4 pt-16 pb-32 gap-8">
-                <Dropdown
+                <LabeledDropdown
                     label={ cityListLabel }
                     value={ getCityName(filterParams.city) } >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('city', null) }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All Cities
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ getVenueName(filterParams.venue) }
                     label={ venueListLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('venue', null) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('venue', venue.venueId) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ getGenreName(filterParams.genre) }
                     label={ genreLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('genre', null) }
                         className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
                         All genres
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { genreList.map((genre, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('genre', genre.id) }
                                 className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
+                </LabeledDropdown>
                 <DateRangePicker
                     label={ dateRangeLabel }
                     onClickApply={

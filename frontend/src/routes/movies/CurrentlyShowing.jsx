@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom"
 import { format } from "date-fns";
 
-import { Dropdown, DropdownItem } from "../../components/Dropdown";
+import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
 import CurrentlyShowingCard from "../../components/card/CurrentlyShowingCard";
 import Input from "../../components/Input";
 import DateCard from "../../components/card/DateCard";
@@ -218,94 +218,94 @@ const CurrentlyShowing = () => {
             </Label>
 
             <div className="grid lg:grid-cols-4 md:grid-cols-2 py-[18px] gap-8">
-                <Dropdown
+                <LabeledDropdown
                     value={ getCityName(filterParams.city) }
                     label={ cityLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('city', null) }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All cities
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ getVenueName(filterParams.venue) }
                     label={ venueLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('venue', null) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('venue', venue.venueId) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ getGenreName(filterParams.genre) }
                     label={ genreLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('genre', null) }
                         className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
                         All genres
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { genreList.map((genre, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('genre', genre.id) }
                                 className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ filterParams.time }
                     label={ timeLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange('time', null) }
                         className={ `${filterParams.time === null ? "font-semibold" : "font-normal"}` }
                     >
                         All projection times
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { times.map((time, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('time', decodeURIComponent(time + ":00")) }
                                 className={ `${time === filterParams.time ? "font-semibold" : "font-normal"}` }
                             >
                                 { time }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
+                </LabeledDropdown>
             </div >
             <div className="grid lg:grid-cols-10 md:grid-cols-5 sm:grid-cols-3 gap-16 pb-[20px]">
                 {

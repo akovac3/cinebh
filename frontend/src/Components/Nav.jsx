@@ -5,18 +5,17 @@ import { faBars, faXmark, faChevronUp, faChevronDown } from "@fortawesome/free-s
 import Logo from "./Logo";
 import Button from "./Button";
 import LogIn from "../routes/login/LogIn";
-import LogOut from "../routes/login/LogOut";
+import UserOptions from "../routes/login/UserOptions";
 
-import { createClassName } from "../utils/utils";
+import { createClassName, useOutsideClick } from "../utils/utils";
 
 const Nav = ({ className, toggleSidebar }) => {
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
+
   const [userClick, setUserClick] = useState(false);
-  const handleUserClick = () => {
-    setUserClick(!userClick);
-    toggleSidebar(<LogOut toggleSidebar={ toggleSidebar } />)
-  }
+
+  const ref = useOutsideClick(() => { setUserClick(false) })
 
   const signedIn = localStorage.getItem("loggedIn")
   const name = localStorage.getItem("firstName") + " " + localStorage.getItem("lastName")
@@ -61,28 +60,34 @@ const Nav = ({ className, toggleSidebar }) => {
           </ul>
         </div>
         { signedIn ?
-          <Button
-            variant="secondary"
-            className="!text-neutral-25 !border-neutral-25 hover:!bg-neutral-800"
-            onClick={ handleUserClick }
-          >
-            { name }
-            <FontAwesomeIcon icon={ userClick ? faChevronUp : faChevronDown } className="h-[14px]" />
-          </Button>
+          <div ref={ ref }>
+            <Button
+              variant="secondary"
+              className="!text-neutral-25 !border-neutral-25 hover:!bg-neutral-800"
+              onClick={ () => setUserClick(prevState => !prevState) }
+            >
+              { name }
+              <FontAwesomeIcon icon={ userClick ? faChevronUp : faChevronDown } className="h-[14px]" />
+            </Button>
+            { userClick &&
+              <UserOptions setUserClick={ setUserClick }></UserOptions>
+            }
+          </div>
           : <Button
             variant="secondary"
             className="!text-neutral-25 !border-neutral-25 hover:!bg-neutral-800"
-            onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />) }
+            onClick={ () => toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } />, "right") }
           >
             Sign in
           </Button>
         }
+
         { click && content }
         <button className="block md:hidden transition" onClick={ handleClick }>
           <FontAwesomeIcon icon={ click ? faXmark : faBars } />
         </button>
       </div>
-    </nav >
+    </nav>
   )
 }
 

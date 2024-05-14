@@ -4,6 +4,8 @@ import format from "date-fns/format";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 import Image from "../../components/Image";
 import Modal from "../../components/Modal";
@@ -27,8 +29,8 @@ const PaymentDetails = () => {
     const [newCard, setNewCard] = useState({ cardNumber: "", expiryDate: "", cvv: "" });
     const [cardFieldFocused, setCardFieldFocused] = useState({ cardNumberFocused: false, expiryDateFocused: false, cvvFocused: false });
     const [selectedCard, setSelectedCard] = useState(null);
-    const [selectedCardIndex, setSelectedCardIndex] = useState(null)
-    const [modal, setModal] = useState(false)
+    const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+    const [modal, setModal] = useState(false);
 
     const savedCards = [
         { cardNumber: "1234 5678 9101 1121", expiryDate: "12/24", cvv: "123", type: "visa" },
@@ -39,7 +41,7 @@ const PaymentDetails = () => {
         const updatedParams = { ...cardFieldFocused, ...fieldsAndValues };
         setCardFieldFocused(updatedParams);
         setSelectedCard(null);
-        setSelectedCardIndex(null)
+        setSelectedCardIndex(null);
     };
 
     const onBlur = (fieldsAndValues) => {
@@ -75,36 +77,35 @@ const PaymentDetails = () => {
 
     const onFinish = async (values) => {
         try {
-            setDisableButton(true)
-            const token = localStorage.getItem("token")
+            setDisableButton(true);
+            const token = localStorage.getItem("token");
             const response = await axios.post(url + reservation, values, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.status === 200) {
-                setModal(true)
+                setModal(true);
             }
         } catch (error) {
-            console.log(error)
-            console.log(error.response.data.message)
+            console.log(error);
+            console.log(error.response.data.message);
         }
-    }
+    };
 
     const handlePayment = () => {
         if (newCard.cardNumber.length === 19 && newCard.expiryDate.length === 5 && newCard.cvv.length === 3) {
             console.log(newCard);
-        } else if (selectedCard) console.log(selectedCard)
+        } else if (selectedCard) console.log(selectedCard);
         const values = {
             date: date,
             projectionId: projection.projectionId,
             seats: selectedSeats,
             price: totalPrice,
             type: "PURCHASE"
-        }
-        onFinish(values)
-    }
-
+        };
+        onFinish(values);
+    };
 
     useEffect(() => {
         if (selectedCard || (newCard.cardNumber.length === 19 && newCard.expiryDate.length === 5 && newCard.cvv.length === 3)) {
@@ -113,6 +114,53 @@ const PaymentDetails = () => {
             setDisableButton(true);
         }
     }, [selectedCard, newCard]);
+
+    const downloadDetailedPDF = async () => {
+        try {
+            const element = document.getElementById('booking-summary');
+            const canvas = await html2canvas(element);
+
+            const imgData = canvas.toDataURL('image/png');
+            const desiredWidth = 100;
+            const desiredHeight = canvas.height * (desiredWidth / canvas.width);
+
+            const detailedPdf = new jsPDF();
+            detailedPdf.addImage(imgData, 'PNG', 10, 10, desiredWidth, desiredHeight);
+            detailedPdf.save('tickets.pdf');
+        } catch (error) {
+            console.error('Error generating detailed PDF:', error);
+        }
+    };
+
+    const downloadReceiptPDF = () => {
+        const receiptPdf = new jsPDF();
+        const marginLeft = 20;
+
+        receiptPdf.setFontSize(16);
+        receiptPdf.text("Receipt", marginLeft, 20);
+
+        receiptPdf.setFontSize(12);
+        receiptPdf.text(`Movie: ${movie.name}`, marginLeft, 30);
+        receiptPdf.text(`Date: ${format(date, "EEEE, MMM dd")}`, marginLeft, 40);
+        receiptPdf.text(`Time: ${projection.time.slice(0, 5)}`, marginLeft, 50);
+
+        receiptPdf.text(`Purchased Tickets:`, marginLeft, 60);
+
+        selectedSeats.forEach((seat, index) => {
+            receiptPdf.text(`Seat: ${seat}`, marginLeft + 10, 70 + (index * 10));
+        });
+
+        receiptPdf.line(marginLeft, 80 + (selectedSeats.length * 10), 190, 80 + (selectedSeats.length * 10));
+        receiptPdf.text(`Total Price: ${totalPrice} KM`, 190 - marginLeft, 90 + (selectedSeats.length * 10), { align: 'right' });
+
+        receiptPdf.save('receipt.pdf');
+    };
+
+    const downloadBothPDFs = async () => {
+        await downloadDetailedPDF();
+        downloadReceiptPDF();
+    };
+
 
     return (
         <div className="font-body">
@@ -130,10 +178,9 @@ const PaymentDetails = () => {
                             type={ card.type }
                             onClick={ () => {
                                 if (selectedCardIndex === i) {
-                                    setSelectedCard(null)
-                                    setSelectedCardIndex(null)
-                                }
-                                else {
+                                    setSelectedCard(null);
+                                    setSelectedCardIndex(null);
+                                } else {
                                     setSelectedCard(card);
                                     setSelectedCardIndex(i);
                                     setNewCard({ cardNumber: "", expiryDate: "", cvv: "" });
@@ -202,7 +249,7 @@ const PaymentDetails = () => {
 
                 <div className="text-neutral-25">
                     <p className="text-heading-h6 text-neutral-500 pb-24">Booking Summary</p>
-                    <div className="rounded-16 bg-neutral-800 flex flex-col items-center justify-center">
+                    <div id="booking-summary" className="rounded-16 bg-neutral-800 flex flex-col items-center justify-center">
                         <div className="px-12 py-24 w-[90%] flex border-b border-neutral-200">
                             <Image className={ `rounded-12 object-cover h-[126px] w-[125px]` } src={ cover } alt="" />
                             <div className="pl-16">
@@ -235,7 +282,7 @@ const PaymentDetails = () => {
                     The receipt and ticket have been sent to your email. You may download them immediately, or retrieve them later from your User Profile.</p>
                 <div className="flex pt-32 gap-8 justify-end">
                     <Button variant="secondary" size="sm" onClick={ () => navigate("/") }>Back to Home</Button>
-                    <Button size="sm">See Reservation</Button>
+                    <Button size="sm" onClick={ downloadBothPDFs }>Download</Button>
                 </div>
             </Modal> }
         </div>

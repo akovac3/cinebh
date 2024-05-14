@@ -132,8 +132,8 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
                     />
                 </Label>
 
-                <div className="flex items-center justify-center pt-8 pb-32">
-                    <label htmlFor="rememberMe" className="flex flex-1 text-neutral-400 font-semibold">
+                <div className="flex items-end justify-end pt-8 pb-32">
+                    { false && <label htmlFor="rememberMe" className="flex flex-1 text-neutral-400 font-semibold">
                         <Input
                             type="checkbox"
                             id="rememberMe"
@@ -143,6 +143,7 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
                         />
                         Remember Me
                     </label>
+                    }
                     <Button
                         variant="tertiary"
                         onClick={ () => toggleSidebar(<PasswordReset toggleSidebar={ toggleSidebar } />) }

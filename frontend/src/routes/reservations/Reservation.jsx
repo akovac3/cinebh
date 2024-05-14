@@ -50,7 +50,6 @@ const Reservation = () => {
 
     const onFinish = async (values) => {
         try {
-            console.log(values)
             const token = localStorage.getItem("token")
             const response = await axios.post(url + reservation, values, {
                 headers: {
@@ -58,7 +57,6 @@ const Reservation = () => {
                 }
             });
             if (response.status === 200) {
-                console.log("reservation made")
                 setModal(true)
             }
         } catch (error) {
@@ -116,7 +114,7 @@ const Reservation = () => {
                 <p className="text-body-m text-neutral-500 text-justify">Your reservation confirmation has been sent to your email. You can also see your reservation details on your User profile and set a reminder for ticket purchasing.</p>
                 <div className="flex pt-32 gap-8 justify-end">
                     <Button variant="secondary" size="sm" onClick={ () => navigate("/") }>Back to Home</Button>
-                    <Button size="sm">See Reservation</Button>
+                    { false && <Button size="sm">See Reservation</Button> }
                 </div>
             </Modal> }
         </div>

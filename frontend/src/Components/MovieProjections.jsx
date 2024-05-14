@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, isAfter, addHours } from "date-fns";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -62,7 +62,6 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
 
     const handleReservation = () => {
         const projection = getProjectionFromTime();
-        console.log(projection)
         if (!localStorage.getItem("token")) {
             toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } reservation />);
         } else {
@@ -82,13 +81,18 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
         );
 
         if (foundProjection) {
-            console.log(foundProjection);
             return foundProjection;
         } else {
-            console.log('Projection not found');
             return null;
         }
     };
+
+    const isValidProjectionTime = (projectionTime, selectedDate) => {
+        const projectionDateTime = new Date(format(selectedDate, 'yyyy-MM-dd') + 'T' + projectionTime);
+        const currentTime = new Date();
+        const currentTimePlusOneHour = addHours(currentTime, 1);
+        return isAfter(projectionDateTime, currentTimePlusOneHour);
+    }
 
     useEffect(() => {
         const startIndex = datePagination.page * datePagination.size;
@@ -179,7 +183,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                                 key={ datePagination.page + index }
                                 date={ date }
                                 className={ `${formattedDate === filterParams.startDate ? "!bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
-                                onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange({ startDate: null }) : _handleFilterChange({ startDate: formattedDate }) } }
+                                onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange({ startDate: null, time: null }) : _handleFilterChange({ startDate: formattedDate, time: null }) } }
                             />
                         )
                     }) }
@@ -201,13 +205,23 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 <p className="text-neutral-600 text-body-l px-24">Please select city and venue.</p> :
                 <div className="flex gap-12 px-24">
                     { projectionList.length !== 0 ? projectionList.map((projection, index) => {
+                        const projectionTime = projection.time.split(":");
+                        const isValidTime = isValidProjectionTime(projection.time, filterParams.startDate);
+
                         return (
                             <div
                                 key={ index }
-                                onClick={ () => { projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time }) } }
-                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time ? "bg-primary-600 text-neutral-25 border-primary-600" : "bg-neutral-0 border-neutral-200 text-neutral-800"} cursor-pointer` }
+                                onClick={ () => {
+                                    if (isValidTime) {
+                                        projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time });
+                                    }
+                                } }
+                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time && isValidTime ? "bg-primary-600 text-neutral-25 border-primary-600" :
+                                    !isValidTime ? "bg-neutral-300 text-neutral-25 border-neutral-300 cursor-not-allowed" :
+                                        "bg-neutral-0 border-neutral-200 text-neutral-800"
+                                    } cursor-pointer` }
                             >
-                                { projection.time.slice(0, 5) }
+                                { projectionTime[0] + ":" + projectionTime[1] }
                             </div>
                         )
                     }) : <p className="text-neutral-600 text-body-l">No projections for selected venue!</p> }

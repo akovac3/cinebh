@@ -36,7 +36,6 @@ const CinemaSeats = ({ className, selectedSeats, reservedSeats, setSelectedSeats
     const generateLoveSeatIds = () => ['I1', 'I2', 'I3', 'I4'];
 
     useState(() => {
-        console.log(reservedSeats)
         const regular = generateRegularSeatIds().map(id => ({ id, status: reservedSeats.includes(id) ? 'reserved' : 'available' }));
         const vip = generateVIPSeatIds().map(id => ({ id, status: reservedSeats.includes(id) ? 'reserved' : 'available' }));
         const love = generateLoveSeatIds().map(id => ({ id, status: reservedSeats.includes(id) ? 'reserved' : 'available' }));

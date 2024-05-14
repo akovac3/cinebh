@@ -4,6 +4,7 @@ import com.atlantbh.cinebh.model.Projection;
 import com.atlantbh.cinebh.model.Type;
 import com.atlantbh.cinebh.repository.ProjectionRepository;
 import com.atlantbh.cinebh.repository.ReservationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class ReservationScheduler {
     private final ReservationRepository reservationRepository;
     private final ProjectionRepository projectionRepository;
@@ -28,6 +30,7 @@ public class ReservationScheduler {
     @Scheduled(cron = "0 0/15 * * * *")
     public void deleteReservedSeatsForExpiredProjections() {
         LocalTime currentHour = LocalTime.now().truncatedTo(ChronoUnit.MINUTES).plusHours(1);
+        log.info("Task for deleting reserved seats started at {}", LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
 
         List<Projection> projections = projectionRepository.getTodaysProjections();
 

@@ -39,7 +39,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -175,11 +174,14 @@ public class MovieController {
     public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
         Movie movie = movieService.findById(id);
         Set<Projection> projections = movie.getProjections();
-        projections.addAll(Arrays.stream(projectionRequests)
-                .map(projectionRequest -> {
+
+        Set<Projection> newProjections = Arrays.stream(projectionRequests)
+                .flatMap(projectionRequest -> {
                     Venue venue = venueService.findById(projectionRequest.getVenueId());
-                    return projectionService.save(new Projection(projectionRequest.getTime(), movie, venue));
-                }).collect(Collectors.toSet()));
+                    return projectionService.createProjectionsForMovie(movie, projectionRequest.getTime(), venue).stream();
+                })
+                .collect(Collectors.toSet());
+        projections.addAll(newProjections);
         movie.setProjections(projections);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);

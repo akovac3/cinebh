@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Date;
 import java.util.List;
 
 @RestController
@@ -35,10 +36,11 @@ public class ProjectionController {
     }
 
     @GetMapping
-    ResponseEntity<List<Projection>> getMovieProjectionsForVenue(@RequestParam Long movie, @RequestParam Long venue){
+    ResponseEntity<List<Projection>> getMovieProjectionsForVenue(@RequestParam Long movie, @RequestParam Long venue, @RequestParam String date){
         Movie movieObj = movieService.findById(movie);
         Venue venueObj = venueService.findById(venue);
-        return ResponseEntity.ok(projectionService.getProjectionsForMovie(movieObj, venueObj));
+        Date dateObj = Date.valueOf(date);
+        return ResponseEntity.ok(projectionService.getProjectionsForMovie(movieObj, venueObj, dateObj));
     }
 
 }

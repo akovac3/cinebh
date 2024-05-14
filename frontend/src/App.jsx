@@ -1,6 +1,5 @@
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
 import Home from './routes/home/Home'
 import AboutUs from './routes/about/AboutUs'
 import Tickets from './routes/tickets/Tickets'
@@ -9,6 +8,13 @@ import CurrentlyShowing from './routes/movies/CurrentlyShowing'
 import UpcomingMovies from './routes/movies/UpcomingMovies'
 import MovieDetails from './routes/movies/MovieDetails'
 import Reservation from './routes/reservations/Reservation'
+import RequireAuth from './components/RequireAuth'
+import Unauthorized from './components/Unauthorized'
+
+const ROLES = {
+  User: 'USER',
+  Admin: 'ADMIN'
+}
 
 const App = () => {
   return (
@@ -21,11 +27,16 @@ const App = () => {
           <Route path='/movie-details/:id' element={ <MovieDetails /> } />
           <Route path='/currently-showing' element={ <CurrentlyShowing /> } />
           <Route path='/upcoming-movies' element={ <UpcomingMovies /> } />
-          <Route path='/reservation' element={ <Reservation /> } />
+          <Route path='/unauthorized' element={ <Unauthorized /> } />
+
+          <Route element={ <RequireAuth allowedRoles={ [ROLES.User] } /> }>
+            <Route path='/reservation' element={ <Reservation /> } />
+          </Route>
+
         </Route>
       </Routes>
     </Router>
   )
 }
 
-export default App
+export default App;

@@ -6,6 +6,8 @@ import { url, logout } from "../../utils/api";
 
 const UserOptions = ({ setUserClick }) => {
 
+    const userRole = localStorage.getItem('userRole')
+
     const onFinish = async () => {
         const token = localStorage.getItem('token');
 
@@ -27,6 +29,7 @@ const UserOptions = ({ setUserClick }) => {
     return (
         <Dropdown className="w-[300px] right-[118px]">
             <DropdownItem>Profile</DropdownItem>
+            { userRole === 'ADMIN' && <DropdownItem>Admin</DropdownItem> }
             <DropdownItem className="text-primary-600" onClick={ onFinish }>Log Out</DropdownItem>
         </Dropdown>
     )

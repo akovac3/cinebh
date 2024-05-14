@@ -43,6 +43,7 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
                 localStorage.setItem('refreshToken', response.data.refreshToken)
                 localStorage.setItem("firstName", response.data.firstName)
                 localStorage.setItem("lastName", response.data.lastName)
+                localStorage.setItem("userRole", response.data.role)
                 localStorage.setItem("loggedIn", email)
                 success()
             }

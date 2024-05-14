@@ -87,7 +87,7 @@ const MovieDetails = () => {
     }
 
     const getProjections = async (venueId) => {
-        axios.get(`${url}${projections}?movie=${movie.movieId}&venue=${venueId}`)
+        axios.get(`${url}${projections}?movie=${movie.movieId}&venue=${venueId}&date=${filterParams.startDate}`)
             .then(response => setProjectionList(response.data))
             .catch(error => {
                 console.log(error)

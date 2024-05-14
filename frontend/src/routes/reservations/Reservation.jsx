@@ -105,7 +105,7 @@ const Reservation = () => {
                     <p>Hall 1</p>
                 </div>
             </div>
-            <div className="grid lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-1 pt-12 pb-40 px-[118px]">
+            <div className="grid lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-1 gap-[50px] pt-12 pb-40 px-[118px]">
                 <CinemaSeats selectedSeats={ selectedSeats } reservedSeats={ reservedSeats } setSelectedSeats={ setSelectedSeats } />
                 <SeatGuide selectedSeats={ selectedSeats } totalPrice={ totalPrice } onClick={ makeReservationClick } />
             </div>

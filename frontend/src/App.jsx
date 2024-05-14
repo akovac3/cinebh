@@ -8,13 +8,10 @@ import CurrentlyShowing from './routes/movies/CurrentlyShowing'
 import UpcomingMovies from './routes/movies/UpcomingMovies'
 import MovieDetails from './routes/movies/MovieDetails'
 import Reservation from './routes/reservations/Reservation'
-import RequireAuth from './components/RequireAuth'
-import Unauthorized from './components/Unauthorized'
+import RequireAuth from './routes/auth/RequireAuth'
+import Unauthorized from './routes/unauthorized/Unauthorized'
 
-const ROLES = {
-  User: 'USER',
-  Admin: 'ADMIN'
-}
+import { ROLES } from './utils/constants'
 
 const App = () => {
   return (

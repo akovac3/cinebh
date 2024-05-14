@@ -47,48 +47,75 @@ const CinemaSeats = ({ className, selectedSeats, reservedSeats, setSelectedSeats
 
     return (
         <div className={ createClassName("flex flex-col justify-center items-center", className) }>
-            <p className="text-body-l pb-[50px]">Cinema Screen</p>
+            <p className="text-body-l pb-[50px] pt-4">Cinema Screen</p>
             <div className="h-24 w-[400px] bg-gradient-to-b from-primary-600 to-neutral-25 transform -translate-y-1/4 rounded-t-full"></div>
-            <div className="grid grid-cols-10 gap-8 pt-[75px] w-full">
+            <div className="grid grid-cols-9 items-center gap-8 pt-[75px]">
                 { regularSeats.map((seat, i) => {
-                    return (
+                    const seatHtml = (
                         <Seat
                             key={ i + seat.id }
                             variant={ selectedSeats.includes(seat.id) ? 'selected' : seat.status }
-                            style={ i % 4 === 3 ? { gridColumnEnd: "span 2" } : {} }
                             onClick={ seat.status === 'reserved' ? null : () => handleSeatClick(seat.id) }
                         >
                             { seat.id }
                         </Seat>
-                    );
+                    )
+
+                    if (Number(seat.id[1]) % 9 == 4) {
+                        return (
+                            <>
+                                { seatHtml }
+                                <div />
+                            </>
+                        )
+                    }
+                    return seatHtml;
                 }) }
                 { vipSeats.map((seat, i) => {
-                    return (
+                    const seatHtml = (
                         <Seat
                             key={ i + seat.id }
                             variant={ selectedSeats.includes(seat.id) ? 'selected' : seat.status }
-                            style={ i % 4 === 3 ? { gridColumnEnd: "span 2" } : {} }
                             onClick={ seat.status === 'reserved' ? null : () => handleSeatClick(seat.id) }
                         >
                             <FontAwesomeIcon className="p-0 pr-4" icon={ fas.faStar } />
                             { seat.id }
                         </Seat>
-                    );
+                    )
+                    if (Number(seat.id[1]) % 9 == 4) {
+                        return (
+                            <>
+                                { seatHtml }
+                                <div />
+                            </>
+                        )
+                    }
+                    return seatHtml;
                 }) }
             </div>
-            <div className="grid grid-cols-10 gap-8 pt-8 w-full">
+            <div className="grid grid-cols-9 gap-8 items-center pt-8">
                 { loveSeats.map((seat, i) => {
-                    return (
+                    const seatHtml = (
                         <Seat
                             key={ i + seat.id }
                             variant={ selectedSeats.includes(seat.id) ? 'selected' : seat.status }
-                            className="!w-[116px]"
+                            className="!w-[112px]"
                             onClick={ seat.status === 'reserved' ? null : () => handleSeatClick(seat.id) }
-                            style={ i % 2 === 1 ? { gridColumnEnd: "span 3" } : { gridColumnEnd: "span 2" } }
+                            style={ { gridColumn: 'span 2' } }
                         >
                             { seat.id }
                         </Seat>
-                    );
+                    )
+
+                    if (i % 2 == 1) {
+                        return (
+                            <>
+                                { seatHtml }
+                                <div />
+                            </>
+                        )
+                    }
+                    return seatHtml;
                 }) }
             </div>
         </div>

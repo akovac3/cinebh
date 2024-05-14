@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import Button from "./Button";
+import Button from "../../components/Button";
 
 const Unauthorized = () => {
     const navigate = useNavigate();
@@ -17,4 +17,4 @@ const Unauthorized = () => {
     )
 }
 
-export default Unauthorized
+export default Unauthorized;

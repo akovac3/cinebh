@@ -58,6 +58,7 @@ public class AuthenticationService {
         authenticationResponse.setRefreshToken(refreshToken);
         authenticationResponse.setFirstName(user.getFirstName());
         authenticationResponse.setLastName(user.getLastName());
+        authenticationResponse.setRole(user.getRole());
         return authenticationResponse;
     }
 
@@ -92,6 +93,7 @@ public class AuthenticationService {
             authenticationResponse.setRefreshToken(request.getRefreshToken());
             authenticationResponse.setFirstName(user.getFirstName());
             authenticationResponse.setLastName(user.getLastName());
+            authenticationResponse.setRole(user.getRole());
             return authenticationResponse;
         }
         return null;

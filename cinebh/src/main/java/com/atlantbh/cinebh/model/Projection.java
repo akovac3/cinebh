@@ -16,6 +16,9 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.sql.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "projections")
@@ -28,20 +31,23 @@ public class Projection {
     @Column(name = "projectionId", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectionId;
+    private Date date;
     private Time time;
+    private List<String> reservedSeats = new ArrayList<>();
+    private List<String> purchasedSeats = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
     @JsonIgnore
     private Movie movie;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "venue_id", nullable = false)
-    @JsonIgnore
     private Venue venue;
 
-    public Projection(Time time, Movie movie, Venue venue) {
+    public Projection(Time time, Date date, Movie movie, Venue venue) {
         this.time = time;
+        this.date = date;
         this.movie = movie;
         this.venue = venue;
     }

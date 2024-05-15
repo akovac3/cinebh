@@ -1,15 +1,18 @@
-import { format } from "date-fns";
+import { format, isAfter, addHours } from "date-fns";
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
-import { Dropdown, DropdownItem } from "./Dropdown";
+import { LabeledDropdown, LabeledDropdownItem } from "./LabeledDropdown";
 import DateCard from "./card/DateCard";
 import Pagination from "./Pagination";
 import Button from "./Button";
 import Label from "./Label";
+import LogIn from "../routes/login/LogIn";
 
-const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionList, filterParams, setFilterParams }) => {
+const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionList, filterParams, toggleSidebar, setFilterParams }) => {
+    const navigate = useNavigate();
     const [datePagination, setDatePagination] = useState({ page: 0, size: 6 })
     const [dates, setDates] = useState([])
     const [currentDates, setCurrentDates] = useState([])
@@ -57,6 +60,40 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
         return venueList?.find(c => c.venueId === id)?.name
     }
 
+    const handleReservation = () => {
+        const projection = getProjectionFromTime();
+        if (!localStorage.getItem("token")) {
+            toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } reservation />);
+        } else {
+            navigate("/reservation", {
+                state: {
+                    movie: movie,
+                    projection: projection,
+                    date: filterParams.startDate,
+                }
+            });
+        }
+    };
+
+    const getProjectionFromTime = () => {
+        const foundProjection = projectionList.find(
+            (projection) => projection.time === filterParams.time
+        );
+
+        if (foundProjection) {
+            return foundProjection;
+        } else {
+            return null;
+        }
+    };
+
+    const isValidProjectionTime = (projectionTime, selectedDate) => {
+        const projectionDateTime = new Date(format(selectedDate, 'yyyy-MM-dd') + 'T' + projectionTime);
+        const currentTime = new Date();
+        const currentTimePlusOneHour = addHours(currentTime, 1);
+        return isAfter(projectionDateTime, currentTimePlusOneHour);
+    }
+
     useEffect(() => {
         const startIndex = datePagination.page * datePagination.size;
         const endIndex = startIndex + datePagination.size;
@@ -72,8 +109,8 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
 
     const cityLabel = (
         <Label
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faLocationPin } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+            leftIcon={ <FontAwesomeIcon className="mr-8" icon={ fas.faLocationPin } /> }
+            rightIcon={ <FontAwesomeIcon icon={ fas.faChevronDown } /> }
         >
             { getCityName(filterParams.city) || "Choose city" }
         </Label>
@@ -81,8 +118,8 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
 
     const venueLabel = (
         <Label
-            leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faBuilding } /> }
-            rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
+            leftIcon={ <FontAwesomeIcon className="mr-8" icon={ fas.faBuilding } /> }
+            rightIcon={ <FontAwesomeIcon icon={ fas.faChevronDown } /> }
         >
             { getVenueName(filterParams.venue) || "Choose venue" }
         </Label>
@@ -91,50 +128,50 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
     return (
         <div>
             <div className="p-24 grid grid-cols-2 gap-16">
-                <Dropdown
+                <LabeledDropdown
                     value={ getCityName(filterParams.city) }
                     label={ cityLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => { _handleFilterChange({ city: null, venue: null, time: null }); getVenues(null) } }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All cities
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange({ city: city.cityId, venue: null, time: null }); getVenues(city.cityId) } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
-                <Dropdown
+                </LabeledDropdown>
+                <LabeledDropdown
                     value={ getVenueName(filterParams.venue) }
                     label={ venueLabel }
                 >
-                    <DropdownItem
+                    <LabeledDropdownItem
                         onClick={ () => _handleFilterChange({ venue: null, time: null }) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </DropdownItem>
+                    </LabeledDropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <DropdownItem
+                            <LabeledDropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange({ venue: venue.venueId, time: null }) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </DropdownItem>
+                            </LabeledDropdownItem>
                         )
                     }) }
-                </Dropdown>
+                </LabeledDropdown>
             </div>
             <div>
                 <div className="grid lg:grid-cols-6 md:grid-cols-3 sm:grid-cols-2 gap-16 px-24">
@@ -146,7 +183,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                                 key={ datePagination.page + index }
                                 date={ date }
                                 className={ `${formattedDate === filterParams.startDate ? "!bg-primary-600 !text-neutral-0" : "bg-neutral-0 text-neutral-800"} cursor-pointer` }
-                                onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange({ startDate: null }) : _handleFilterChange({ startDate: formattedDate }) } }
+                                onClick={ () => { formattedDate === filterParams.startDate ? _handleFilterChange({ startDate: null, time: null }) : _handleFilterChange({ startDate: formattedDate, time: null }) } }
                             />
                         )
                     }) }
@@ -168,20 +205,30 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 <p className="text-neutral-600 text-body-l px-24">Please select city and venue.</p> :
                 <div className="flex gap-12 px-24">
                     { projectionList.length !== 0 ? projectionList.map((projection, index) => {
+                        const projectionTime = projection.time.split(":");
+                        const isValidTime = isValidProjectionTime(projection.time, filterParams.startDate);
+
                         return (
                             <div
                                 key={ index }
-                                onClick={ () => { projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time }) } }
-                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time ? "bg-primary-600 text-neutral-25 border-primary-600" : "bg-neutral-0 border-neutral-200 text-neutral-800"} cursor-pointer` }
+                                onClick={ () => {
+                                    if (isValidTime) {
+                                        projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time });
+                                    }
+                                } }
+                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time && isValidTime ? "bg-primary-600 text-neutral-25 border-primary-600" :
+                                    !isValidTime ? "bg-neutral-300 text-neutral-25 border-neutral-300 cursor-not-allowed" :
+                                        "bg-neutral-0 border-neutral-200 text-neutral-800"
+                                    } cursor-pointer` }
                             >
-                                { projection.time.slice(0, 5) }
+                                { projectionTime[0] + ":" + projectionTime[1] }
                             </div>
                         )
                     }) : <p className="text-neutral-600 text-body-l">No projections for selected venue!</p> }
                 </div>
             }
             <div className="absolute bottom-0 border-t border-neutral-200 grid grid-cols-2 py-24 gap-16 px-[20px] w-full">
-                <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull }>
+                <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull } onClick={ handleReservation }>
                     Reserve Ticket
                 </Button>
                 <Button className="w-full" disabled={ !allFieldsNotNull }>

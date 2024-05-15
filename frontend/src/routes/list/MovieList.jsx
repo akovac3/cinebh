@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import MovieCard from "../../components/card/MovieCard";
 import { List, ListItem } from "../../components/List";
 
-const MovieList = (props) => {
+const MovieList = ({ ...props }) => {
     const route = props.route;
     const [data, setMovies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);

@@ -5,10 +5,14 @@ import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useEffect } from "react";
 
-const Success = ({ text, toggleSidebar }) => {
+const Success = ({ text, toggleSidebar, reservation = false }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (reservation) {
+            toggleSidebar(null)
+            return
+        }
         const timeoutId = setTimeout(() => {
             toggleSidebar(null);
             navigate("/");

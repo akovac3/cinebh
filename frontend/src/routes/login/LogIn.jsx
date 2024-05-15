@@ -13,7 +13,7 @@ import Label from "../../components/Label";
 import { url, signin } from "../../utils/api";
 import PasswordReset from "./PasswordReset";
 
-const LogIn = ({ toggleSidebar }) => {
+const LogIn = ({ toggleSidebar, reservation = false }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
@@ -32,7 +32,7 @@ const LogIn = ({ toggleSidebar }) => {
     };
 
     const success = () => {
-        toggleSidebar(<Success text={ "Sign In Successful! 🎉" } toggleSidebar={ toggleSidebar } />)
+        toggleSidebar(<Success reservation={ reservation } text={ "Sign In Successful! 🎉" } toggleSidebar={ toggleSidebar } />)
     }
 
     const onFinish = async (values) => {
@@ -43,6 +43,7 @@ const LogIn = ({ toggleSidebar }) => {
                 localStorage.setItem('refreshToken', response.data.refreshToken)
                 localStorage.setItem("firstName", response.data.firstName)
                 localStorage.setItem("lastName", response.data.lastName)
+                localStorage.setItem("userRole", response.data.role)
                 localStorage.setItem("loggedIn", email)
                 success()
             }
@@ -98,7 +99,7 @@ const LogIn = ({ toggleSidebar }) => {
                     value={ email }
                     className="mb-16"
                     error={ !validData || !validEmail }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEnvelope } /> }
+                    leftIcon={ <FontAwesomeIcon icon={ fas.faEnvelope } /> }
                     variant={ (!validEmail || !validEmail) ? 'error' : 'default' }
                     errorMessage={ validEmail ? null : "Enter valid email address" }
                 >
@@ -115,8 +116,8 @@ const LogIn = ({ toggleSidebar }) => {
                     active={ passwordFocused }
                     password
                     value={ password }
-                    leftIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faLock } /> }
-                    rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
+                    leftIcon={ <FontAwesomeIcon icon={ fas.faLock } /> }
+                    rightIcon={ <FontAwesomeIcon icon={ fas.faEyeSlash } onClick={ () => setPasswordVisibility(!passwordVisibility) } /> }
                     variant={ !validData ? 'error' : 'default' }
                     className="mb-8"
                     error={ !validData }
@@ -132,8 +133,8 @@ const LogIn = ({ toggleSidebar }) => {
                     />
                 </Label>
 
-                <div className="flex items-center justify-center pt-8 pb-32">
-                    <label htmlFor="rememberMe" className="flex flex-1 text-neutral-400 font-semibold">
+                <div className="flex items-end justify-end pt-8 pb-32">
+                    { false && <label htmlFor="rememberMe" className="flex flex-1 text-neutral-400 font-semibold">
                         <Input
                             type="checkbox"
                             id="rememberMe"
@@ -143,6 +144,7 @@ const LogIn = ({ toggleSidebar }) => {
                         />
                         Remember Me
                     </label>
+                    }
                     <Button
                         variant="tertiary"
                         onClick={ () => toggleSidebar(<PasswordReset toggleSidebar={ toggleSidebar } />) }

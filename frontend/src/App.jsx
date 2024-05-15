@@ -10,9 +10,9 @@ import MovieDetails from './routes/movies/MovieDetails'
 import Reservation from './routes/reservations/Reservation'
 import RequireAuth from './routes/auth/RequireAuth'
 import Unauthorized from './routes/unauthorized/Unauthorized'
+import PaymentDetails from './routes/reservations/PaymentDetails'
 
 import { ROLES } from './utils/constants'
-import PaymentDetails from './routes/reservations/PaymentDetails'
 
 const App = () => {
   return (
@@ -29,9 +29,9 @@ const App = () => {
 
           <Route element={ <RequireAuth allowedRoles={ [ROLES.User] } /> }>
             <Route path='/reservation' element={ <Reservation /> } />
+            <Route path='/payment-details' element={ <PaymentDetails /> } />
           </Route>
 
-          <Route path='/payment-details' element={ <PaymentDetails /> } />
         </Route>
       </Routes>
     </Router>

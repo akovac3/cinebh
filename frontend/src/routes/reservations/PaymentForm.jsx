@@ -16,7 +16,7 @@ const PaymentForm = ({ totalPrice, handlePayment }) => {
 
     const createPaymentIntent = async (price) => {
         const token = localStorage.getItem("token");
-        const values = { price, type: "PURCHASE" };
+        const values = { amount: price };
         const response = await axios.post(`${url}${reservation}/create-payment-intent`, values, {
             headers: {
                 'Authorization': `Bearer ${token}`

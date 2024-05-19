@@ -1,8 +1,6 @@
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import format from "date-fns/format";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fas } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -10,120 +8,58 @@ import html2canvas from "html2canvas";
 import Image from "../../components/Image";
 import Modal from "../../components/Modal";
 import Button from "../../components/Button";
-import Input from "../../components/Input";
-import Label from "../../components/Label";
 import CreditCard from "../../components/CreditCard";
+import PaymentForm from "./PaymentForm";
 
 import { url, reservation } from "../../utils/api";
+
+const savedCards = [
+    { cardNumber: "1234 5678 9101 1121", expiryDate: "12/24", cvv: "123", type: "visa" },
+    { cardNumber: "3141 5161 7181 9202", expiryDate: "05/25", cvv: "456", type: "mastercard" }
+];
 
 const PaymentDetails = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const movie = location.state.movie;
-    const cover = location.state.cover;
-    const projection = location.state.projection;
-    const date = location.state.date;
-    const totalPrice = location.state.totalPrice;
-    const selectedSeats = location.state.selectedSeats;
-    const [disableButton, setDisableButton] = useState(true);
-    const [newCard, setNewCard] = useState({ cardNumber: "", expiryDate: "", cvv: "" });
-    const [cardFieldFocused, setCardFieldFocused] = useState({ cardNumberFocused: false, expiryDateFocused: false, cvvFocused: false });
-    const [selectedCard, setSelectedCard] = useState(null);
+    const { movie, cover, projection, date, totalPrice, selectedSeats } = location.state;
+
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
     const [modal, setModal] = useState(false);
 
-    const savedCards = [
-        { cardNumber: "1234 5678 9101 1121", expiryDate: "12/24", cvv: "123", type: "visa" },
-        { cardNumber: "3141 5161 7181 9202", expiryDate: "05/25", cvv: "456", type: "mastercard" }
-    ];
-
-    const onFocus = (fieldsAndValues) => {
-        const updatedParams = { ...cardFieldFocused, ...fieldsAndValues };
-        setCardFieldFocused(updatedParams);
-        setSelectedCard(null);
-        setSelectedCardIndex(null);
-    };
-
-    const onBlur = (fieldsAndValues) => {
-        const updatedParams = { ...cardFieldFocused, ...fieldsAndValues };
-        setCardFieldFocused(updatedParams);
-    };
-
-    function _handleCardChange(setFields, fieldsAndValues) {
-        setFields(prevValues => ({
-            ...prevValues,
-            ...fieldsAndValues
-        }));
-    }
-
-    const handleExpiryDateChange = (event) => {
-        const { value } = event.target;
-        const sanitizedValue = value.replace(/\D/g, '');
-        const formattedValue = sanitizedValue.replace(/(\d{2})(\d{2})/, '$1/$2').trim();
-        _handleCardChange(setNewCard, { expiryDate: formattedValue });
-    };
-
-    const handleCardNumberChange = (event) => {
-        const { value } = event.target;
-        const sanitizedValue = value.replace(/\D/g, '');
-        const formattedValue = sanitizedValue.replace(/(\d{4})/g, '$1 ').trim();
-        _handleCardChange(setNewCard, { cardNumber: formattedValue });
-    };
-
-    const handleCvvChange = (e) => {
-        if (isNaN(e.target.value)) return;
-        _handleCardChange(setNewCard, { cvv: e.target.value });
-    };
-
-    const onFinish = async (values) => {
+    const handlePayment = async () => {
         try {
-            setDisableButton(true);
             const token = localStorage.getItem("token");
-            const response = await axios.post(url + reservation, values, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            const response = await axios.post(
+                `${url}${reservation}`,
+                {
+                    date,
+                    projectionId: projection.projectionId,
+                    seats: selectedSeats,
+                    price: totalPrice,
+                    type: "PURCHASE"
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            });
+            );
+
             if (response.status === 200) {
                 setModal(true);
             }
         } catch (error) {
-            console.log(error);
-            console.log(error.response.data.message);
+            console.error("Payment error:", error.response?.data?.message || error.message);
         }
     };
-
-    const handlePayment = () => {
-        if (newCard.cardNumber.length === 19 && newCard.expiryDate.length === 5 && newCard.cvv.length === 3) {
-            console.log(newCard);
-        } else if (selectedCard) console.log(selectedCard);
-        const values = {
-            date: date,
-            projectionId: projection.projectionId,
-            seats: selectedSeats,
-            price: totalPrice,
-            type: "PURCHASE"
-        };
-        onFinish(values);
-    };
-
-    useEffect(() => {
-        if (selectedCard || (newCard.cardNumber.length === 19 && newCard.expiryDate.length === 5 && newCard.cvv.length === 3)) {
-            setDisableButton(false);
-        } else {
-            setDisableButton(true);
-        }
-    }, [selectedCard, newCard]);
 
     const downloadDetailedPDF = async () => {
         try {
             const element = document.getElementById('booking-summary');
             const canvas = await html2canvas(element);
-
             const imgData = canvas.toDataURL('image/png');
             const desiredWidth = 100;
             const desiredHeight = canvas.height * (desiredWidth / canvas.width);
-
             const detailedPdf = new jsPDF();
             detailedPdf.addImage(imgData, 'PNG', 10, 10, desiredWidth, desiredHeight);
             detailedPdf.save('tickets.pdf');
@@ -135,24 +71,18 @@ const PaymentDetails = () => {
     const downloadReceiptPDF = () => {
         const receiptPdf = new jsPDF();
         const marginLeft = 20;
-
         receiptPdf.setFontSize(16);
         receiptPdf.text("Receipt", marginLeft, 20);
-
         receiptPdf.setFontSize(12);
         receiptPdf.text(`Movie: ${movie.name}`, marginLeft, 30);
         receiptPdf.text(`Date: ${format(date, "EEEE, MMM dd")}`, marginLeft, 40);
         receiptPdf.text(`Time: ${projection.time.slice(0, 5)}`, marginLeft, 50);
-
-        receiptPdf.text(`Purchased Tickets:`, marginLeft, 60);
-
+        receiptPdf.text("Purchased Tickets:", marginLeft, 60);
         selectedSeats.forEach((seat, index) => {
             receiptPdf.text(`Seat: ${seat}`, marginLeft + 10, 70 + (index * 10));
         });
-
         receiptPdf.line(marginLeft, 80 + (selectedSeats.length * 10), 190, 80 + (selectedSeats.length * 10));
         receiptPdf.text(`Total Price: ${totalPrice} KM`, 190 - marginLeft, 90 + (selectedSeats.length * 10), { align: 'right' });
-
         receiptPdf.save('receipt.pdf');
     };
 
@@ -160,7 +90,6 @@ const PaymentDetails = () => {
         await downloadDetailedPDF();
         downloadReceiptPDF();
     };
-
 
     return (
         <div className="font-body">
@@ -176,16 +105,7 @@ const PaymentDetails = () => {
                             className={ `my-24 ${selectedCardIndex === i ? "border border-primary-600" : "border border-neutral-200"}` }
                             cardNumber={ card.cardNumber }
                             type={ card.type }
-                            onClick={ () => {
-                                if (selectedCardIndex === i) {
-                                    setSelectedCard(null);
-                                    setSelectedCardIndex(null);
-                                } else {
-                                    setSelectedCard(card);
-                                    setSelectedCardIndex(i);
-                                    setNewCard({ cardNumber: "", expiryDate: "", cvv: "" });
-                                }
-                            } }
+                            onClick={ () => setSelectedCardIndex(selectedCardIndex === i ? null : i) }
                         />
                     )) }
                     <div className="flex gap-16 items-center justify-center pt-8">
@@ -193,67 +113,19 @@ const PaymentDetails = () => {
                         <p className="text-heading-h6 text-neutral-500">or</p>
                         <div className="w-[45%] border border-neutral-200 h-[1px]"></div>
                     </div>
-                    <div className="pt-24 pb-[85px]">
+                    <div className="pt-16 pb-[85px]">
                         <p className="text-neutral-500 text-heading-h6 pb-24">Add New Card</p>
-                        <p className="text-neutral-700 font-semibold">Card Number</p>
-                        <Label className="!text-neutral-900" active={ cardFieldFocused.cardNumberFocused } leftIcon={ <FontAwesomeIcon icon={ fas.faCreditCard } /> }>
-                            <Input
-                                value={ newCard.cardNumber }
-                                onChange={ handleCardNumberChange }
-                                pattern="\d{4} \d{4} \d{4} \d{4}"
-                                maxLength="19"
-                                text="**** **** **** ****"
-                                onFocus={ () => onFocus({ cardNumberFocused: true }) }
-                                onBlur={ () => onBlur({ cardNumberFocused: false }) }
-                            />
-                        </Label>
-                        <div className="flex gap-8 pt-24">
-                            <div className="w-[50%]">
-                                <p className="font-semibold text-neutral-700">Expiry Date</p>
-                                <Label active={ cardFieldFocused.expiryDateFocused }>
-                                    <Input
-                                        type="text"
-                                        value={ newCard.expiryDate }
-                                        onChange={ handleExpiryDateChange }
-                                        pattern="(0[1-9]|1[0-2])\/\d{2}"
-                                        maxLength="5"
-                                        placeholder="MM/YY"
-                                        required
-                                        text="00/00"
-                                        onFocus={ () => onFocus({ expiryDateFocused: true }) }
-                                        onBlur={ () => onBlur({ expiryDateFocused: false }) }
-                                    />
-                                </Label>
-                            </div>
-                            <div className="w-[50%]">
-                                <p className="font-semibold text-neutral-700">CVV</p>
-                                <Label active={ cardFieldFocused.cvvFocused }>
-                                    <Input
-                                        type="text"
-                                        value={ newCard.cvv }
-                                        onChange={ handleCvvChange }
-                                        pattern="\d{3}"
-                                        maxLength="3"
-                                        text="000"
-                                        onFocus={ () => onFocus({ cvvFocused: true }) }
-                                        onBlur={ () => onBlur({ cvvFocused: false }) }
-                                    />
-                                </Label>
-                            </div>
-                        </div>
+                        <PaymentForm totalPrice={ totalPrice } handlePayment={ handlePayment } />
                     </div>
-                    <Button className="!w-full" disabled={ disableButton } onClick={ () => handlePayment() }>
-                        Make Payment - { totalPrice } KM
-                    </Button>
                 </div>
 
                 <div className="text-neutral-25">
                     <p className="text-heading-h6 text-neutral-500 pb-24">Booking Summary</p>
                     <div id="booking-summary" className="rounded-16 bg-neutral-800 flex flex-col items-center justify-center">
                         <div className="px-12 py-24 w-[90%] flex border-b border-neutral-200">
-                            <Image className={ `rounded-12 object-cover h-[126px] w-[125px]` } src={ cover } alt="" />
+                            <Image className="rounded-12 object-cover h-[126px] w-[125px]" src={ cover } alt="" />
                             <div className="pl-16">
-                                <p className="text-heading-h6 pb-6"> { movie.name }</p>
+                                <p className="text-heading-h6 pb-6">{ movie.name }</p>
                                 <div className="flex text-body-l font-normal pt-[10px] pb-[6px]">
                                     <p className="border-primary-600 h-[20px] pr-12 border-r">{ movie.rating }</p>
                                     <p className="border-primary-600 h-[20px] px-12 border-r">{ movie.language }</p>
@@ -266,7 +138,7 @@ const PaymentDetails = () => {
                             <p className="text-neutral-400 pb-4">Date and Time</p>
                             <p className="font-semibold pb-16">{ format(date, "EEEE, MMM dd") } at { projection.time.slice(0, 5) }</p>
                             <p className="text-neutral-400 pb-4">Cinema Details</p>
-                            <p className="font-semibold">{ projection.venue.address }, <br />{ projection.venue.city.name }</p>
+                            <p className="font-semibold">{ projection.venue.address },<br />{ projection.venue.city.name }</p>
                             <p className="font-semibold pb-16 pt-4">Hall 1</p>
                             <p className="text-neutral-400 pb-4">Seat(s) Details</p>
                             <p>Seat(s): <span className="font-semibold">{ selectedSeats.join(', ') }</span></p>
@@ -276,15 +148,18 @@ const PaymentDetails = () => {
                     </div>
                 </div>
             </div>
-            { modal && <Modal>
-                <p className="text-heading-h6 text-neutral-900 pb-16">Payment Successful!</p>
-                <p className="text-body-m text-neutral-500 text-justify">
-                    The receipt and ticket have been sent to your email. You may download them immediately, or retrieve them later from your User Profile.</p>
-                <div className="flex pt-32 gap-8 justify-end">
-                    <Button variant="secondary" size="sm" onClick={ () => navigate("/") }>Back to Home</Button>
-                    <Button size="sm" onClick={ downloadBothPDFs }>Download</Button>
-                </div>
-            </Modal> }
+            { modal && (
+                <Modal>
+                    <p className="text-heading-h6 text-neutral-900 pb-16">Payment Successful!</p>
+                    <p className="text-body-m text-neutral-500 text-justify">
+                        The receipt and ticket have been sent to your email. You may download them immediately, or retrieve them later from your User Profile.
+                    </p>
+                    <div className="flex pt-32 gap-8 justify-end">
+                        <Button variant="secondary" size="sm" onClick={ () => navigate("/") }>Back to Home</Button>
+                        <Button size="sm" onClick={ downloadBothPDFs }>Download</Button>
+                    </div>
+                </Modal>
+            ) }
         </div>
     );
 };

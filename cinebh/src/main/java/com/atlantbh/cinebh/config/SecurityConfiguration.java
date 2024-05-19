@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                         .requestMatchers("api/auth/**", "api/password-reset/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "api/movies", "api/venues", "api/actors", "api/writers", "api/photos").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
-                        .requestMatchers("/api/user", "/api/reservations").hasAnyAuthority(Role.USER.name())
+                        .requestMatchers("/api/user", "/api/reservations", "/api/reservations/create-payment-intent").hasAnyAuthority(Role.USER.name())
                         .anyRequest().authenticated())
                 .exceptionHandling(e->e.accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

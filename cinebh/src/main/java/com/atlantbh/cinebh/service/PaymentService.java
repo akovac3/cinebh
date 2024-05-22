@@ -21,7 +21,6 @@ public class PaymentService {
         Stripe.apiKey = secretKey;
     }
 
-
     public PaymentResponse createPaymentIntent(PaymentRequest paymentRequest) throws StripeException {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount((long) (paymentRequest.getAmount() * 100)) // amount in cents

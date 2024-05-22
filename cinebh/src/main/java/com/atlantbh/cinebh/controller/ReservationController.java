@@ -41,9 +41,6 @@ public class ReservationController {
         }
         try {
             String response = reservationService.create(request, user);
-            if (request.getType().equals(Type.PURCHASE)){
-
-            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

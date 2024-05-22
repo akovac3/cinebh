@@ -89,6 +89,12 @@ const PaymentDetails = () => {
     const downloadBothPDFs = async () => {
         await downloadDetailedPDF();
         downloadReceiptPDF();
+
+        const timeoutId = setTimeout(() => {
+            navigate("/");
+        }, 4000);
+
+        return () => clearTimeout(timeoutId);
     };
 
     return (

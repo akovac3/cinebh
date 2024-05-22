@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "./Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCcVisa, faCcMastercard } from "@fortawesome/free-brands-svg-icons";
@@ -37,7 +37,7 @@ const CreditCard = ({ className, cardNumber, type, onClick }) => {
                     { cardNumber.slice(-4) }
                 </p>
             </div>
-            <Button className="" variant="tertiary"> Delete Card</Button>
+            <Button variant="tertiary"> Delete Card</Button>
         </div>
     )
 }

@@ -98,7 +98,7 @@ const PaymentForm = ({ totalPrice, handlePayment }) => {
 
             { formErrorMessage && <p className="text-body-m text-error-600">{ formErrorMessage }</p> }
 
-            <Button className="!w-full mt-[75px]" disabled={ disableButton }>
+            <Button className="!w-full mt-[95px]" disabled={ disableButton }>
                 Make Payment - { totalPrice } KM
             </Button>
         </form>

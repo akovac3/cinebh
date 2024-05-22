@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
@@ -60,10 +60,10 @@ const CinemaSeats = ({ className, selectedSeats, reservedSeats, setSelectedSeats
 
                     if (Number(seat.id.slice(1)) % 9 === 4) {
                         return (
-                            <>
+                            <Fragment key={ seat.id }>
                                 { seatHtml }
-                                <div key={ seat.id + "-spacer" } />
-                            </>
+                                <div />
+                            </Fragment>
 
                         );
                     }
@@ -82,10 +82,10 @@ const CinemaSeats = ({ className, selectedSeats, reservedSeats, setSelectedSeats
                     );
                     if (Number(seat.id.slice(1)) % 9 === 4) {
                         return (
-                            <>
+                            <Fragment key={ seat.id }>
                                 { seatHtml }
-                                <div key={ seat.id + "-spacer" } />
-                            </>
+                                <div />
+                            </Fragment>
                         );
                     }
                     return seatHtml;
@@ -107,11 +107,10 @@ const CinemaSeats = ({ className, selectedSeats, reservedSeats, setSelectedSeats
 
                     if (i % 2 === 1) {
                         return (
-                            <>
+                            <Fragment key={ seat.id }>
                                 { seatHtml }
-                                <div key={ seat.id + "-spacer" } />
-                            </>
-
+                                <div />
+                            </Fragment>
                         );
                     }
                     return seatHtml;

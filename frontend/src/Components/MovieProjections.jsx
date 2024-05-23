@@ -70,6 +70,23 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                     movie: movie,
                     projection: projection,
                     date: filterParams.startDate,
+                    payment: false
+                }
+            });
+        }
+    };
+
+    const handlePayment = () => {
+        const projection = getProjectionFromTime();
+        if (!localStorage.getItem("token")) {
+            toggleSidebar(<LogIn toggleSidebar={ toggleSidebar } reservation />);
+        } else {
+            navigate("/reservation", {
+                state: {
+                    movie: movie,
+                    projection: projection,
+                    date: filterParams.startDate,
+                    payment: true
                 }
             });
         }
@@ -216,10 +233,10 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                                         projection.time === filterParams.time ? _handleFilterChange({ time: null }) : _handleFilterChange({ time: projection.time });
                                     }
                                 } }
-                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time && isValidTime ? "bg-primary-600 text-neutral-25 border-primary-600" :
+                                className={ `p-[10px] text-heading-h6 border rounded-8 shadow-light-50 ${filterParams.time === projection.time && isValidTime ? "bg-primary-600 text-neutral-25 border-primary-600 cursor-pointer" :
                                     !isValidTime ? "bg-neutral-300 text-neutral-25 border-neutral-300 cursor-not-allowed" :
-                                        "bg-neutral-0 border-neutral-200 text-neutral-800"
-                                    } cursor-pointer` }
+                                        "bg-neutral-0 border-neutral-200 text-neutral-800 cursor-pointer"
+                                    } ` }
                             >
                                 { projectionTime[0] + ":" + projectionTime[1] }
                             </div>
@@ -231,7 +248,7 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                 <Button variant="secondary" className="w-full" disabled={ !allFieldsNotNull } onClick={ handleReservation }>
                     Reserve Ticket
                 </Button>
-                <Button className="w-full" disabled={ !allFieldsNotNull }>
+                <Button className="w-full" disabled={ !allFieldsNotNull } onClick={ handlePayment }>
                     Buy Ticket
                 </Button>
             </div>

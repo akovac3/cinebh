@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import axios from "axios";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -256,6 +256,7 @@ const UpcomingmovieList = () => {
                 </LabeledDropdown>
                 <DateRangePicker
                     label={ dateRangeLabel }
+                    minDate={ addDays(new Date(), 10) }
                     onClickApply={
                         (valueStart, valueEnd) => {
                             _handleFilterChange('startDate', format(valueStart, 'yyyy-MM-dd'))

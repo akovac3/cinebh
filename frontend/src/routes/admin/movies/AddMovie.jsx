@@ -12,7 +12,7 @@ import Details from '../../../components/steps/Details';
 import Venues from '../../../components/steps/Venues';
 import { StepperContext } from '../../../contexts/StepperContext';
 
-import { url, genres } from '../../../utils/api';
+import { url, genres, movies } from '../../../utils/api';
 
 const AddMovie = () => {
     const navigate = useNavigate();
@@ -33,7 +33,7 @@ const AddMovie = () => {
     const steps = ["General", "Details", "Venues"];
 
     const validateGeneralStep = useCallback(() => {
-        const requiredFields = ["name", "language", "director", "rating", "duration", "projectionStart", "projectionEnd", "genres"];
+        const requiredFields = ["name", "language", "director", "rating", "duration", "projectionStart", "projectionEnd", "genres", "synopsis"];
         for (let field of requiredFields) {
             if (!movieData[field]) {
                 setStepStatus(prevStatus => ({ ...prevStatus, 1: false }));
@@ -47,6 +47,35 @@ const AddMovie = () => {
     useEffect(() => {
         validateGeneralStep();
     }, [movieData, validateGeneralStep]);
+
+    const addMovie = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            if (movieData.id === undefined) {
+
+                const response = await axios.post(url + movies, movieData, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.status === 200) {
+                    setMovieData({ ...movieData, ["id"]: response.data.id });
+
+                    if (detailsData) {
+                        console.log("add details")
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            console.log(error.response.data.message)
+        }
+    }
+
+    const handleSaveToDraft = async () => {
+        console.log("called")
+        await addMovie();
+    }
 
     const displayStep = (step) => {
         switch (step) {
@@ -102,6 +131,7 @@ const AddMovie = () => {
                 handleClick={ handleClick }
                 currentStep={ currentStep }
                 steps={ steps }
+                saveToDraft={ handleSaveToDraft }
             />
         </div>
     );

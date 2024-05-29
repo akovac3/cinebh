@@ -1,14 +1,18 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Tab, TabGroup, TabContent } from "../../../components/Tab";
 import { lastPathPart } from "../../../utils/utils";
 import Button from "../../../components/Button";
+import { useState, useContext } from "react";
+import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
 
 const Movies = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const tab = lastPathPart(location.pathname) || 'drafts';
+    const [numberOfElements, setNumberOfElements] = useState({ drafts: 0, currently: 0, upcoming: 0, archived: 0 })
+    const [selectedTab, setSelectedTab] = useState(lastPathPart(location.pathname) || 'drafts');
 
     const navigateToTab = (tab) => {
+        setSelectedTab(tab);
         navigate(`/admin-panel/movies/${tab}`);
     };
 
@@ -18,16 +22,19 @@ const Movies = () => {
                 <p className="text-heading-h6 pb-16 flex-1">Movies</p>
                 <Button onClick={ () => navigate('/admin-panel/add-movie', { state: { from: location.pathname } }) }>Add Movie</Button>
             </div>
-            <TabGroup selected={ tab } onChange={ navigateToTab }>
-                <Tab value="drafts">Drafts (0)</Tab>
-                <Tab value="currently">Currently Showing (0)</Tab>
-                <Tab value="upcoming">Upcoming (0)</Tab>
-                <Tab value="archived">Archived (0)</Tab>
-            </TabGroup>
+            <NumberOfElementsContext.Provider value={ { numberOfElements, setNumberOfElements } }>
+                <TabGroup selected={ selectedTab } onChange={ navigateToTab }>
+                    <Tab value="drafts">Drafts ({ numberOfElements.drafts })</Tab>
+                    <Tab value="currently">Currently Showing ({ numberOfElements.currently })</Tab>
+                    <Tab value="upcoming">Upcoming ({ numberOfElements.upcoming })</Tab>
+                    <Tab value="archived">Archived ({ numberOfElements.archived })</Tab>
+                </TabGroup>
 
-            <TabContent>
-                <Outlet />
-            </TabContent>
+                <TabContent>
+                    <Outlet />
+                </TabContent>
+            </NumberOfElementsContext.Provider>
+
         </div>
     );
 };

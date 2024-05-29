@@ -3,8 +3,8 @@ import { createClassName } from "../utils/utils"
 const Button = ({ className, children, variant = 'primary', size = 'lg', type = 'default', ...props }) => {
     const sizeClassName = {
         lg: "text-body-l",
-        md: "text-body-m",
-        sm: "text-body-s px-16 py-8"
+        md: "text-body-m h-[45px]",
+        sm: "text-body-s px-16 py-8 h-32"
     }
 
     const variantClassName = {
@@ -18,7 +18,7 @@ const Button = ({ className, children, variant = 'primary', size = 'lg', type = 
     }
 
     return (
-        <button className={ createClassName(variantClassName[variant], sizeClassName[size], defaultClassName[type], className, "disabled:cursor-not-allowed") }  { ...props }>
+        <button className={ createClassName(variantClassName[variant], sizeClassName[size], defaultClassName[type], className, "disabled:cursor-not-allowed cursor-pointer") }  { ...props }>
             { children }
         </button>
     )

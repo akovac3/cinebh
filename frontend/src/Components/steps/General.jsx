@@ -15,7 +15,9 @@ const General = ({ genreList }) => {
     const [movieDataFocused, setMovieDataFocused] = useState({});
 
     useEffect(() => {
-        console.log(movieData)
+        if (movieData.status === undefined) {
+            setMovieData({ ...movieData, ["status"]: "DRAFT" });
+        }
     }, [movieData]);
 
     const handleTextChange = (e) => {
@@ -26,13 +28,17 @@ const General = ({ genreList }) => {
     };
 
     const handleSelectGenres = (values) => {
-        setMovieData({ ...movieData, genres: values.map(id => id.toString()) });
+        setMovieData({ ...movieData, genres: values.map(id => Number(id)) });
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setMovieData({ ...movieData, [name]: value });
     };
+
+    const handleDurationChange = (e) => {
+        setMovieData({ ...movieData, ["duration"]: Number(e.target.value) });
+    }
 
     const onFocus = (fieldsAndValues) => {
         const updatedParams = { ...movieDataFocused, ...fieldsAndValues };
@@ -46,7 +52,7 @@ const General = ({ genreList }) => {
 
     const getAllGenres = () => {
         return movieData.genres.map(id => {
-            const genre = genreList.find(genre => genre.id === parseInt(id));
+            const genre = genreList.find(genre => genre.id === id);
             return genre ? genre.name : '';
         }).filter(Boolean).join(', ');
     };
@@ -159,7 +165,7 @@ const General = ({ genreList }) => {
                     >
                         <Input
                             name="rating"
-                            value={ movieData["rating"] }
+                            value={ movieData["rating"] || "" }
                             text="Type PG rating"
                             onChange={ handleChange }
                             onFocus={ () => onFocus({ rating: true }) }
@@ -175,9 +181,9 @@ const General = ({ genreList }) => {
                     >
                         <Input
                             name="duration"
-                            value={ movieData["duration"] }
+                            value={ movieData["duration"] || "" }
                             text="Type movie duration"
-                            onChange={ handleChange }
+                            onChange={ handleDurationChange }
                             onFocus={ () => onFocus({ duration: true }) }
                             onBlur={ () => onBlur({ duration: false }) }
                         />

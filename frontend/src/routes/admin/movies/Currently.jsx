@@ -1,9 +1,11 @@
+import MovieTable from './MovieTable';
+
 const Currently = () => {
     return (
         <div>
-            Currently
+            <MovieTable type="currently" />
         </div>
-    )
-}
+    );
+};
 
 export default Currently;

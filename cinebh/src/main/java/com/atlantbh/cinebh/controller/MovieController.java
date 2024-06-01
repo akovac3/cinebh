@@ -9,6 +9,8 @@ import com.atlantbh.cinebh.model.Writer;
 import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.request.PaginationParams;
+import com.atlantbh.cinebh.request.StatusParams;
+import com.atlantbh.cinebh.request.UpdateStatusRequest;
 import com.atlantbh.cinebh.request.PhotoRequest;
 import com.atlantbh.cinebh.request.ActorRequest;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
@@ -16,6 +18,8 @@ import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.atlantbh.cinebh.request.ProjectionRequest;
 import com.atlantbh.cinebh.request.WriterRequest;
 import com.atlantbh.cinebh.request.MovieRequest;
+import com.atlantbh.cinebh.response.MovieResponse;
+import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
 import com.atlantbh.cinebh.service.MovieActorService;
@@ -36,15 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -80,6 +76,16 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getAll());
     }
 
+    @GetMapping("/count-elements")
+    public ResponseEntity<NumberOfElementsResponse> getNumberOfElements() {
+        return ResponseEntity.ok(movieService.getNumberOfElements());
+    }
+
+    @GetMapping("/search-by-status")
+    public ResponseEntity<Iterable<Movie>> getByStatus(StatusParams statusParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getByStatus(statusParams, paginationParams.getPage(), paginationParams.getSize()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id) {
         Movie newMovie = movieService.findById(id);
@@ -94,6 +100,11 @@ public class MovieController {
     @GetMapping("/upcoming")
     public ResponseEntity<Iterable<Movie>> getUpcoming(PaginationParams paginationParams) {
         return ResponseEntity.ok(movieService.getUpcoming(paginationParams.getPage(), paginationParams.getSize()));
+    }
+
+    @GetMapping("/all-upcoming")
+    public ResponseEntity<Iterable<Movie>> getAllUpcoming(PaginationParams paginationParams) {
+        return ResponseEntity.ok(movieService.getAllUpcoming(paginationParams.getPage(), paginationParams.getSize()));
     }
 
     @GetMapping("/search-currently")
@@ -113,9 +124,9 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
+    public ResponseEntity<MovieResponse> createMovie(@Validated @RequestBody MovieRequest movieRequest) {
         Movie movie = new Movie(movieRequest.getName(),
-                movieRequest.getYear(),
+                movieRequest.getStep(),
                 movieRequest.getLanguage(),
                 movieRequest.getProjectionStart(),
                 movieRequest.getProjectionEnd(),
@@ -126,21 +137,21 @@ public class MovieController {
                 movieRequest.getTrailer(),
                 movieRequest.getStatus()
         );
-        Set<Long> genresSet = movieRequest.getGenres();
-        Set<Genre> genres = genresSet.stream()
-                .map(genreId -> genreRepository.findById(genreId)
-                        .orElseThrow(() -> new RuntimeException("Error: Genre not found for ID " + genreId)))
-                .collect(Collectors.toSet());
-        movie.setGenres(genres);
-        movieService.save(movie);
-        return new ResponseEntity<>("Movie successfully added!", HttpStatus.CREATED);
+            Set<Long> genresSet = movieRequest.getGenres();
+            Set<Genre> genres = genresSet.stream()
+                    .map(genreId -> genreRepository.findById(genreId)
+                            .orElseThrow(() -> new RuntimeException("Error: Genre not found for ID " + genreId)))
+                    .collect(Collectors.toSet());
+            movie.setGenres(genres);
+
+        Movie createdMovie = movieService.save(movie);
+        return ResponseEntity.ok(new MovieResponse(createdMovie.getMovieId()));
     }
 
     @PostMapping("/{id}")
     public ResponseEntity<String> updateMovie(@PathVariable long id, @Validated @RequestBody MovieRequest movieDetails) {
         Movie updateMovie = movieService.findById(id);
         updateMovie.setName(movieDetails.getName());
-        updateMovie.setYear(movieDetails.getYear());
         updateMovie.setLanguage(movieDetails.getLanguage());
         updateMovie.setProjectionStart(movieDetails.getProjectionStart());
         updateMovie.setProjectionEnd(movieDetails.getProjectionEnd());
@@ -150,6 +161,7 @@ public class MovieController {
         updateMovie.setDuration(movieDetails.getDuration());
         updateMovie.setTrailer(movieDetails.getTrailer());
         updateMovie.setStatus(movieDetails.getStatus());
+        updateMovie.setStep(movieDetails.getStep());
         Set<Long> genresSet = movieDetails.getGenres();
         Set<Genre> genres = genresSet.stream()
                 .map(genreId -> genreRepository.findById(genreId)
@@ -238,6 +250,14 @@ public class MovieController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PutMapping("/update-status")
+    public ResponseEntity<String> updateStatus(@Validated @RequestBody UpdateStatusRequest updateStatusRequest) {
+        Set<Long> movieIds = updateStatusRequest.getMovieIds();
+        String newStatus = updateStatusRequest.getStatus();
+        movieService.batchUpdateStatus(movieIds, newStatus);
+        return new ResponseEntity<>("Movies successfully updated!", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

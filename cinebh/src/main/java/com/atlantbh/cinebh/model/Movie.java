@@ -35,7 +35,6 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieId;
     private String name;
-    private Integer year;
     private String language;
     private Date projectionStart;
     private Date projectionEnd;
@@ -47,6 +46,9 @@ public class Movie {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private Step step;
 
     @OneToMany(mappedBy = "movie")
     private Set<Photo> photos = new HashSet<>();
@@ -73,9 +75,8 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     Set<MovieActor> movieActors = new HashSet<>();
 
-    public Movie(String name, Integer year, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer, Status status) {
+    public Movie(String name, Step step, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer, Status status) {
         this.name = name;
-        this.year = year;
         this.language = language;
         this.projectionStart = projectionStart;
         this.projectionEnd = projectionEnd;
@@ -85,5 +86,6 @@ public class Movie {
         this.duration = duration;
         this.trailer = trailer;
         this.status = status;
+        this.step = step;
     }
 }

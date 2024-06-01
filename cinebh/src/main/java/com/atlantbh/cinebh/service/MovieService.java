@@ -1,20 +1,24 @@
 package com.atlantbh.cinebh.service;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.City;
-import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.model.Movie;
+import com.atlantbh.cinebh.model.Genre;
+import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
+import com.atlantbh.cinebh.model.Status;
 import com.atlantbh.cinebh.repository.CityRepository;
 import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.repository.MovieRepository;
 import com.atlantbh.cinebh.repository.VenueRepository;
 import com.atlantbh.cinebh.request.CurrentlyMoviesFilterParams;
 import com.atlantbh.cinebh.request.PaginationParams;
+import com.atlantbh.cinebh.request.StatusParams;
 import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
+import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import com.atlantbh.cinebh.specification.MovieSpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micrometer.common.util.StringUtils;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,7 @@ import static com.atlantbh.cinebh.specification.MovieSpecification.projectionSta
 import static com.atlantbh.cinebh.specification.MovieSpecification.projectionEndGreaterThenDate;
 import static com.atlantbh.cinebh.specification.MovieSpecification.projectionBetweenDates;
 import static com.atlantbh.cinebh.specification.MovieSpecification.hasSimilarGenres;
+import static com.atlantbh.cinebh.specification.MovieSpecification.hasStatus;
 
 @Service
 @AllArgsConstructor
@@ -91,8 +96,9 @@ public class MovieService {
                 .and(city.map(MovieSpecification::hasProjectionInCity).orElse(null))
                 .and(venue.map(MovieSpecification::hasProjectionInVenue).orElse(null))
                 .and(projectionStartLessThenDate(currentlyMoviesFilterParams.getStartDate()))
-                .and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()));
-        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
+                .and(projectionEndGreaterThenDate(currentlyMoviesFilterParams.getStartDate()))
+                .and(hasStatus(Status.PUBLISHED));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage() - 1, paginationParams.getSize()));
     }
 
     public Page<Movie> getUpcomingForFilter(UpcomingMoviesFilterParams upcomingMoviesFilterParams, PaginationParams paginationParams) {
@@ -103,7 +109,34 @@ public class MovieService {
                 .and(genre.map(MovieSpecification::hasGenre).orElse(null))
                 .and(city.map(MovieSpecification::hasProjectionInCity).orElse(null))
                 .and(venue.map(MovieSpecification::hasProjectionInVenue).orElse(null))
-                .and(projectionBetweenDates(upcomingMoviesFilterParams.getStartDate(), upcomingMoviesFilterParams.getEndDate()));
-        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
+                .and(projectionBetweenDates(upcomingMoviesFilterParams.getStartDate(), upcomingMoviesFilterParams.getEndDate()))
+                .and(hasStatus(Status.PUBLISHED));
+        return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage() - 1, paginationParams.getSize()));
+    }
+
+    public Page<Movie> getByStatus(StatusParams statusParams, Integer pageNumber, Integer size) {
+        Status status = Status.valueOf(statusParams.getStatus());
+        return movieRepository.findByStatus(status, PageRequest.of(pageNumber-1, size));
+    }
+
+    public NumberOfElementsResponse getNumberOfElements() {
+        int drafts = (int) movieRepository.countDrafts();
+        int currently = (int) movieRepository.countCurrentlyShowing();
+        int upcoming = (int) movieRepository.countUpcoming();
+        int archived = (int) movieRepository.countArchived();
+        return new NumberOfElementsResponse(drafts, currently, upcoming, archived);
+    }
+
+    public Page<Movie> getAllUpcoming(Integer page, Integer size) {
+        return movieRepository.findAllUpcoming(PageRequest.of(page-1, size));
+    }
+
+    @Transactional
+    public void batchUpdateStatus(Set<Long> movieIds, String newStatus) {
+        for (Long id : movieIds) {
+            Movie movie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found for ID " + id));
+            movie.setStatus(Status.valueOf(newStatus));
+            movieRepository.save(movie);
+        }
     }
 }

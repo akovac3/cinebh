@@ -5,6 +5,7 @@ import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.model.Projection;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.model.City;
+import com.atlantbh.cinebh.model.Status;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -19,6 +20,10 @@ public class MovieSpecification {
             query.distinct(true);
             return builder.like(builder.lower(root.get("name")), "%" + contains.toLowerCase() + "%");
         };
+    }
+
+    public static Specification<Movie> hasStatus(Status status) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
     }
 
     public static Specification<Movie> projectionStartLessThenDate(Date date) {

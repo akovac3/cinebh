@@ -1,79 +1,127 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { format, differenceInDays } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 import Image from '../../../components/Image';
-import Badge from '../../../components/Badge'
-import { Dropdown, DropdownItem } from '../../../components/Dropdown';
-import Button from '../../../components/Button';
-import { Table, TableCell, TableHeaderCell, TableHeaderRow, TableRow } from '../../../components/Table';
-import { NumberOfElementsContext } from '../../../contexts/NumberOfElementsContext';
-
-import { url, movies, searchStatus, venues, searchCurrently, searchUpcoming, currently, upcoming } from "../../../utils/api";
-import Checkbox from '../../../components/CheckBox';
+import Badge from '../../../components/Badge';
+import { Checkbox } from '../../../components/Input';
+import Modal from '../../../components/Modal';
 import Tooltip from '../../../components/Tooltip';
 import Pagination from '../../../components/Pagination';
+import { Dropdown, DropdownItem } from '../../../components/Dropdown';
+import Button from '../../../components/Button';
+import { NoDataRow, Table, TableCell, TableHeaderCell, TableHeaderRow, TableRow } from '../../../components/Table';
+
+import { url, movies, searchStatus, venues, currently } from "../../../utils/api";
 
 const MovieTable = ({ type, selectable = false, actions = false }) => {
+    const navigate = useNavigate();
     const [movieList, setMovieList] = useState([]);
     const [venueList, setVenueList] = useState([]);
     const [showActions, setShowActions] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
-    const [pagination, setPagination] = useState({ page: 1, size: 4 });
+    const [pagination, setPagination] = useState({ page: 1, size: 5 });
     const [selectedMovies, setSelectedMovies] = useState([]);
-
-    const { numberOfElements, setNumberOfElements } = useContext(NumberOfElementsContext);
     const [showMenuIndex, setShowMenuIndex] = useState(null);
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [postsPerPage, setPostsPerPage] = useState(4);
     const [maxPages, setMaxPages] = useState(1);
     const [totalPosts, setTotalPosts] = useState(0);
+    const [modal, setModal] = useState(false);
 
     const paginateFront = () => {
-        setCurrentPage(prev => prev + 1);
         setPagination({ ...pagination, page: pagination.page + 1 });
     }
 
-    useEffect(() => {
-        fetchData()
-    }, [pagination])
-
     const paginateBack = () => {
-        setCurrentPage(prev => prev - 1);
         setPagination({ ...pagination, page: pagination.page - 1 });
-
     }
 
     const handleItemsPerPage = (value) => {
         setPagination({ ...pagination, size: value });
     }
 
-    const handleEdit = () => {
+    const handleMovieClick = (movie) => {
+        setSelectedMovies((prevSelectedMovies) =>
+            prevSelectedMovies.includes(movie)
+                ? prevSelectedMovies.filter(m => m.movieId !== movie.movieId)
+                : [...prevSelectedMovies, movie]
+        );
+    }
+
+    const handleEdit = (movie) => {
         setShowMenuIndex(null);
+        navigate('/admin-panel/add-movie', { state: { movie: movie } });
     };
 
-    const handlePublish = () => {
-        setShowMenuIndex(null);
+    const updateMoviesStatus = async (movieIds, status) => {
+        try {
+            const token = localStorage.getItem('token');
+
+            await axios.put(`${url}${movies}/update-status`, { movieIds, status }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            fetchData()
+        } catch (error) {
+            console.error('Error updating movies status:', error);
+        }
     };
 
-    const handleArchive = () => {
+    const handlePublish = async (movie = null) => {
         setShowMenuIndex(null);
-    };
-
-    const handleMoveToDrafts = () => {
-        setShowMenuIndex(null);
-    };
-
-    const getCover = (photos) => {
-        for (let element of photos) {
-            if (element.cover) {
-                return element.link;
+        if (movie !== null) {
+            if (movie.step !== "THREE") {
+                setModal(true);
+                return;
+            }
+            await updateMoviesStatus([movie.movieId], 'PUBLISHED');
+        } else {
+            const allStepThree = selectedMovies.every(movie => movie.step === "THREE");
+            if (allStepThree) {
+                const movieIds = selectedMovies.map(movie => movie.movieId);
+                await updateMoviesStatus(movieIds, 'PUBLISHED');
+            } else {
+                setModal(true);
             }
         }
-        return null;
+    };
+
+    const handleArchive = async (movie = null) => {
+        if (movie !== null) {
+            await updateMoviesStatus([movie.movieId], 'ARCHIVED');
+        } else {
+            const movieIds = selectedMovies.map(movie => movie.movieId);
+            await updateMoviesStatus(movieIds, 'ARCHIVED');
+        }
+        setShowMenuIndex(null);
+    };
+
+    const handleMoveToDrafts = async (movie = null) => {
+        if (movie !== null) {
+            await updateMoviesStatus([movie.movieId], 'DRAFT');
+        } else {
+            const movieIds = selectedMovies.map(movie => movie.movieId);
+            await updateMoviesStatus(movieIds, 'DRAFT');
+        }
+        setShowMenuIndex(null);
+    };
+
+    const fetchData = async () => {
+        let route = `${url}${movies}`
+        if (type === "drafts") route += `${searchStatus}?status=DRAFT`
+        else if (type === "currently") route += `${currently}?`
+        else if (type === "upcoming") route += `/all-upcoming?`
+        else if (type === "archived") route += `${searchStatus}?status=ARCHIVED`
+        route += `&page=${pagination.page}&size=${pagination.size}`
+
+        const result = await axios.get(route);
+        setMovieList(result.data.content);
+
+        setTotalPosts(result.data.totalElements);
+        setMaxPages(result.data.totalPages + 1);
     };
 
     const getVenueNames = (projections) => {
@@ -106,37 +154,7 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
             setVenueList(response.data);
         } catch (error) {
             console.error(error);
-            console.warning(error.response.data.message);
         }
-    };
-
-    const fetchData = async () => {
-        let route = `${url}${movies}`
-        if (type === "drafts") route += `${searchStatus}?status=DRAFT`
-        else if (type === "currently") route += `${currently}?`
-        else if (type === "upcoming") route += `${upcoming}?`
-        else if (type === "archived") route += `${searchStatus}?status=ARCHIVED`
-        route += `&page=${pagination.page}&size=${pagination.size}`
-
-        const result = await axios.get(route);
-        setMovieList(result.data.content);
-        console.log(result.data)
-
-        setNumberOfElements({ ...numberOfElements, [type]: result.data.totalElements });
-        setTotalPosts(result.data.totalElements)
-        setMaxPages(result.data.totalPages + 1)
-    };
-
-    useEffect(() => {
-        getGenreList();
-    }, []);
-
-    const handleMovieClick = (movieId) => {
-        setSelectedMovies((prevSelectedMovies) =>
-            prevSelectedMovies.includes(movieId)
-                ? prevSelectedMovies.filter(id => id !== movieId)
-                : [...prevSelectedMovies, movieId]
-        );
     };
 
     const getDaysRemaining = (date) => {
@@ -174,22 +192,30 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
         return { badgeState, badgeText };
     };
 
-    const DropdownComponent = (
-        <Dropdown className="w-[300px] right-0">
-            { type === "drafts" && <DropdownItem onClick={ handleEdit }>Edit</DropdownItem> }
-            { type === "drafts" && <DropdownItem onClick={ handlePublish }>Publish</DropdownItem> }
-            { type !== "drafts" && <DropdownItem onClick={ handleMoveToDrafts }>Move to Drafts</DropdownItem> }
-            { type !== "archived" && <DropdownItem onClick={ handleArchive }>Archive</DropdownItem> }
-        </Dropdown>
-    );
+    const getCover = (photos) => {
+        for (let element of photos) {
+            if (element.cover) {
+                return element.link;
+            }
+        }
+        return null;
+    };
+
+    useEffect(() => {
+        fetchData()
+    }, [pagination])
+
+    useEffect(() => {
+        getGenreList();
+    }, []);
 
     return (
         <div>
             { selectedMovies.length > 0 && (
                 <div className="flex justify-end gap-16 mb-16">
-                    { type !== "archived" && <Button variant='secondary' size='md' className="!border-error-500 underline !text-error-500">Archive</Button> }
-                    { type === "drafts" && <Button variant='secondary' size='md' className="border-success-600 text-success-600">Publish</Button> }
-                    { type !== "drafts" && <Button variant='secondary' size='md' className="border-success-600 text-success-600">Move to Drafts</Button> }
+                    { type !== "archived" && <Button variant='secondary' size='md' className="!border-error-500 underline !text-error-500 bg-neutral-0 z-50" onClick={ () => handleArchive() }>Archive</Button> }
+                    { type === "drafts" && <Button variant='secondary' size='md' className="border-success-600 text-success-600 bg-neutral-0 z-50" onClick={ () => handlePublish() }>Publish</Button> }
+                    { type !== "drafts" && <Button variant='secondary' size='md' className="border-success-600 text-success-600 bg-neutral-0 z-50" onClick={ () => handleMoveToDrafts() }>Move to Drafts</Button> }
                 </div>
             ) }
             <Table className="mb-16">
@@ -216,10 +242,10 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
                             const { badgeState, badgeText } = getBadgeDetails(movie);
 
                             return (
-                                <TableRow key={ i } className="cursor-pointer" onClick={ () => { if (selectable) handleMovieClick(movie.movieId) } }>
+                                <TableRow key={ i } className="cursor-pointer" onClick={ () => { if (selectable) handleMovieClick(movie) } }>
                                     <TableCell className="w-[300px]">
                                         <div className="flex items-center gap-8">
-                                            { selectable ? <Checkbox isChecked={ selectedMovies.includes(movie.movieId) } /> : null }
+                                            { selectable ? <Checkbox isChecked={ selectedMovies.includes(movie) } /> : null }
                                             <Image
                                                 width="40px"
                                                 height="40px"
@@ -247,18 +273,21 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
                                             >
                                                 <FontAwesomeIcon icon={ faEllipsis } />
                                             </Button>
-                                            { showActions && showMenuIndex === i && DropdownComponent }
+                                            { showActions && showMenuIndex === i && (
+                                                <Dropdown className="w-[300px] right-0">
+                                                    { type === "drafts" && <DropdownItem onClick={ () => handleEdit(movie) }>Edit</DropdownItem> }
+                                                    { type === "drafts" && <DropdownItem onClick={ () => handlePublish(movie) }>Publish</DropdownItem> }
+                                                    { type !== "drafts" && <DropdownItem onClick={ () => handleMoveToDrafts(movie) }>Move to Drafts</DropdownItem> }
+                                                    { type !== "archived" && <DropdownItem onClick={ () => handleArchive(movie) }>Archive</DropdownItem> }
+                                                </Dropdown>
+                                            ) }
                                         </div>
                                     </TableCell> : null }
                                 </TableRow>
                             );
                         })
                     ) : (
-                        <TableRow>
-                            <TableCell colSpan={ 5 } className="text-center">
-                                No data available in table
-                            </TableCell>
-                        </TableRow>
+                        <NoDataRow />
                     ) }
                 </tbody>
             </Table>
@@ -270,9 +299,21 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
                 paginateFront={ paginateFront }
                 currentPage={ pagination.page }
                 maxPages={ maxPages }
-                itemsPerPage={ [4, 10, 20] }
+                itemsPerPage={ [5, 10, 15, 20] }
                 handleItemsPerPage={ handleItemsPerPage }
             />
+
+            { modal && (
+                <Modal>
+                    <p className="text-heading-h6 text-neutral-900 pb-16">Publish Failed!</p>
+                    <p className="text-body-m text-neutral-500 text-justify">
+                        Movies that are in progress cannot be published.
+                    </p>
+                    <div className="flex pt-32 gap-8 justify-end">
+                        <Button size="sm" onClick={ () => setModal(false) }>Okay</Button>
+                    </div>
+                </Modal>
+            ) }
         </div>
     );
 };

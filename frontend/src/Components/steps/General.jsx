@@ -3,12 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { format } from "date-fns";
 
-import { StepperContext } from "../../contexts/StepperContext";
-
-import Input from "../Input";
+import { Input } from "../Input";
 import Label from "../Label";
-import { LabeledDropdown, LabeledDropdownItem } from "../LabeledDropdown";
 import DateRangePicker from "../DateRangePicker";
+import { MultiSelect, MultiSelectItem } from "../MultiSelect";
+
+import { StepperContext } from "../../contexts/StepperContext";
 
 const General = ({ genreList }) => {
     const { movieData, setMovieData } = useContext(StepperContext);
@@ -188,18 +188,18 @@ const General = ({ genreList }) => {
                             onBlur={ () => onBlur({ duration: false }) }
                         />
                     </Label>
-                    <LabeledDropdown
+                    <MultiSelect
                         label={ genreLabel }
                         value={ movieData.genres?.[0] }
                         isMultiSelect={ true }
                         onClick={ handleSelectGenres }
                     >
                         { genreList.map((genre, index) => (
-                            <LabeledDropdownItem key={ index } value={ genre.id }>
+                            <MultiSelectItem key={ index } value={ genre.id }>
                                 { genre.name }
-                            </LabeledDropdownItem>
+                            </MultiSelectItem>
                         )) }
-                    </LabeledDropdown>
+                    </MultiSelect>
                     <Label
                         label="Trailer"
                         value={ movieData["trailer"] }

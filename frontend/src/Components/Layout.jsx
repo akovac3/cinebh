@@ -31,7 +31,7 @@ const Layout = () => {
             <Outlet />
           </Elements>
         </ToggleSidebarContext.Provider>
-        { isSidebarOpen && <SideBar> { sidebarContent } </SideBar> }
+        { isSidebarOpen && <SideBar className="w-[500px] overflow-y-scroll"> { sidebarContent } </SideBar> }
       </div>
       <Footer />
     </div>

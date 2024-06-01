@@ -31,7 +31,7 @@ const UserOptions = ({ setUserClick }) => {
         <Dropdown className="w-[300px] right-[118px]">
             <DropdownItem>Profile</DropdownItem>
             { userRole === 'ADMIN' && <DropdownItem onClick={ () => navigate("/admin-panel/movies/drafts") }>Admin</DropdownItem> }
-            <DropdownItem className="text-primary-600" onClick={ onFinish }>Log Out</DropdownItem>
+            <DropdownItem className="text-primary-600 z-50" onClick={ onFinish }>Log Out</DropdownItem>
         </Dropdown>
     )
 }

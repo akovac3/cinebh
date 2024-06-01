@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 import Logo from "../../components/Logo";
-import Input from "../../components/Input";
+import { Input } from "../../components/Input";
 import Button from "../../components/Button";
 import Label from "../../components/Label";
 import Success from "../../components/Success";

@@ -1,9 +1,12 @@
-import { Outlet, useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+
 import { Tab, TabGroup, TabContent } from "../../../components/Tab";
-import { lastPathPart } from "../../../utils/utils";
 import Button from "../../../components/Button";
-import { useState, useContext } from "react";
-import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
+
+import { lastPathPart } from "../../../utils/utils";
+import { movies, url } from "../../../utils/api";
 
 const Movies = () => {
     const navigate = useNavigate();
@@ -16,25 +19,34 @@ const Movies = () => {
         navigate(`/admin-panel/movies/${tab}`);
     };
 
+    const getNumberOfElements = async () => {
+        try {
+            const result = await axios.get(`${url}${movies}/count-elements`);
+            setNumberOfElements(result.data);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    useEffect(() => {
+        getNumberOfElements()
+    }, [])
+
     return (
         <div className="pt-32 px-40 font-body text-neutral-800 w-full">
             <div className="flex">
                 <p className="text-heading-h6 pb-16 flex-1">Movies</p>
                 <Button onClick={ () => navigate('/admin-panel/add-movie', { state: { from: location.pathname } }) }>Add Movie</Button>
             </div>
-            <NumberOfElementsContext.Provider value={ { numberOfElements, setNumberOfElements } }>
-                <TabGroup selected={ selectedTab } onChange={ navigateToTab }>
-                    <Tab value="drafts">Drafts ({ numberOfElements.drafts })</Tab>
-                    <Tab value="currently">Currently Showing ({ numberOfElements.currently })</Tab>
-                    <Tab value="upcoming">Upcoming ({ numberOfElements.upcoming })</Tab>
-                    <Tab value="archived">Archived ({ numberOfElements.archived })</Tab>
-                </TabGroup>
+            <TabGroup selected={ selectedTab } onChange={ navigateToTab }>
+                <Tab value="drafts">Drafts ({ numberOfElements.drafts })</Tab>
+                <Tab value="currently">Currently Showing ({ numberOfElements.currently })</Tab>
+                <Tab value="upcoming">Upcoming ({ numberOfElements.upcoming })</Tab>
+                <Tab value="archived">Archived ({ numberOfElements.archived })</Tab>
+            </TabGroup>
 
-                <TabContent>
-                    <Outlet />
-                </TabContent>
-            </NumberOfElementsContext.Provider>
-
+            <TabContent>
+                <Outlet />
+            </TabContent>
         </div>
     );
 };

@@ -7,7 +7,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
 import Label from "../../components/Label";
-import Input from "../../components/Input";
+import { Input } from "../../components/Input";
 import Button from "../../components/Button";
 import Card from "../../components/Card";
 import MovieCard from "../../components/card/MovieCard";

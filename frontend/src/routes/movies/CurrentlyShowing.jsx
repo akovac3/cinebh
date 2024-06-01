@@ -8,7 +8,7 @@ import { format } from "date-fns";
 
 import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
 import CurrentlyShowingCard from "../../components/card/CurrentlyShowingCard";
-import Input from "../../components/Input";
+import { Input } from "../../components/Input";
 import DateCard from "../../components/card/DateCard";
 import Button from "../../components/Button";
 import Card from "../../components/Card";

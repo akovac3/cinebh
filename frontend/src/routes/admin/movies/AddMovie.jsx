@@ -96,26 +96,32 @@ const AddMovie = () => {
     useEffect(() => {
         validateGeneralStep();
         validateDetailsStep()
+
     }, [movieData, validateGeneralStep]);
 
     const addMovie = async () => {
+        let step = "THREE";
+        if (!stepStatus[1]) step = "ONE";
+        else if (!stepStatus[2]) step = "TWO";
+        const updatedMovieData = { ...movieData, step };
+        setMovieData(updatedMovieData);
+
         const token = localStorage.getItem('token');
         try {
-            if (movieData.id === undefined) {
-                const response = await axios.post(url + movies, movieData, {
+            if (updatedMovieData.id === undefined) {
+                const response = await axios.post(url + movies, updatedMovieData, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 if (response.status === 200) {
-                    setMovieData({ ...movieData, ["id"]: response.data.id });
+                    setMovieData((prevMovieData) => ({ ...prevMovieData, id: response.data.id }));
                     if (detailsData) {
                         console.log("add details");
                     }
                 }
-            }
-            else {
-                console.log("save")
+            } else {
+                console.log("save");
             }
         } catch (error) {
             console.log(error);

@@ -39,7 +39,7 @@ const MultiSelect = ({ className, children, label, value, onClick }) => {
 
 const MultiSelectItem = ({ className, children, onClick, value, isChecked }) => {
     return (
-        <DropdownItem className={ createClassName("flex items-center gap-4", className) } onClick={ onClick } value={ value }>
+        <DropdownItem className={ createClassName("items-center gap-4", className) } onClick={ onClick } value={ value }>
             <Checkbox isChecked={ isChecked } />
             { children }
         </DropdownItem>

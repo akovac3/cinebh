@@ -24,7 +24,7 @@ const AddMovie = () => {
     const { movie } = location.state || {};
 
     const [currentStep, setCurrentStep] = useState(1);
-    const [detailsData, setDetailsData] = useState([]);
+    const [detailsData, setDetailsData] = useState({ writersFile: null, actorsFile: null });
     const [projectionsData, setProjectionsData] = useState([]);
     const [genreList, setGenreList] = useState([]);
     const [stepStatus, setStepStatus] = useState({
@@ -52,18 +52,18 @@ const AddMovie = () => {
                 trailer: movie.trailer || '',
                 status: movie.status || 'DRAFT',
             });
-            const writers = movie.writers.map(writer => ({
+            const writers = movie.writers.length > 0 ? movie.writers.map(writer => ({
                 firstName: writer.firstName,
                 lastName: writer.lastName
-            }))
-            const actors = movie.movieActors.map(movieActor => ({
+            })) : null;
+            const actors = movie.movieActors.length > 0 ? movie.movieActors.map(movieActor => ({
                 firstName: movieActor.actor.firstName,
                 lastName: movieActor.actor.lastName,
                 role: movieActor.role
-            }));
+            })) : null;
             setDetailsData({
-                writers: writers,
-                actors: actors,
+                writersList: writers,
+                actorsList: actors,
                 photos: movie.photos
             })
         }
@@ -82,7 +82,7 @@ const AddMovie = () => {
     }, [movieData]);
 
     const validateDetailsStep = useCallback(() => {
-        const requiredFields = ["writers", "actors", "photos"];
+        const requiredFields = ["writersList", "actorsList", "photos"];
         for (let field of requiredFields) {
             if (!detailsData[field]) {
                 setStepStatus(prevStatus => ({ ...prevStatus, 2: false }));
@@ -98,6 +98,100 @@ const AddMovie = () => {
         validateDetailsStep()
 
     }, [movieData, validateGeneralStep]);
+
+    const uploadFiles = async (id) => {
+        const token = localStorage.getItem('token');
+
+        if (detailsData.actorsDelete) {
+            await deleteActors(token, id)
+        }
+
+        if (detailsData.writersDelete) {
+            await deleteWriters(token, id)
+        }
+
+        if (!detailsData.actorsFile && !detailsData.writersFile) {
+            return;
+        } else {
+            await upload(token, id)
+        }
+    }
+
+    const deleteWriters = async (token, id) => {
+        const response = await axios.delete(`${url}${movies}/${id}/delete-writers`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.status === "200") {
+            throw new Error("Failed to delete writers");
+        } else {
+            setDetailsData((prevDetailsData) => ({
+                ...prevDetailsData,
+                writersDelete: false,
+            }));
+        }
+    }
+
+    const deleteActors = async (token, id) => {
+        const response = await axios.delete(`${url}${movies}/${id}/delete-actors`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.status === "200") {
+            throw new Error("Failed to delete actors");
+        } else {
+            setDetailsData((prevDetailsData) => ({
+                ...prevDetailsData,
+                actorsDelete: false,
+            }));
+        }
+    }
+
+    const upload = async (token, id) => {
+        const formData = new FormData();
+        if (detailsData.writersFile) {
+            formData.append("writersFile", detailsData.writersFile);
+        }
+        if (detailsData.actorsFile) {
+            formData.append("actorsFile", detailsData.actorsFile);
+        }
+
+        try {
+            const response = await axios.post(`${url}${movies}/${id}/add-details`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.status === "200") {
+                throw new Error("Failed to upload files");
+            }
+
+            const writers = response.data.writers.length > 0 ? response.data.writers.map(writer => ({
+                firstName: writer.firstName,
+                lastName: writer.lastName
+            })) : detailsData.writersList;
+
+            const actors = response.data.actors.length > 0 ? response.data.actors.map(movieActor => ({
+                firstName: movieActor.actor.firstName,
+                lastName: movieActor.actor.lastName,
+                role: movieActor.role
+            })) : detailsData.actorsList;
+
+            setDetailsData((prevDetailsData) => ({
+                ...prevDetailsData,
+                writersList: writers,
+                actorsList: actors,
+                writersFile: null,
+                actorsFile: null
+            }));
+        } catch (error) {
+            console.error("Error uploading files:", error);
+        }
+    };
+
 
     const addMovie = async () => {
         let step = "THREE";
@@ -116,18 +210,27 @@ const AddMovie = () => {
                 });
                 if (response.status === 200) {
                     setMovieData((prevMovieData) => ({ ...prevMovieData, id: response.data.id }));
-                    if (detailsData) {
-                        console.log("add details");
-                    }
+                    await uploadFiles(response.data.id)
                 }
             } else {
-                console.log("save");
+                const response = await axios.post(url + movies + "/" + updatedMovieData.id, updatedMovieData, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.status === 200) {
+                    await uploadFiles(updatedMovieData.id)
+                }
             }
         } catch (error) {
             console.log(error);
             console.log(error.response.data.message);
         }
     };
+
+    useEffect(() => {
+        console.log(detailsData)
+    }, [detailsData])
 
     const handleSaveToDraft = async () => {
         await addMovie();

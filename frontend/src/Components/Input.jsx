@@ -1,3 +1,4 @@
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -55,4 +56,8 @@ const Checkbox = ({ isChecked }) => {
     )
 }
 
-export { Input, Checkbox };
+const FileInput = ({ className, ref, ...props }) => {
+    return <Input className={ className } type="file" ref={ ref } { ...props } />;
+};
+
+export { Input, Checkbox, FileInput };

@@ -1,25 +1,49 @@
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import Button from "../Button";
+import UploadFile from "../UploadFile";
+
+import { StepperContext } from "../../contexts/StepperContext";
 
 const Details = () => {
+    const { detailsData, setDetailsData } = useContext(StepperContext);
+
+    const handleFileChange = (file, type) => {
+        setDetailsData((prevDetailsData) => ({
+            ...prevDetailsData,
+            [`${type}File`]: file,
+            [`${type}List`]: null
+        }));
+    };
+
+    const handleRemove = (type) => {
+        setDetailsData((prevDetailsData) => ({
+            ...prevDetailsData,
+            [`${type}File`]: null,
+            [`${type}List`]: null,
+            [`${type}Delete`]: true,
+        }));
+    }
+
     return (
         <div>
             <div className="grid grid-cols-2 text-neutral-800">
-                <p className="text-body-l font-semibold mb-8">Writers</p>
-                <p className="text-body-l font-semibold mb-8">Actors</p>
-
-                <div className="border border-neutral-200 bg-neutral-0 rounded-16 min-h-160 mr-24">
-                    <div className="flex items-center justify-center h-full">
-                        <Button variant="tertiary"><FontAwesomeIcon icon={ faPlus } />Upload Writers via CSV</Button>
-                    </div>
-                </div>
-                <div className="border border-neutral-200 bg-neutral-0 rounded-16 min-h-160">
-                    <div className="flex items-center justify-center h-full">
-                        <Button variant="tertiary"><FontAwesomeIcon icon={ faPlus } />Upload Cast via CSV</Button>
-                    </div>
-                </div>
+                <UploadFile
+                    file={ detailsData.writersFile || null }
+                    text="Writers"
+                    onRemove={ () => handleRemove("writers") }
+                    onFileChange={ (file) => handleFileChange(file, "writers") }
+                    names={ detailsData.writersList || [] }
+                />
+                <UploadFile
+                    file={ detailsData.actorsFile || null }
+                    text="Actors"
+                    onRemove={ () => handleRemove("actors") }
+                    onFileChange={ (file) => handleFileChange(file, "actors") }
+                    names={ detailsData.actorsList || [] }
+                />
             </div>
             <p className="text-body-l font-semibold mt-24 mb-8">Upload Photos</p>
             <div className="border border-neutral-200 bg-neutral-0 flex items-center justify-center rounded-16 min-h-160">
@@ -32,7 +56,7 @@ const Details = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Details;

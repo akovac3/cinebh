@@ -40,6 +40,7 @@ public class SecurityConfiguration {
                         .requestMatchers("api/auth/**", "api/password-reset/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "api/movies/**", "api/venues", "api/actors", "api/writers", "api/photos").hasAnyAuthority(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.PUT, "api/movies/**", "api/venues", "api/actors", "api/writers", "api/photos").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "api/movies/**", "api/venues", "api/actors", "api/writers", "api/photos").hasAnyAuthority(Role.ADMIN.name())
                         .requestMatchers("/api/user", "/api/reservations", "/api/reservations/create-payment-intent").hasAnyAuthority(Role.USER.name())
                         .anyRequest().authenticated())
                 .exceptionHandling(e->e.accessDeniedHandler(accessDeniedHandler)

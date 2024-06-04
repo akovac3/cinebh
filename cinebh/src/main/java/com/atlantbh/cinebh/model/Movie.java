@@ -72,7 +72,7 @@ public class Movie {
     )
     private Set<Writer> writers = new HashSet<>();
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
     Set<MovieActor> movieActors = new HashSet<>();
 
     public Movie(String name, Step step, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer, Status status) {

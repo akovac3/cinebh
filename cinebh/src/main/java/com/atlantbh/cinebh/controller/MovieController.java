@@ -18,6 +18,7 @@ import com.atlantbh.cinebh.request.UpcomingMoviesFilterParams;
 import com.atlantbh.cinebh.request.ProjectionRequest;
 import com.atlantbh.cinebh.request.WriterRequest;
 import com.atlantbh.cinebh.request.MovieRequest;
+import com.atlantbh.cinebh.response.DetailsResponse;
 import com.atlantbh.cinebh.response.MovieResponse;
 import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import com.atlantbh.cinebh.service.ActorService;
@@ -34,15 +35,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.opencsv.CSVReader;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -137,12 +143,14 @@ public class MovieController {
                 movieRequest.getTrailer(),
                 movieRequest.getStatus()
         );
-            Set<Long> genresSet = movieRequest.getGenres();
+        Set<Long> genresSet = movieRequest.getGenres();
+        if (genresSet != null) {
             Set<Genre> genres = genresSet.stream()
                     .map(genreId -> genreRepository.findById(genreId)
                             .orElseThrow(() -> new RuntimeException("Error: Genre not found for ID " + genreId)))
                     .collect(Collectors.toSet());
             movie.setGenres(genres);
+        }
 
         Movie createdMovie = movieService.save(movie);
         return ResponseEntity.ok(new MovieResponse(createdMovie.getMovieId()));
@@ -231,6 +239,126 @@ public class MovieController {
         movie.setMovieActors(actors);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added actors for movie with id=" + id + "!", HttpStatus.OK);
+    }
+
+
+    @PostMapping(path = "/{id}/add-details")
+    public ResponseEntity<DetailsResponse> addDetails(@PathVariable long id,
+                                                      @RequestParam(value = "actorsFile", required = false) MultipartFile actorsFile,
+                                                      @RequestParam(value = "writersFile", required = false) MultipartFile writersFile) {
+        try {
+            Movie movie = movieService.findById(id);
+            if (movie == null) {
+                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            }
+
+            Set<MovieActor> actors = new HashSet<>();
+            Set<Writer> writers = new HashSet<>();
+
+            if (actorsFile != null && !actorsFile.isEmpty() && actorsFile.getOriginalFilename().endsWith(".csv")) {
+                actors = readActorsFromCSV(actorsFile, movie);
+            }
+            if (writersFile != null && !writersFile.isEmpty() && writersFile.getOriginalFilename().endsWith(".csv")) {
+                writers = readWritersFromCSV(writersFile);
+            }
+            if (!actors.isEmpty()) {
+                movie.setMovieActors(actors);
+            }
+            if (!writers.isEmpty()) {
+                movie.setWriters(writers);
+            }
+
+            movieService.save(movie);
+
+            DetailsResponse response = new DetailsResponse(actors, writers);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Set<MovieActor> readActorsFromCSV(MultipartFile file, Movie movie) throws Exception {
+        Set<MovieActor> actors = new HashSet<>();
+
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+            String[] fields;
+            while ((fields = csvReader.readNext()) != null) {
+                if (fields.length < 3) continue;
+                String firstName = fields[0].trim();
+                String lastName = fields[1].trim();
+                String role = fields[2].trim();
+
+                Actor newActor = actorService.findByName(firstName, lastName);
+                if (newActor == null) {
+                    newActor = actorService.save(new Actor(firstName, lastName));
+                }
+                MovieActor movieActor = new MovieActor(movie, newActor, role);
+                actors.add(movieActorService.save(movieActor));
+            }
+        }
+        return actors;
+    }
+
+    private Set<Writer> readWritersFromCSV(MultipartFile file) throws Exception {
+        Set<Writer> writers = new HashSet<>();
+
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+            String[] fields;
+            while ((fields = csvReader.readNext()) != null) {
+                if (fields.length < 2) continue;
+                String firstName = fields[0].trim();
+                String lastName = fields[1].trim();
+
+                Writer writer = writerService.findByName(firstName, lastName);
+                if (writer == null) {
+                    writer = writerService.save(new Writer(firstName, lastName));
+                }
+                writers.add(writer);
+            }
+        }
+        return writers;
+    }
+
+    @DeleteMapping(path = "/{id}/delete-actors")
+    public ResponseEntity<String> deleteActors(@PathVariable long id) {
+        try {
+            Movie movie = movieService.findById(id);
+            if (movie == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            Set<MovieActor> movieActors = movie.getMovieActors();
+            movie.getMovieActors().clear();
+            movieService.save(movie);
+
+            for (MovieActor ma : movieActors) {
+                movieActorService.remove(ma.getMovieActorId());
+            }
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(path = "/{id}/delete-writers")
+    public ResponseEntity<String> deleteWriters(@PathVariable long id) {
+        try {
+            Movie movie = movieService.findById(id);
+            if (movie == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            movie.getWriters().clear();
+            movieService.save(movie);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private Movie applyPatchToMovie(JsonPatch patch, Movie targetMovie) throws JsonPatchException, JsonProcessingException {

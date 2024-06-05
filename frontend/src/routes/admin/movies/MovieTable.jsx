@@ -242,8 +242,8 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
                             const { badgeState, badgeText } = getBadgeDetails(movie);
 
                             return (
-                                <TableRow key={ i } className="cursor-pointer" onClick={ () => { if (selectable) handleMovieClick(movie) } }>
-                                    <TableCell className="w-[300px]">
+                                <TableRow key={ i } className={ `cursor-pointer${i + 1 === movieList.length ? " border-b-0" : ""}` } onClick={ () => { if (selectable) handleMovieClick(movie) } }>
+                                    <TableCell className={ `w-[300px]${i + 1 === movieList.length ? " rounded-8" : ""}` }>
                                         <div className="flex items-center gap-8">
                                             { selectable ? <Checkbox isChecked={ selectedMovies.includes(movie) } /> : null }
                                             <Image

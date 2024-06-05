@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCircle } from "@fortawesome/free-solid-svg-icons";
 
 import { createClassName } from "../utils/utils";
 
@@ -10,7 +10,7 @@ const Input = ({ className, label, error, open, text, ...props }) => {
     )
 }
 
-const Checkbox = ({ isChecked }) => {
+const Checkbox = ({ className, rounded = false, children, isChecked }) => {
     const checkboxStyles = {
         position: 'relative',
         width: '16px',
@@ -25,7 +25,7 @@ const Checkbox = ({ isChecked }) => {
         width: '100%',
         height: '100%',
         border: `2px solid ${isChecked ? '#B22222' : '#98A2B3'}`,
-        borderRadius: '4px',
+        borderRadius: `${rounded ? "100%" : "4px"}`,
         backgroundColor: isChecked ? '#B22222' : 'transparent',
     };
 
@@ -41,17 +41,23 @@ const Checkbox = ({ isChecked }) => {
     };
 
     return (
-        <div style={ checkboxStyles }>
-            <input
-                type="checkbox"
-                checked={ isChecked }
-                style={ { display: 'none' } }
-                readOnly
-            />
-            <div style={ customCheckboxStyles }></div>
-            <span style={ checkmarkStyles }>
-                <FontAwesomeIcon className="w-12 font-semibold" icon={ faCheck } />
-            </span>
+        <div className={ createClassName("flex gap-4 items-center", className) }>
+            <div style={ checkboxStyles }>
+                <input
+                    type="checkbox"
+                    checked={ isChecked }
+                    style={ { display: 'none' } }
+                    readOnly
+                />
+                <div style={ customCheckboxStyles }></div>
+                <span style={ checkmarkStyles }>
+                    { rounded ?
+                        <FontAwesomeIcon className="w-[6px] font-semibold" icon={ faCircle } />
+                        : <FontAwesomeIcon className="w-12 font-semibold" icon={ faCheck } /> }
+                </span>
+            </div>
+            <p className="text-body-m font-semibold text-neutral-900">{ children }</p>
+
         </div>
     )
 }

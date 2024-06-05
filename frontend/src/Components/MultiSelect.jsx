@@ -28,7 +28,6 @@ const MultiSelect = ({ className, children, label, value, onClick }) => {
                         cloneElement(child, {
                             onClick: () => handleSelect(child.props.value),
                             isChecked: selectedValues.includes(child.props.value),
-                            isMultiSelect: true
                         })
                     ) }
                 </Dropdown>

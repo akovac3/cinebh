@@ -39,6 +39,8 @@ public class Movie {
     private Date projectionStart;
     private Date projectionEnd;
     private String director;
+
+    @Column(length = 500)
     private String synopsis;
     private String rating;
     private Integer duration;

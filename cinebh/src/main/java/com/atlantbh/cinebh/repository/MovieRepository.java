@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie> {
 
     @Query("SELECT mov FROM Movie mov WHERE mov.projectionStart <= CURRENT_DATE() AND mov.projectionEnd >= CURRENT_DATE() AND mov.status = 'PUBLISHED'")
@@ -30,6 +32,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
 
     @Query("SELECT COUNT(mov) FROM Movie mov WHERE mov.status = 'ARCHIVED'")
     long countArchived();
+
+    @Query("SELECT mov FROM Movie mov WHERE mov.projectionEnd <= CURRENT_DATE AND mov.status = 'PUBLISHED'")
+    List<Movie> findMoviesToArchive();
 
     Page<Movie> findByStatus(Status status, Pageable pageable);
 }

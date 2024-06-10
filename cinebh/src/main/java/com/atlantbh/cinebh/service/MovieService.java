@@ -6,6 +6,7 @@ import com.atlantbh.cinebh.model.Genre;
 import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.model.Status;
+import com.atlantbh.cinebh.model.Photo;
 import com.atlantbh.cinebh.repository.CityRepository;
 import com.atlantbh.cinebh.repository.GenreRepository;
 import com.atlantbh.cinebh.repository.MovieRepository;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,6 +53,12 @@ public class MovieService {
 
     @Autowired
     private GenreRepository genreRepository;
+
+    @Autowired
+    private PhotoService photoService;
+
+    @Autowired
+    private AmazonService amazonService;
 
     public Iterable<Movie> getAll() {
         return movieRepository.findAll();
@@ -138,5 +146,22 @@ public class MovieService {
             movie.setStatus(Status.valueOf(newStatus));
             movieRepository.save(movie);
         }
+    }
+
+    public void deletePhotos(long movieId, List<Long> photoIds) {
+        Movie movie = findById(movieId);
+        Set<Photo> photos = movie.getPhotos();
+
+        for (Long photoId : photoIds) {
+            Photo photo = photoService.findById(photoId);
+            if (photo != null && photos.contains(photo)) {
+                amazonService.deleteFileFromS3Bucket(photo.getLink());
+                photos.remove(photo);
+                photoService.deletePhoto(photo);
+            }
+        }
+
+        movie.setPhotos(photos);
+        save(movie);
     }
 }

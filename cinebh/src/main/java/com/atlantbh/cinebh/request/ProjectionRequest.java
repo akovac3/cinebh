@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
 import java.sql.Time;
 
 @Getter
@@ -14,5 +13,6 @@ import java.sql.Time;
 @NoArgsConstructor
 public class ProjectionRequest {
     private Time time;
-    private Long venueId;
+    private Long city;
+    private Long venue;
 }

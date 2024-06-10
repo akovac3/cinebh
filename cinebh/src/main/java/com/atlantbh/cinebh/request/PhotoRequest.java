@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PhotoRequest {
-    private String link;
+    private Long id;
     private Boolean cover;
 }

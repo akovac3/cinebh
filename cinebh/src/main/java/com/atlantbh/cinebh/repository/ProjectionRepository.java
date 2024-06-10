@@ -6,6 +6,7 @@ import com.atlantbh.cinebh.model.Venue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -20,4 +21,7 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long>, J
 
     @Query("SELECT proj FROM Projection proj WHERE proj.date=CURRENT_DATE()")
     List<Projection> getTodaysProjections();
+
+    @Transactional
+    void deleteByMovie(Movie movie);
 }

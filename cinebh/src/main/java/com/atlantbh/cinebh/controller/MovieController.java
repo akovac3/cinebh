@@ -21,13 +21,15 @@ import com.atlantbh.cinebh.request.MovieRequest;
 import com.atlantbh.cinebh.response.DetailsResponse;
 import com.atlantbh.cinebh.response.MovieResponse;
 import com.atlantbh.cinebh.response.NumberOfElementsResponse;
-import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.MovieService;
-import com.atlantbh.cinebh.service.MovieActorService;
 import com.atlantbh.cinebh.service.PhotoService;
+import com.atlantbh.cinebh.service.ActorService;
 import com.atlantbh.cinebh.service.WriterService;
-import com.atlantbh.cinebh.service.VenueService;
 import com.atlantbh.cinebh.service.ProjectionService;
+import com.atlantbh.cinebh.service.AmazonService;
+import com.atlantbh.cinebh.service.VenueService;
+import com.atlantbh.cinebh.service.MovieActorService;
+import com.atlantbh.cinebh.service.CSVService;
 import com.atlantbh.cinebh.model.Projection;
 import com.atlantbh.cinebh.model.Venue;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,20 +37,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.opencsv.CSVReader;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,6 +86,11 @@ public class MovieController {
     private ProjectionService projectionService;
 
     ObjectMapper objectMapper;
+
+    private AmazonService amazonClient;
+
+    @Autowired
+    private CSVService csvService;
 
     @GetMapping
     public ResponseEntity<Iterable<Movie>> getAll() {
@@ -180,31 +195,104 @@ public class MovieController {
         return new ResponseEntity<>("Movie with id = " + id + " successfully updated!", HttpStatus.OK);
     }
 
-    @PostMapping(path = "/{id}/photos")
-    public ResponseEntity<String> addPhotos(@PathVariable long id, @Validated @RequestBody PhotoRequest[] photoRequests) {
-        Movie movie = movieService.findById(id);
-        Set<Photo> photos = Arrays.stream(photoRequests).
-                map(photoRequest -> photoService.createPhoto(new Photo(photoRequest.getLink(), photoRequest.getCover(), movie))).collect(Collectors.toSet());
-        movie.setPhotos(photos);
-        movieService.save(movie);
-        return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
+    @PostMapping(path = "/{id}/add-files")
+    public ResponseEntity<String> addPhotos(@PathVariable long id, @RequestPart(value = "files", required = false) MultipartFile[] files, @RequestPart(value = "photos", required = false) PhotoRequest[] photoRequests) {
+        try {
+            Movie movie = movieService.findById(id);
+            if (movie == null) {
+                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
+            }
+
+            Set<Photo> newPhotos = new HashSet<>();
+
+            int index = 0;
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    String fileUrl = amazonClient.uploadFile(file);
+                    newPhotos.add(photoService.createPhoto(new Photo(fileUrl, photoRequests[index].getCover(), movie)));
+                    index++;
+                }
+            }
+
+            if (photoRequests != null) {
+                for (int i = index; i < photoRequests.length; i++) {
+                    Photo p = photoService.findById(photoRequests[i].getId());
+                    p.setCover(photoRequests[i].getCover());
+                    photoService.save(p);
+                    newPhotos.add(p);
+                }
+            }
+            movie.setPhotos(newPhotos);
+            movieService.save(movie);
+
+            return new ResponseEntity<>("Successfully added photos for movie with id=" + id + "!", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred while adding photos", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(path = "/{id}/photos")
+    public ResponseEntity<String> deletePhotos(@PathVariable long id, @RequestBody List<Long> deletePhotos) {
+        try {
+            Movie movie = movieService.findById(id);
+            if (movie == null) {
+                return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
+            }
+
+            Set<Photo> photos = movie.getPhotos();
+            Set<Photo> photosToDelete = deletePhotos.stream()
+                    .map(photoService::findById)
+                    .collect(Collectors.toSet());
+
+            for (Photo photo : photosToDelete) {
+                if (photo == null) {
+                    return new ResponseEntity<>("Photo not found", HttpStatus.NOT_FOUND);
+                }
+                amazonClient.deleteFileFromS3Bucket(photo.getLink());
+                photos.remove(photo);
+                photoService.deletePhoto(photo);
+            }
+
+            movie.setPhotos(photos);
+            movieService.save(movie);
+
+            return new ResponseEntity<>("Successfully deleted photos for movie with id=" + id + "!", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred while deleting photos", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(path = "/{id}/projection")
     public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
         Movie movie = movieService.findById(id);
-        Set<Projection> projections = movie.getProjections();
+        deleteProjectionsForMovie(movie);
 
         Set<Projection> newProjections = Arrays.stream(projectionRequests)
                 .flatMap(projectionRequest -> {
-                    Venue venue = venueService.findById(projectionRequest.getVenueId());
+                    Venue venue = venueService.findById(projectionRequest.getVenue());
                     return projectionService.createProjectionsForMovie(movie, projectionRequest.getTime(), venue).stream();
                 })
                 .collect(Collectors.toSet());
-        projections.addAll(newProjections);
-        movie.setProjections(projections);
+        movie.setProjections(newProjections);
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
+    }
+
+    private void deleteProjectionsForMovie(Movie movie) {
+        movie.setProjections(new HashSet<>());
+        movieService.save(movie);
+        projectionService.deleteProjectionsByMovie(movie);
+    }
+
+    @DeleteMapping(path = "/{id}/projection")
+    public ResponseEntity<String> deleteProjections(@PathVariable long id) {
+        Movie movie = movieService.findById(id);
+        deleteProjectionsForMovie(movie);
+        return new ResponseEntity<>("Successfully deleted projections for movie with id=" + id + "!", HttpStatus.OK);
     }
 
     @PostMapping(path = "/{id}/writers")
@@ -240,7 +328,6 @@ public class MovieController {
         movieService.save(movie);
         return new ResponseEntity<>("Successfully added actors for movie with id=" + id + "!", HttpStatus.OK);
     }
-
 
     @PostMapping(path = "/{id}/add-details")
     public ResponseEntity<DetailsResponse> addDetails(@PathVariable long id,
@@ -281,42 +368,38 @@ public class MovieController {
 
     private Set<MovieActor> readActorsFromCSV(MultipartFile file, Movie movie) throws Exception {
         Set<MovieActor> actors = new HashSet<>();
+        List<String[]> rows = csvService.readCsv(file);
 
-        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
-            String[] fields;
-            while ((fields = csvReader.readNext()) != null) {
-                if (fields.length < 3) continue;
-                String firstName = fields[0].trim();
-                String lastName = fields[1].trim();
-                String role = fields[2].trim();
+        for (String[] fields : rows) {
+            if (fields.length < 3) continue;
+            String firstName = fields[0].trim();
+            String lastName = fields[1].trim();
+            String role = fields[2].trim();
 
-                Actor newActor = actorService.findByName(firstName, lastName);
-                if (newActor == null) {
-                    newActor = actorService.save(new Actor(firstName, lastName));
-                }
-                MovieActor movieActor = new MovieActor(movie, newActor, role);
-                actors.add(movieActorService.save(movieActor));
+            Actor newActor = actorService.findByName(firstName, lastName);
+            if (newActor == null) {
+                newActor = actorService.save(new Actor(firstName, lastName));
             }
+            MovieActor movieActor = new MovieActor(movie, newActor, role);
+            actors.add(movieActorService.save(movieActor));
         }
         return actors;
     }
 
     private Set<Writer> readWritersFromCSV(MultipartFile file) throws Exception {
         Set<Writer> writers = new HashSet<>();
+        List<String[]> rows = csvService.readCsv(file);
 
-        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
-            String[] fields;
-            while ((fields = csvReader.readNext()) != null) {
-                if (fields.length < 2) continue;
-                String firstName = fields[0].trim();
-                String lastName = fields[1].trim();
+        for (String[] fields : rows) {
+            if (fields.length < 2) continue;
+            String firstName = fields[0].trim();
+            String lastName = fields[1].trim();
 
-                Writer writer = writerService.findByName(firstName, lastName);
-                if (writer == null) {
-                    writer = writerService.save(new Writer(firstName, lastName));
-                }
-                writers.add(writer);
+            Writer writer = writerService.findByName(firstName, lastName);
+            if (writer == null) {
+                writer = writerService.save(new Writer(firstName, lastName));
             }
+            writers.add(writer);
         }
         return writers;
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,7 @@ import StepperControl from '../../../components/StepperControl';
 import General from '../../../components/steps/General';
 import Details from '../../../components/steps/Details';
 import Venues from '../../../components/steps/Venues';
+import Modal from '../../../components/Modal';
 
 import { StepperContext } from '../../../contexts/StepperContext';
 
@@ -19,6 +20,7 @@ const AddMovie = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [movieData, setMovieData] = useState({});
+    const [addModal, setAddModal] = useState(false)
 
     const from = location.state?.from || '/admin-panel/movies/drafts';
     const { movie } = location.state || {};
@@ -34,6 +36,8 @@ const AddMovie = () => {
     });
 
     const steps = ["General", "Details", "Venues"];
+
+    const isAddButtonDisabled = projectionsData ? projectionsData.some(projection => !projection.city || !projection.venue || !projection.time) : true;
 
     useEffect(() => {
         if (movie) {
@@ -61,11 +65,30 @@ const AddMovie = () => {
                 lastName: movieActor.actor.lastName,
                 role: movieActor.role
             })) : null;
+            const photos = movie.photos.length > 0 ? movie.photos.map(photo => ({
+                id: photo.photoId,
+                link: photo.link,
+                file: null,
+                cover: photo.cover
+            })) : null;
             setDetailsData({
                 writersList: writers,
                 actorsList: actors,
-                photos: movie.photos
+                photos: photos,
+                deletePhotos: []
             })
+            const projections = movie.projections.length > 0 ? (() => {
+                const seen = new Set();
+                return movie.projections.filter(projection => {
+                    const key = `${projection.time}-${projection.venue.venueId}-${projection.venue.city.cityId}`;
+                    return seen.has(key) ? false : seen.add(key);
+                }).map(projection => ({
+                    venue: projection.venue.venueId,
+                    city: projection.venue.city.cityId,
+                    time: projection.time
+                }));
+            })() : [{ venue: null, city: null, time: null }];
+            setProjectionsData(projections)
         }
     }, [movie]);
 
@@ -82,40 +105,141 @@ const AddMovie = () => {
     }, [movieData]);
 
     const validateDetailsStep = useCallback(() => {
-        const requiredFields = ["writersList", "actorsList", "photos"];
-        for (let field of requiredFields) {
-            if (!detailsData[field]) {
-                setStepStatus(prevStatus => ({ ...prevStatus, 2: false }));
-                return false;
-            }
+        const { writersList, writersFile, actorsList, actorsFile, photos } = detailsData;
+
+        if ((writersList || writersFile) && (actorsList || actorsFile) && photos) {
+            setStepStatus(prevStatus => ({ ...prevStatus, 2: true }));
+            return true;
+        } else {
+            setStepStatus(prevStatus => ({ ...prevStatus, 2: false }));
+            return false;
         }
-        setStepStatus(prevStatus => ({ ...prevStatus, 2: true }));
+    }, [detailsData]);
+
+    const validateVenuesStep = useCallback(() => {
+        if (!projectionsData || projectionsData.length < 0 || isAddButtonDisabled) {
+            setStepStatus(prevStatus => ({ ...prevStatus, 3: false }));
+            return false;
+        }
+        setStepStatus(prevStatus => ({ ...prevStatus, 3: true }));
         return true;
-    }, [movieData]);
+    }, [projectionsData]);
 
     useEffect(() => {
-        validateGeneralStep();
+        validateGeneralStep()
         validateDetailsStep()
-
-    }, [movieData, validateGeneralStep]);
+        validateVenuesStep()
+    }, [movieData]);
 
     const uploadFiles = async (id) => {
         const token = localStorage.getItem('token');
 
         if (detailsData.actorsDelete) {
-            await deleteActors(token, id)
+            await deleteActors(token, id);
         }
 
         if (detailsData.writersDelete) {
-            await deleteWriters(token, id)
+            await deleteWriters(token, id);
         }
 
-        if (!detailsData.actorsFile && !detailsData.writersFile) {
+        if (detailsData.deletePhotos && detailsData.deletePhotos.length > 0) {
+            await deletePhotos(token, id);
+        }
+
+        if (!detailsData.actorsFile && !detailsData.writersFile && (!detailsData.photos || detailsData.photos.length === 0)) {
             return;
         } else {
-            await upload(token, id)
+            await upload(token, id);
+        }
+
+        if (detailsData.photos && detailsData.photos.length > 0) {
+            await uploadPhotos(token, id);
+        }
+
+        if (projectionsData && projectionsData.length > 0) {
+            await addProjections(token, id)
+        }
+    };
+
+    const addProjections = async (token, id) => {
+        try {
+            const response = await axios.post(`${url}${movies}/${id}/projection`, projectionsData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.status === "200") {
+                throw new Error("Failed to upload projections");
+            }
+
+        } catch (error) {
+            console.error("Error uploading files:", error);
         }
     }
+
+    const uploadPhotos = async (token, id) => {
+        const formData = new FormData();
+
+        if (detailsData.photos && detailsData.photos.length > 0) {
+            let data = [];
+            let existingPhotos = []
+            detailsData.photos.map((photo, i) => {
+                if (photo.file !== null) {
+                    formData.append("files", photo.file)
+                    data = [...data, { "cover": photo.cover }]
+                } else {
+                    existingPhotos = [...existingPhotos, { "id": photo.id, "cover": photo.cover }]
+
+                }
+            })
+            data = data.concat(existingPhotos)
+            formData.append("photos", new Blob([JSON.stringify(data)], { type: "application/json" }))
+        } else {
+            return
+        }
+        try {
+            const response = await axios.post(`${url}${movies}/${id}/add-files`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Failed to upload photos");
+            }
+        } catch (error) {
+            console.error("Error uploading photos:", error);
+        }
+    };
+
+    const deletePhotos = async (token, id) => {
+        try {
+            const deleteRequest = detailsData.deletePhotos;
+
+            const response = await axios.delete(
+                `${url}${movies}/${id}/photos`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    data: deleteRequest // Sending the list of photo IDs directly
+                }
+            );
+
+            if (response.status !== 200) {
+                throw new Error("Failed to delete photos");
+            } else {
+                setDetailsData(prevDetailsData => ({
+                    ...prevDetailsData,
+                    deletePhotos: []
+                }));
+            }
+        } catch (error) {
+            console.error("Error deleting photos:", error);
+        }
+    };
 
     const deleteWriters = async (token, id) => {
         const response = await axios.delete(`${url}${movies}/${id}/delete-writers`, {
@@ -192,11 +316,15 @@ const AddMovie = () => {
         }
     };
 
-
     const addMovie = async () => {
-        let step = "THREE";
+        let step = "";
         if (!stepStatus[1]) step = "ONE";
         else if (!stepStatus[2]) step = "TWO";
+        else if (!stepStatus[3]) step = "TWO";
+        else step = "THREE";
+
+        console.log(step, stepStatus[3])
+
         const updatedMovieData = { ...movieData, step };
         setMovieData(updatedMovieData);
 
@@ -211,6 +339,7 @@ const AddMovie = () => {
                 if (response.status === 200) {
                     setMovieData((prevMovieData) => ({ ...prevMovieData, id: response.data.id }));
                     await uploadFiles(response.data.id)
+                    navigate("/admin-panel/movies")
                 }
             } else {
                 const response = await axios.post(url + movies + "/" + updatedMovieData.id, updatedMovieData, {
@@ -220,6 +349,7 @@ const AddMovie = () => {
                 });
                 if (response.status === 200) {
                     await uploadFiles(updatedMovieData.id)
+                    navigate("/admin-panel/movies")
                 }
             }
         } catch (error) {
@@ -297,8 +427,20 @@ const AddMovie = () => {
                     handleClick={ handleClick }
                     currentStep={ currentStep }
                     steps={ steps }
+                    disableAdd={ isAddButtonDisabled }
                     saveToDraft={ handleSaveToDraft }
                 />
+                { addModal && (
+                    <Modal>
+                        <p className="text-heading-h6 text-neutral-900 pb-16">Movie Cannot be Added</p>
+                        <p className="text-body-m text-neutral-500 text-justify">
+                            Movie that has conflicting projection time cannot be added.
+                        </p>
+                        <div className="flex pt-32 gap-8 justify-end">
+                            <Button size="sm" onClick={ () => setAddModal(false) }>Okay</Button>
+                        </div>
+                    </Modal>
+                ) }
             </div>
         </StepperContext.Provider>
     );

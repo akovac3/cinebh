@@ -1,6 +1,6 @@
 import Button from "./Button";
 
-const StepperControl = ({ handleClick, currentStep, steps, saveToDraft }) => {
+const StepperControl = ({ handleClick, currentStep, steps, saveToDraft, disableAdd }) => {
     return (
         <div className="flex mt-24 mb-32">
             <div className="flex-1">
@@ -8,7 +8,10 @@ const StepperControl = ({ handleClick, currentStep, steps, saveToDraft }) => {
             </div>
             <div className="flex gap-16">
                 <Button variant="secondary" onClick={ () => saveToDraft() }>Save to Drafts</Button>
-                <Button onClick={ () => handleClick("continue") }>
+                <Button onClick={ () => {
+                    if (currentStep === steps.length) saveToDraft()
+                    else handleClick("continue")
+                } } disabled={ currentStep === steps.length && disableAdd }>
                     { currentStep === steps.length ? "Add Movie" : "Continue" }</Button>
             </div>
         </div>

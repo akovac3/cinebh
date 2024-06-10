@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -7,10 +7,12 @@ import Button from "../../../components/Button";
 
 import { lastPathPart } from "../../../utils/utils";
 import { movies, url } from "../../../utils/api";
+import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
 
 const Movies = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { numberOfElementsChanged } = useContext(NumberOfElementsContext);
     const [numberOfElements, setNumberOfElements] = useState({ drafts: 0, currently: 0, upcoming: 0, archived: 0 })
     const [selectedTab, setSelectedTab] = useState(lastPathPart(location.pathname) || 'drafts');
 
@@ -29,7 +31,7 @@ const Movies = () => {
     }
     useEffect(() => {
         getNumberOfElements()
-    }, [])
+    }, [numberOfElementsChanged])
 
     return (
         <div className="pt-32 px-40 font-body text-neutral-800 w-full">

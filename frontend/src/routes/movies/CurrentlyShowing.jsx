@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom"
 import { format } from "date-fns";
 
-import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
+import { LabeledDropdown, DropdownItem } from "../../components/Dropdown";
 import CurrentlyShowingCard from "../../components/card/CurrentlyShowingCard";
 import { Input } from "../../components/Input";
 import DateCard from "../../components/card/DateCard";
@@ -222,21 +222,21 @@ const CurrentlyShowing = () => {
                     value={ getCityName(filterParams.city) }
                     label={ cityLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('city', null) }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All cities
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -244,21 +244,21 @@ const CurrentlyShowing = () => {
                     value={ getVenueName(filterParams.venue) }
                     label={ venueLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('venue', null) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('venue', venue.venueId) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -266,21 +266,21 @@ const CurrentlyShowing = () => {
                     value={ getGenreName(filterParams.genre) }
                     label={ genreLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('genre', null) }
                         className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
                         All genres
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { genreList.map((genre, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('genre', genre.id) }
                                 className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -288,21 +288,21 @@ const CurrentlyShowing = () => {
                     value={ filterParams.time }
                     label={ timeLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('time', null) }
                         className={ `${filterParams.time === null ? "font-semibold" : "font-normal"}` }
                     >
                         All projection times
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { times.map((time, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('time', decodeURIComponent(time + ":00")) }
                                 className={ `${time === filterParams.time ? "font-semibold" : "font-normal"}` }
                             >
                                 { time }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>

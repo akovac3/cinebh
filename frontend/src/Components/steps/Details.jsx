@@ -32,13 +32,15 @@ const Details = () => {
         }));
     };
 
-    const handlePhotosRemove = () => {
+    const handlePhotosRemove = (photoId) => {
         setDetailsData((prevDetailsData) => ({
             ...prevDetailsData,
-            photos: [],
+            deletePhotos: [
+                ...prevDetailsData.deletePhotos,
+                photoId
+            ],
         }));
     };
-
     return (
         <div>
             <div className="grid grid-cols-2 text-neutral-800">
@@ -59,7 +61,7 @@ const Details = () => {
             </div>
             <UploadImages
                 files={ detailsData.photos }
-                onRemove={ handlePhotosRemove }
+                onRemove={ (idsToRemove) => handlePhotosRemove(idsToRemove) }
                 onFileChange={ handlePhotosChange }
             />
         </div>

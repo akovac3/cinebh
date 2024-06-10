@@ -5,14 +5,14 @@ import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
 import { Checkbox } from "./Input";
 
-const UploadImages = ({ files, onFileChange }) => {
+const UploadImages = ({ files, onFileChange, onRemove }) => {
     const inputRef = useRef();
     const individualInputRefs = useRef([]);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const handleChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            const selectedFiles = Array.from(e.target.files).slice(0, 4).map(file => ({ file, cover: false }));
+            const selectedFiles = Array.from(e.target.files).slice(0, 4).map(file => ({ file, cover: false, link: null, id: null }));
             if (!selectedFiles.some(file => file.cover)) {
                 selectedFiles[0].cover = true;
             }
@@ -23,7 +23,7 @@ const UploadImages = ({ files, onFileChange }) => {
     const handleIndividualChange = (e, index) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = [...files];
-            newFiles[index] = { file: e.target.files[0], cover: index === 0 };
+            newFiles[index] = { file: e.target.files[0], cover: index === 0, link: null, id: null };
             if (index === 0 || !newFiles.some(file => file.cover)) {
                 newFiles[0].cover = true;
             }
@@ -78,13 +78,13 @@ const UploadImages = ({ files, onFileChange }) => {
             const droppedFiles = Array.from(e.dataTransfer.files).slice(0, 4).map((file, index) => ({
                 file,
                 cover: index === 0,
-                isLocal: true,
+                link: null,
             }));
             onFileChange(droppedFiles);
         }
     };
 
-    const renderFile = (index, file, placeholder) => (
+    const renderFile = (index, file, isExisting, placeholder) => (
         <div className={ `flex flex-col w-full py-16 ${index === 0 ? "pl-16" : "pl-8"} ${index === 3 ? "pr-16" : "pr-8"}` }>
             <div className="rounded-16 relative">
                 <input
@@ -95,7 +95,7 @@ const UploadImages = ({ files, onFileChange }) => {
                 />
                 <img
                     className={ `w-full h-[240px] rounded-16 object-cover ${placeholder ? 'opacity-60' : ''}` }
-                    src={ placeholder ? "/chess_board.png" : URL.createObjectURL(file.file) }
+                    src={ placeholder ? "/placeholder.png" : isExisting ? file.link : URL.createObjectURL(file.file) }
                     alt={ placeholder ? "" : `Uploaded ${index + 1}` }
                 />
                 <div className="bg-neutral-800 bg-opacity-80 absolute top-[80%] rounded-b-16 w-full flex justify-center">
@@ -123,6 +123,7 @@ const UploadImages = ({ files, onFileChange }) => {
                     icon={ faTrash }
                     onClick={ () => {
                         if (!placeholder) {
+                            if (files[index].id) onRemove(files[index].id)
                             const newFiles = files.filter((_, i) => i !== index);
                             if (newFiles.length > 0 && !newFiles.some(file => file.cover)) {
                                 newFiles[0].cover = true;
@@ -152,8 +153,10 @@ const UploadImages = ({ files, onFileChange }) => {
                         { Array.from({ length: 4 }).map((_, index) => (
                             <div key={ index }>
                                 { files[index]
-                                    ? renderFile(index, files[index], false)
-                                    : renderFile(index, {}, true) }
+                                    ? files[index].link !== null
+                                        ? renderFile(index, files[index], true, false)
+                                        : renderFile(index, files[index], false, false)
+                                    : renderFile(index, {}, false, true) }
                             </div>
                         )) }
                     </div>

@@ -43,7 +43,7 @@ const Checkbox = ({ className, rounded = false, children, isChecked }) => {
     return (
         <div className={ createClassName("flex gap-4 items-center", className) }>
             <div style={ checkboxStyles }>
-                <input
+                <Input
                     type="checkbox"
                     checked={ isChecked }
                     style={ { display: 'none' } }

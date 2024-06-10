@@ -3,7 +3,7 @@ import { faArrowLeft, faArrowRight, faChevronDown } from "@fortawesome/free-soli
 
 import Button from "./Button";
 import Label from "./Label";
-import { LabeledDropdown, LabeledDropdownItem } from "./LabeledDropdown";
+import { LabeledDropdown, DropdownItem } from "./Dropdown";
 
 import { createClassName } from "../utils/utils";
 
@@ -52,13 +52,13 @@ const Pagination = ({ className, displayCount = true, handleItemsPerPage, itemsP
         >
           { itemsPerPage.map((item, i) => {
             return (
-              <LabeledDropdownItem
+              <DropdownItem
                 key={ i }
                 className={ `${postsPerPage === item ? "font-semibold" : "font-normal"}` }
                 onClick={ () => { handleItemsPerPage(item) } }
               >
                 { item }
-              </LabeledDropdownItem>
+              </DropdownItem>
             )
           }
           ) }

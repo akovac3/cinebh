@@ -1,14 +1,18 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { faBuilding } from "@fortawesome/free-regular-svg-icons";
 
 import SideBar from "../../components/SideBar";
+import { NumberOfElementsContext } from "../../contexts/NumberOfElementsContext";
 
 const AdminPanel = () => {
+    const [numberOfElementsChanged, setNumberOfElementsChanged] = useState({});
+
     return (
         <div className="flex font-body">
-            <SideBar left className="w-[264px] flex flex-col gap-32 p-32">
+            <SideBar position="left" className="w-[264px] flex flex-col gap-32 p-32">
                 <div className="text-heading-h5 pb-40 border-b border-neutral-500 text-neutral-25">Admin</div>
                 <NavLink
                     to="/admin-panel/movies"
@@ -25,9 +29,15 @@ const AdminPanel = () => {
                     <span className="pl-8">Venues</span>
                 </NavLink>
             </SideBar>
-            <div className="pl-[264px] w-full">
-                <Outlet />
-            </div>
+            <NumberOfElementsContext.Provider value={ {
+                numberOfElementsChanged,
+                setNumberOfElementsChanged
+            } }>
+                <div className="pl-[264px] w-full">
+                    <Outlet />
+                </div>
+            </NumberOfElementsContext.Provider>
+
         </div>
     )
 }

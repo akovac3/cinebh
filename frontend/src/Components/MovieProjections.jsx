@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
-import { LabeledDropdown, LabeledDropdownItem } from "./LabeledDropdown";
+import { DropdownItem, LabeledDropdown } from "./Dropdown";
 import DateCard from "./card/DateCard";
 import Pagination from "./Pagination";
 import Button from "./Button";
@@ -149,21 +149,21 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                     value={ getCityName(filterParams.city) }
                     label={ cityLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => { _handleFilterChange({ city: null, venue: null, time: null }); getVenues(null) } }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All cities
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange({ city: city.cityId, venue: null, time: null }); getVenues(city.cityId) } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -171,21 +171,21 @@ const MovieProjections = ({ movie, cityList, venueList, getVenues, projectionLis
                     value={ getVenueName(filterParams.venue) }
                     label={ venueLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange({ venue: null, time: null }) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange({ venue: venue.venueId, time: null }) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>

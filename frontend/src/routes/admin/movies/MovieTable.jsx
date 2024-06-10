@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { format, differenceInDays } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,6 +15,8 @@ import { Dropdown, DropdownItem } from '../../../components/Dropdown';
 import Button from '../../../components/Button';
 import { NoDataRow, Table, TableCell, TableHeaderCell, TableHeaderRow, TableRow } from '../../../components/Table';
 
+import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
+
 import { url, movies, searchStatus, venues, currently } from "../../../utils/api";
 
 const MovieTable = ({ type, selectable = false, actions = false }) => {
@@ -29,6 +31,7 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
     const [maxPages, setMaxPages] = useState(1);
     const [totalPosts, setTotalPosts] = useState(0);
     const [modal, setModal] = useState(false);
+    const { setNumberOfElementsChanged } = useContext(NumberOfElementsContext);
 
     const paginateFront = () => {
         setPagination({ ...pagination, page: pagination.page + 1 });
@@ -122,6 +125,7 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
 
         setTotalPosts(result.data.totalElements);
         setMaxPages(result.data.totalPages + 1);
+        setNumberOfElementsChanged(result.data.content[0])
     };
 
     const getVenueNames = (projections) => {

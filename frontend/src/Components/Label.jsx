@@ -16,10 +16,10 @@ const Label = ({ className, label, active, value, error, children, errorMessage,
     }
 
     return (
-        <div className={ createClassName("relative text-primary-25 w-full", className) }>
-            { label ? <p className={ `font-semibold pb-4 ${error ? "text-error-300" : ""}` }>{ label }</p> : null }
+        <div className={ createClassName(`relative text-primary-25 w-full ${error ? "mb-32" : ""}`, className) }>
+            { label ? <p className={ `font-semibold pb-4 ${error ? "text-error-600" : ""}` }>{ label }</p> : null }
             <div className={ active ? createClassName(varianClassName[variant], varianClassName["focused"], sizeClassName[size]) : createClassName(varianClassName[variant], sizeClassName[size]) }>
-                <div className={ `flex w-full relative h-full capitalize cursor-pointer ${active || value ? "text-neutral-900" : "text-neutral-500"}` }>
+                <div className={ `flex w-full relative h-full capitalize cursor-pointer ${active || value ? "text-neutral-900" : "text-neutral-500"} ${error ? "!text-error-600" : ""} ` }>
                     <div className={ `${active || value ? "text-primary-600" : "text-neutral-700"} ${error ? "!text-error-600" : ""} pr-8` }>
                         { leftIcon ? leftIcon : null }
                     </div>
@@ -29,7 +29,7 @@ const Label = ({ className, label, active, value, error, children, errorMessage,
                     </div>
                 </div>
             </div>
-            { error ? <p className="pt-8 text-error-300 text-body-s">{ errorMessage }</p> : null }
+            { error ? <p className="absolute pt-8 text-error-600 text-body-s">{ errorMessage }</p> : null }
         </div>
     )
 }

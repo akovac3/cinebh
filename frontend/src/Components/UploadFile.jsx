@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Button from "./Button";
+import { FileInput } from "./Input";
 
 const UploadFile = ({ file, text, onFileChange, onRemove, names }) => {
     const inputRef = useRef();
@@ -32,8 +33,7 @@ const UploadFile = ({ file, text, onFileChange, onRemove, names }) => {
             <div className="border border-neutral-200 bg-neutral-0 rounded-16 h-160 mr-24">
                 { file === null && names.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
-                        <input
-                            type="file"
+                        <FileInput
                             accept=".csv,text/csv"
                             onChange={ handleChange }
                             className="hidden"

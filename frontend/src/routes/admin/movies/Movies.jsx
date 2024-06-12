@@ -7,7 +7,7 @@ import Button from "../../../components/Button";
 
 import { lastPathPart } from "../../../utils/utils";
 import { movies, url } from "../../../utils/api";
-import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
+import { NumberOfElementsContext } from "../AdminPanel";
 
 const Movies = () => {
     const navigate = useNavigate();

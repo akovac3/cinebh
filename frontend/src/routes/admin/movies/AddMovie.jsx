@@ -12,7 +12,7 @@ import Details from '../../../components/steps/Details';
 import Venues from '../../../components/steps/Venues';
 import Modal from '../../../components/Modal';
 
-import { StepperContext } from '../../../contexts/StepperContext';
+import { StepperContext } from '../../../components/Stepper';
 
 import { url, genres, movies } from '../../../utils/api';
 
@@ -41,7 +41,7 @@ const AddMovie = () => {
 
     useEffect(() => {
         if (movie) {
-            const genreIds = movie.genres.map(genre => genre.id)
+            const genreIds = movie.genres.map(genre => genre.id);
             setMovieData({
                 id: movie.movieId,
                 name: movie.name,
@@ -76,7 +76,7 @@ const AddMovie = () => {
                 actorsList: actors,
                 photos: photos,
                 deletePhotos: []
-            })
+            });
             const projections = movie.projections.length > 0 ? (() => {
                 const seen = new Set();
                 return movie.projections.filter(projection => {
@@ -88,7 +88,7 @@ const AddMovie = () => {
                     time: projection.time
                 }));
             })() : [{ venue: null, city: null, time: null }];
-            setProjectionsData(projections)
+            setProjectionsData(projections);
         }
     }, [movie]);
 
@@ -126,10 +126,10 @@ const AddMovie = () => {
     }, [projectionsData]);
 
     useEffect(() => {
-        validateGeneralStep()
-        validateDetailsStep()
-        validateVenuesStep()
-    }, [movieData]);
+        validateGeneralStep();
+        validateDetailsStep();
+        validateVenuesStep();
+    }, [movieData, detailsData, projectionsData]);
 
     const uploadFiles = async (id) => {
         const token = localStorage.getItem('token');
@@ -146,22 +146,28 @@ const AddMovie = () => {
             await deletePhotos(token, id);
         }
 
-        if (!detailsData.actorsFile && !detailsData.writersFile && (!detailsData.photos || detailsData.photos.length === 0)) {
-            return;
+        if (!detailsData.actorsFile && !detailsData.writersFile) {
         } else {
             await upload(token, id);
         }
 
+        console.log(detailsData.photos)
+
         if (detailsData.photos && detailsData.photos.length > 0) {
+            console.log("desilo se", detailsData.photos[0].file)
             await uploadPhotos(token, id);
         }
 
         if (projectionsData && projectionsData.length > 0) {
-            await addProjections(token, id)
+            await addProjections(token, id);
         }
     };
 
     const addProjections = async (token, id) => {
+        if (isAddButtonDisabled) {
+            return;
+        }
+
         try {
             const response = await axios.post(`${url}${movies}/${id}/projection`, projectionsData, {
                 headers: {
@@ -176,27 +182,27 @@ const AddMovie = () => {
         } catch (error) {
             console.error("Error uploading files:", error);
         }
-    }
+    };
 
     const uploadPhotos = async (token, id) => {
         const formData = new FormData();
+        console.log("Upload photos")
 
         if (detailsData.photos && detailsData.photos.length > 0) {
             let data = [];
-            let existingPhotos = []
+            let existingPhotos = [];
             detailsData.photos.map((photo, i) => {
                 if (photo.file !== null) {
-                    formData.append("files", photo.file)
-                    data = [...data, { "cover": photo.cover }]
+                    formData.append("files", photo.file);
+                    data = [...data, { "cover": photo.cover }];
                 } else {
-                    existingPhotos = [...existingPhotos, { "id": photo.id, "cover": photo.cover }]
-
+                    existingPhotos = [...existingPhotos, { "id": photo.id, "cover": photo.cover }];
                 }
-            })
-            data = data.concat(existingPhotos)
-            formData.append("photos", new Blob([JSON.stringify(data)], { type: "application/json" }))
+            });
+            data = data.concat(existingPhotos);
+            formData.append("photos", new Blob([JSON.stringify(data)], { type: "application/json" }));
         } else {
-            return
+            return;
         }
         try {
             const response = await axios.post(`${url}${movies}/${id}/add-files`, formData, {
@@ -224,7 +230,7 @@ const AddMovie = () => {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    data: deleteRequest // Sending the list of photo IDs directly
+                    data: deleteRequest
                 }
             );
 
@@ -255,7 +261,7 @@ const AddMovie = () => {
                 writersDelete: false,
             }));
         }
-    }
+    };
 
     const deleteActors = async (token, id) => {
         const response = await axios.delete(`${url}${movies}/${id}/delete-actors`, {
@@ -271,7 +277,7 @@ const AddMovie = () => {
                 actorsDelete: false,
             }));
         }
-    }
+    };
 
     const upload = async (token, id) => {
         const formData = new FormData();
@@ -319,11 +325,9 @@ const AddMovie = () => {
     const addMovie = async () => {
         let step = "";
         if (!stepStatus[1]) step = "ONE";
-        else if (!stepStatus[2]) step = "TWO";
+        else if (!stepStatus[2]) step = "ONE";
         else if (!stepStatus[3]) step = "TWO";
         else step = "THREE";
-
-        console.log(step, stepStatus[3])
 
         const updatedMovieData = { ...movieData, step };
         setMovieData(updatedMovieData);
@@ -338,8 +342,8 @@ const AddMovie = () => {
                 });
                 if (response.status === 200) {
                     setMovieData((prevMovieData) => ({ ...prevMovieData, id: response.data.id }));
-                    await uploadFiles(response.data.id)
-                    navigate("/admin-panel/movies")
+                    await uploadFiles(response.data.id);
+                    navigate("/admin-panel/movies");
                 }
             } else {
                 const response = await axios.post(url + movies + "/" + updatedMovieData.id, updatedMovieData, {
@@ -348,8 +352,9 @@ const AddMovie = () => {
                     }
                 });
                 if (response.status === 200) {
-                    await uploadFiles(updatedMovieData.id)
-                    navigate("/admin-panel/movies")
+                    console.log("Status 200", updatedMovieData.id)
+                    await uploadFiles(updatedMovieData.id);
+                    navigate("/admin-panel/movies");
                 }
             }
         } catch (error) {
@@ -359,8 +364,8 @@ const AddMovie = () => {
     };
 
     useEffect(() => {
-        console.log(detailsData)
-    }, [detailsData])
+        console.log(detailsData);
+    }, [detailsData]);
 
     const handleSaveToDraft = async () => {
         await addMovie();
@@ -429,6 +434,7 @@ const AddMovie = () => {
                     steps={ steps }
                     disableAdd={ isAddButtonDisabled }
                     saveToDraft={ handleSaveToDraft }
+                    stepStatus={ stepStatus }
                 />
                 { addModal && (
                     <Modal>

@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createContext } from "react";
+
+export const StepperContext = createContext(null);
 
 const Stepper = ({ steps, currentStep, stepStatus }) => {
     const [newStep, setNewStep] = useState([]);

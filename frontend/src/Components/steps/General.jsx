@@ -2,13 +2,11 @@ import { useState, useContext, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { format } from "date-fns";
-
 import { Input } from "../Input";
 import Label from "../Label";
 import DateRangePicker from "../DateRangePicker";
 import { MultiSelect, MultiSelectItem } from "../MultiSelect";
-
-import { StepperContext } from "../../contexts/StepperContext";
+import { StepperContext } from "../Stepper";
 
 const General = ({ genreList }) => {
     const { movieData, setMovieData } = useContext(StepperContext);
@@ -51,10 +49,18 @@ const General = ({ genreList }) => {
     };
 
     const getAllGenres = () => {
-        return movieData.genres.map(id => {
+        const genreNames = movieData.genres.map(id => {
             const genre = genreList.find(genre => genre.id === id);
             return genre ? genre.name : '';
-        }).filter(Boolean).join(', ');
+        }).filter(Boolean);
+
+        if (genreNames.length <= 6) {
+            return genreNames.join(', ');
+        } else {
+            const displayedGenres = genreNames.slice(0, 6);
+            const remainingCount = genreNames.length - 6;
+            return `${displayedGenres.join(', ')} +${remainingCount}`;
+        }
     };
 
     const genreLabel = (
@@ -190,8 +196,7 @@ const General = ({ genreList }) => {
                     </Label>
                     <MultiSelect
                         label={ genreLabel }
-                        value={ movieData.genres?.[0] }
-                        isMultiSelect={ true }
+                        selectedValues={ movieData.genres || [] }
                         onClick={ handleSelectGenres }
                     >
                         { genreList.map((genre, index) => (
@@ -232,9 +237,9 @@ const General = ({ genreList }) => {
                     maxLength={ 500 }
                     onFocus={ () => onFocus({ text: true }) }
                     onBlur={ () => onBlur({ text: false }) }
-                    rows={ 4 } // Adjust the number of rows as needed
-                    cols={ 150 } // Adjust the number of columns as needed
-                    style={ { resize: "none", outlineColor: "transparent" } } // Disable resizing of textarea
+                    rows={ 4 }
+                    cols={ 150 }
+                    style={ { resize: "none", outlineColor: "transparent" } }
                 />
                 <div style={ { textAlign: "right", fontSize: "0.8rem", color: "inherit" } }>
                     { movieData.synopsis ? movieData.synopsis.length : 0 }/{ 500 }

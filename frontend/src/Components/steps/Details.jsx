@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import UploadFile from "../UploadFile";
 import UploadImages from "../UploadImages";
 
-import { StepperContext } from "../../contexts/StepperContext";
+import { StepperContext } from "../Stepper";
 
 const Details = () => {
     const { detailsData, setDetailsData } = useContext(StepperContext);

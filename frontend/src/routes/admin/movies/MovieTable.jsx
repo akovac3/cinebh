@@ -15,7 +15,7 @@ import { Dropdown, DropdownItem } from '../../../components/Dropdown';
 import Button from '../../../components/Button';
 import { NoDataRow, Table, TableCell, TableHeaderCell, TableHeaderRow, TableRow } from '../../../components/Table';
 
-import { NumberOfElementsContext } from "../../../contexts/NumberOfElementsContext";
+import { NumberOfElementsContext } from "../AdminPanel";
 
 import { url, movies, searchStatus, venues, currently } from "../../../utils/api";
 
@@ -67,6 +67,8 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            setSelectedMovies([])
+            setPagination({ ...pagination, page: 1 });
             fetchData()
         } catch (error) {
             console.error('Error updating movies status:', error);

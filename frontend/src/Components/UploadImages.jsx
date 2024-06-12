@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import Button from "./Button";
-import { Checkbox } from "./Input";
+import { Checkbox, FileInput } from "./Input";
 
 const UploadImages = ({ files, onFileChange, onRemove }) => {
     const inputRef = useRef();
@@ -87,8 +87,8 @@ const UploadImages = ({ files, onFileChange, onRemove }) => {
     const renderFile = (index, file, isExisting, placeholder) => (
         <div className={ `flex flex-col w-full py-16 ${index === 0 ? "pl-16" : "pl-8"} ${index === 3 ? "pr-16" : "pr-8"}` }>
             <div className="rounded-16 relative">
-                <input
-                    type="file"
+                <FileInput
+                    accept="image/*"
                     onChange={ (e) => handleIndividualChange(e, index) }
                     className="hidden"
                     ref={ (el) => setInputRef(el, index) }
@@ -149,7 +149,7 @@ const UploadImages = ({ files, onFileChange, onRemove }) => {
                 onDrop={ handleDrop }
             >
                 { files && files.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-16">
+                    <div className="grid grid-cols-4">
                         { Array.from({ length: 4 }).map((_, index) => (
                             <div key={ index }>
                                 { files[index]
@@ -162,8 +162,8 @@ const UploadImages = ({ files, onFileChange, onRemove }) => {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full">
-                        <input
-                            type="file"
+                        <FileInput
+                            accept="image/*"
                             onChange={ handleChange }
                             className="hidden"
                             ref={ inputRef }

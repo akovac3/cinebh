@@ -8,31 +8,37 @@ import Label from "../../components/Label";
 import Button from "../Button";
 import Modal from "../Modal";
 
-import { StepperContext } from "../../contexts/StepperContext";
+import { StepperContext } from "../Stepper";
 
 import { url, venues, cities } from "../../utils/api";
 
 const Venues = () => {
     const [cityList, setCityList] = useState([]);
     const [times, setTimes] = useState([]);
-    const [venueList, setVenueList] = useState([]);
+    const [venueLists, setVenueLists] = useState({});
     const { projectionsData, setProjectionsData } = useContext(StepperContext);
     const [conflictTime, setConflictTime] = useState([]);
-    const [modal, setModal] = useState(false)
-    const [deleteIndex, setDeleteIndex] = useState(0)
+    const [modal, setModal] = useState(false);
+    const [deleteIndex, setDeleteIndex] = useState(0);
 
     useEffect(() => {
         getCities();
-        getVenues();
         getTimes();
     }, []);
+
+    useEffect(() => {
+        projectionsData.forEach(projection => {
+            if (projection.city) {
+                getVenues(projection.city);
+            }
+        });
+    }, [projectionsData]);
 
     const getCities = () => {
         axios.get(`${url}${cities}`)
             .then(response => setCityList(response.data))
             .catch(error => {
-                console.log(error);
-                console.warning(error.response.data.message);
+                console.error(error);
             });
     };
 
@@ -44,18 +50,23 @@ const Venues = () => {
             }
             setTimes(array);
         } catch (error) {
-            console.log(error);
-            console.warning(error.response.data.message);
+            console.error(error);
         }
     };
 
     const getVenues = async (city) => {
-        const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`;
+        if (venueLists[city]) return;
+
+        const fullUrl = `${url}${venues}/city/${city}`;
         axios.get(fullUrl)
-            .then(response => setVenueList(response.data))
+            .then(response => {
+                setVenueLists(prev => ({
+                    ...prev,
+                    [city]: response.data
+                }));
+            })
             .catch(error => {
-                console.log(error);
-                console.warning(error.response.data.message);
+                console.error(error);
             });
     };
 
@@ -78,7 +89,10 @@ const Venues = () => {
             updatedConflictTime[index] = false;
         }
 
-        if (key === 'city') getVenues(value)
+        if (key === 'city') {
+            getVenues(value);
+            updatedProjections[index].venue = null;
+        }
 
         updatedProjections[index][key] = value;
         setProjectionsData(updatedProjections);
@@ -89,15 +103,15 @@ const Venues = () => {
         return cityList?.find(c => c.cityId === id)?.name;
     };
 
-    const getVenueName = (id) => {
-        return venueList?.find(c => c.venueId === id)?.name;
+    const getVenueName = (city, id) => {
+        return venueLists[city]?.find(c => c.venueId === id)?.name;
     };
 
     useEffect(() => {
-        if (projectionsData === null || projectionsData.length === 0) {
-            setProjectionsData([{ venue: null, city: null, time: null }])
+        if (!projectionsData || projectionsData.length === 0) {
+            setProjectionsData([{ venue: null, city: null, time: null }]);
         }
-    })
+    }, [projectionsData, setProjectionsData]);
 
     const isAddButtonDisabled = projectionsData.some(projection => !projection.city || !projection.venue || !projection.time);
 
@@ -136,7 +150,7 @@ const Venues = () => {
                             )) }
                         </LabeledDropdown>
                         <LabeledDropdown
-                            value={ getVenueName(projection.venue) }
+                            value={ getVenueName(projection.city, projection.venue) }
                             label={
                                 <Label
                                     label="Venue"
@@ -144,7 +158,7 @@ const Venues = () => {
                                     leftIcon={ <FontAwesomeIcon className="w-5 h-5 mr-8" icon={ fas.faBuilding } /> }
                                     rightIcon={ <FontAwesomeIcon className="w-5 h-5" icon={ fas.faChevronDown } /> }
                                 >
-                                    { getVenueName(projection.venue) || "Choose venue" }
+                                    { getVenueName(projection.city, projection.venue) || "Choose venue" }
                                 </Label>
                             }
                         >
@@ -154,7 +168,7 @@ const Venues = () => {
                             >
                                 Choose venue
                             </DropdownItem>
-                            { venueList.map((venue, venueIndex) => (
+                            { venueLists[projection.city]?.map((venue, venueIndex) => (
                                 <DropdownItem
                                     key={ venueIndex }
                                     onClick={ () => handleProjectionChange(index, 'venue', venue.venueId) }
@@ -201,11 +215,12 @@ const Venues = () => {
                         <Button
                             variant="tertiary"
                             className="mt-[35px] mb-8 h-[50px] hover:bg-primary-50"
-                            disabled={ projection.city === null || projection.venue === null || projection.time === null }
+                            disabled={ !projection.city || !projection.venue || !projection.time }
                             onClick={ () => {
-                                setDeleteIndex(index)
-                                setModal(true)
-                            } }>
+                                setDeleteIndex(index);
+                                setModal(true);
+                            } }
+                        >
                             <FontAwesomeIcon icon={ fas.faTrash } />
                         </Button>
                     </div>
@@ -229,8 +244,8 @@ const Venues = () => {
                         <Button size="sm" onClick={ () => {
                             const updatedProjections = projectionsData.filter((_, projIndex) => projIndex !== deleteIndex);
                             setProjectionsData(updatedProjections);
-                            setModal(false)
-                        } } > Delete</Button>
+                            setModal(false);
+                        } }>Delete</Button>
                     </div>
                 </Modal>
             ) }

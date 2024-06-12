@@ -1,14 +1,14 @@
-import React from "react";
+import { forwardRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faCircle } from "@fortawesome/free-solid-svg-icons";
 
 import { createClassName } from "../utils/utils";
 
-const Input = ({ className, label, error, open, text, ...props }) => {
+const Input = forwardRef(({ className, label, error, open, text, ...props }, ref) => {
     return (
-        <input placeholder={ text } { ...props } className={ createClassName(`${error ? "text-error-600" : "text-neutral-900"} focus-within:outline-none w-full`, className) } />
+        <input placeholder={ text } { ...props } ref={ ref } className={ createClassName(`${error ? "text-error-600" : "text-neutral-900"} focus-within:outline-none w-full`, className) } />
     )
-}
+})
 
 const Checkbox = ({ className, rounded = false, children, isChecked }) => {
     const checkboxStyles = {
@@ -62,8 +62,8 @@ const Checkbox = ({ className, rounded = false, children, isChecked }) => {
     )
 }
 
-const FileInput = ({ className, ref, ...props }) => {
+const FileInput = forwardRef(({ className, ...props }, ref) => {
     return <Input className={ className } type="file" ref={ ref } { ...props } />;
-};
+});
 
 export { Input, Checkbox, FileInput };

@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useState, createContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { faBuilding } from "@fortawesome/free-regular-svg-icons";
 
 import SideBar from "../../components/SideBar";
-import { NumberOfElementsContext } from "../../contexts/NumberOfElementsContext";
+
+export const NumberOfElementsContext = createContext();
 
 const AdminPanel = () => {
     const [numberOfElementsChanged, setNumberOfElementsChanged] = useState({});

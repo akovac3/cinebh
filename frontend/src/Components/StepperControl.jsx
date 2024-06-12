@@ -1,6 +1,11 @@
+import { useContext } from "react";
 import Button from "./Button";
+import { StepperContext } from "./Stepper";
 
-const StepperControl = ({ handleClick, currentStep, steps, saveToDraft, disableAdd }) => {
+const StepperControl = ({ handleClick, currentStep, steps, saveToDraft, disableAdd, stepStatus }) => {
+    const isContinueDisabled = !stepStatus[currentStep];
+    const { movieData } = useContext(StepperContext);
+
     return (
         <div className="flex mt-24 mb-32">
             <div className="flex-1">
@@ -11,8 +16,8 @@ const StepperControl = ({ handleClick, currentStep, steps, saveToDraft, disableA
                 <Button onClick={ () => {
                     if (currentStep === steps.length) saveToDraft()
                     else handleClick("continue")
-                } } disabled={ currentStep === steps.length && disableAdd }>
-                    { currentStep === steps.length ? "Add Movie" : "Continue" }</Button>
+                } } disabled={ currentStep === steps.length && disableAdd || isContinueDisabled }>
+                    { currentStep === steps.length ? movieData.id ? "Save changes" : "Add Movie" : "Continue" }</Button>
             </div>
         </div>
     )

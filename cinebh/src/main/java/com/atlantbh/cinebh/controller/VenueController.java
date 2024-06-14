@@ -4,6 +4,7 @@ import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.request.PaginationParams;
+import com.atlantbh.cinebh.request.VenueFilterParams;
 import com.atlantbh.cinebh.request.VenueRequest;
 import com.atlantbh.cinebh.service.AmazonService;
 import com.atlantbh.cinebh.service.CityService;
@@ -45,6 +46,11 @@ public class VenueController {
     @GetMapping
     public ResponseEntity<Page<Venue>> getVenues(PaginationParams paginationParams) {
         return ResponseEntity.ok(venueService.getVenues(paginationParams.getPage(), paginationParams.getSize()));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Venue>> getVenuesForFilter(VenueFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(venueService.getVenuesByFilter(filterParams, paginationParams));
     }
 
     @GetMapping("/{id}")

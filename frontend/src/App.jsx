@@ -14,7 +14,6 @@ import Unauthorized from './routes/unauthorized/Unauthorized';
 import PaymentDetails from './routes/reservations/PaymentDetails';
 import AdminPanel from './routes/admin/AdminPanel';
 import Movies from './routes/admin/movies/Movies';
-import Venues from './routes/admin/venues/Venues';
 import Drafts from './routes/admin/movies/Drafts';
 import Currently from './routes/admin/movies/Currently';
 import AddMovie from './routes/admin/movies/AddMovie';
@@ -51,7 +50,6 @@ const App = () => {
                 <Route path='archived' element={ <Archived /> } />
               </Route>
               <Route path='add-movie' element={ <AddMovie /> } />
-              <Route path='venues' element={ <Venues /> } />
             </Route>
           </Route>
         </Route>

@@ -1,7 +1,9 @@
 import { useState, useEffect, cloneElement, Children } from "react";
+
 import { Dropdown, DropdownItem } from "./Dropdown";
-import { createClassName, useOutsideClick } from "../utils/utils";
 import { Checkbox } from "./Input";
+
+import { createClassName, useOutsideClick } from "../utils/utils";
 
 const MultiSelect = ({ className, children, label, selectedValues, onClick }) => {
     const [open, setOpen] = useState(false);
@@ -9,7 +11,6 @@ const MultiSelect = ({ className, children, label, selectedValues, onClick }) =>
 
     useEffect(() => {
         setInternalSelectedValues(selectedValues);
-        //console.log(selectedValues)
     }, [selectedValues]);
 
     const ref = useOutsideClick(() => { setOpen(false) });

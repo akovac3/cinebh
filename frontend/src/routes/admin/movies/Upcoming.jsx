@@ -1,4 +1,5 @@
 import MovieTable from './MovieTable';
+
 const Upcoming = () => {
     return (
         <div>

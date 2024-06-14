@@ -1,5 +1,5 @@
-
 import MovieTable from './MovieTable';
+
 const Drafts = () => {
     return (
         <div>

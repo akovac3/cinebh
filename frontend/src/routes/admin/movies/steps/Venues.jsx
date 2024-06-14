@@ -3,14 +3,14 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 
-import { LabeledDropdown, DropdownItem } from "../../components/Dropdown";
-import Label from "../../components/Label";
-import Button from "../Button";
-import Modal from "../Modal";
+import { LabeledDropdown, DropdownItem } from "../../../../components/Dropdown";
+import Label from "../../../../components/Label";
+import Button from "../../../../components/Button";
+import Modal from "../../../../components/Modal";
 
-import { StepperContext } from "../Stepper";
+import { StepperContext } from "../../../../components/Stepper";
 
-import { url, venues, cities } from "../../utils/api";
+import { url, venues, cities } from "../../../../utils/api";
 
 const Venues = () => {
     const [cityList, setCityList] = useState([]);

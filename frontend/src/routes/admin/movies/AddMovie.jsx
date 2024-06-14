@@ -9,9 +9,8 @@ import Stepper from '../../../components/Stepper';
 import StepperControl from '../../../components/StepperControl';
 import General from '../../../components/steps/General';
 import Details from '../../../components/steps/Details';
-import Venues from '../../../components/steps/Venues';
+import Venues from './steps/Venues';
 import Modal from '../../../components/Modal';
-
 import { StepperContext } from '../../../components/Stepper';
 
 import { url, genres, movies } from '../../../utils/api';
@@ -20,7 +19,7 @@ const AddMovie = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [movieData, setMovieData] = useState({});
-    const [addModal, setAddModal] = useState(false)
+    const [addModal, setAddModal] = useState(false);
 
     const from = location.state?.from || '/admin-panel/movies/drafts';
     const { movie } = location.state || {};
@@ -151,10 +150,7 @@ const AddMovie = () => {
             await upload(token, id);
         }
 
-        console.log(detailsData.photos)
-
         if (detailsData.photos && detailsData.photos.length > 0) {
-            console.log("desilo se", detailsData.photos[0].file)
             await uploadPhotos(token, id);
         }
 
@@ -186,7 +182,6 @@ const AddMovie = () => {
 
     const uploadPhotos = async (token, id) => {
         const formData = new FormData();
-        console.log("Upload photos")
 
         if (detailsData.photos && detailsData.photos.length > 0) {
             let data = [];
@@ -352,22 +347,33 @@ const AddMovie = () => {
                     }
                 });
                 if (response.status === 200) {
-                    console.log("Status 200", updatedMovieData.id)
                     await uploadFiles(updatedMovieData.id);
                     navigate("/admin-panel/movies");
                 }
             }
         } catch (error) {
-            console.log(error);
-            console.log(error.response.data.message);
+            console.error(error);
         }
     };
 
-    useEffect(() => {
-        console.log(detailsData);
-    }, [detailsData]);
+    const checkForCollisions = () => {
+        const projectionMap = new Map();
+
+        for (let projection of projectionsData) {
+            const key = `${projection.city}-${projection.venue}-${projection.time}`;
+            if (projectionMap.has(key)) {
+                return true; // Collision detected
+            }
+            projectionMap.set(key, true);
+        }
+        return false;
+    };
 
     const handleSaveToDraft = async () => {
+        if (checkForCollisions()) {
+            setAddModal(true);
+            return;
+        }
         await addMovie();
     };
 
@@ -398,7 +404,6 @@ const AddMovie = () => {
             setGenreList(response.data);
         } catch (error) {
             console.error(error);
-            console.warn(error.response.data.message);
         }
     };
 

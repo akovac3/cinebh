@@ -1,4 +1,4 @@
-package com.atlantbh.cinebh.request;
+package com.atlantbh.cinebh.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PhotoRequest {
+public class MovieResponse {
     private Long id;
-    private Boolean cover;
 }

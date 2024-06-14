@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PhotoRequest {
-    private Long id;
-    private Boolean cover;
+public class StatusParams {
+    private String status;
 }

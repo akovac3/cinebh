@@ -48,6 +48,10 @@ public class PhotoService {
         photoRepository.deleteById(id);
     }
 
+    public void deletePhoto(Photo photo) {
+        photoRepository.delete(photo);
+    }
+
     public Set<Photo> getCovers() {
         return photoRepository.findByCoverTrue();
     }

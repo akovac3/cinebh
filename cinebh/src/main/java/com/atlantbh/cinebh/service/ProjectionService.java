@@ -33,6 +33,10 @@ public class ProjectionService {
         return projectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Projection with provided id not found!"));
     }
 
+    public void deleteProjectionsByMovie(Movie movie) {
+        projectionRepository.deleteByMovie(movie);
+    }
+
     public Set<Projection> createProjectionsForMovie(Movie movie, Time time, Venue venue) {
         Set<Projection> projections = new HashSet<>();
 

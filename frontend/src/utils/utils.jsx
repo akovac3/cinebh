@@ -83,3 +83,10 @@ export const handlePageChange = (search, setSearch, { page = 1, size = 4 }) => {
     search.set('size', size)
     setSearch(search)
 }
+
+export const lastPathPart = (path) => {
+    if (!path) {
+        return path;
+    }
+    return path.substring(path.lastIndexOf('/') + 1);
+}

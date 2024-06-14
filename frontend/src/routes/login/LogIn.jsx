@@ -7,7 +7,7 @@ import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import SignUp from "./SignUp";
 import Success from "../../components/Success"
-import Input from "../../components/Input"
+import { Input } from "../../components/Input"
 import Label from "../../components/Label";
 
 import { url, signin } from "../../utils/api";

@@ -5,7 +5,7 @@ import axios from "axios";
 
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
-import Input from "../../components/Input"
+import { Input } from "../../components/Input"
 import Label from "../../components/Label";
 import EnterCode from "./EnterCode";
 import LogIn from "./LogIn";

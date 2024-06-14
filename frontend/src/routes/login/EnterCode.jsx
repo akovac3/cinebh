@@ -10,7 +10,6 @@ import PasswordReset from "./PasswordReset";
 
 import { url, passwordReset } from "../../utils/api";
 import { useCountDown } from "../../utils/utils";
-import Input from "../../components/Input";
 
 const EnterCode = ({ toggleSidebar }) => {
     const [code, setCode] = useState(new Array(4).fill(""))

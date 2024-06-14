@@ -1,13 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import axios from "axios";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
-import { LabeledDropdown, LabeledDropdownItem } from "../../components/LabeledDropdown";
+import { LabeledDropdown, DropdownItem } from "../../components/Dropdown";
 import Label from "../../components/Label";
-import Input from "../../components/Input";
+import { Input } from "../../components/Input";
 import Button from "../../components/Button";
 import Card from "../../components/Card";
 import MovieCard from "../../components/card/MovieCard";
@@ -61,7 +61,6 @@ const UpcomingmovieList = () => {
                 setGenreList(response.data)
             }).catch(error => {
                 console.log(error)
-                console.warning(error.response.data.message)
             })
     }
 
@@ -72,7 +71,6 @@ const UpcomingmovieList = () => {
             }).catch(error => {
                 {
                     console.log(error)
-                    console.warning(error.response.data.message)
                 }
             })
     }
@@ -83,7 +81,6 @@ const UpcomingmovieList = () => {
             .then(response => setVenueList(response.data))
             .catch(error => {
                 console.log(error)
-                console.warning(error.response.data.message)
             })
     }
 
@@ -103,7 +100,6 @@ const UpcomingmovieList = () => {
             })
             .catch(error => {
                 console.log(error)
-                console.warning(error.response.data.message)
             })
     }
 
@@ -192,21 +188,21 @@ const UpcomingmovieList = () => {
                 <LabeledDropdown
                     label={ cityListLabel }
                     value={ getCityName(filterParams.city) } >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('city', null) }
                         className={ `${filterParams.city === null ? "font-semibold" : "font-normal"}` }
                     >
                         All Cities
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { cityList.map((city, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => { _handleFilterChange('city', city.cityId); _handlePageChange() } }
                                 className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === parseInt(filterParams.city) ? "font-semibold" : "font-normal"}` }
                             >
                                 { city.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -214,21 +210,21 @@ const UpcomingmovieList = () => {
                     value={ getVenueName(filterParams.venue) }
                     label={ venueListLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('venue', null) }
                         className={ `${filterParams.venue === null ? "font-semibold" : "font-normal"}` }
                     >
                         All venues
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { venueList.map((venue, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('venue', venue.venueId) }
                                 className={ `${venue.venueId === parseInt(filterParams.venue) ? "font-semibold" : "font-normal"}` }
                             >
                                 { venue.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
@@ -236,26 +232,27 @@ const UpcomingmovieList = () => {
                     value={ getGenreName(filterParams.genre) }
                     label={ genreLabel }
                 >
-                    <LabeledDropdownItem
+                    <DropdownItem
                         onClick={ () => _handleFilterChange('genre', null) }
                         className={ `${filterParams.genre === null ? "font-semibold" : "font-normal"}` }
                     >
                         All genres
-                    </LabeledDropdownItem>
+                    </DropdownItem>
                     { genreList.map((genre, index) => {
                         return (
-                            <LabeledDropdownItem
+                            <DropdownItem
                                 key={ index }
                                 onClick={ () => _handleFilterChange('genre', genre.id) }
                                 className={ `${genre.id === parseInt(filterParams.genre) ? "font-semibold" : "font-normal"}` }
                             >
                                 { genre.name }
-                            </LabeledDropdownItem>
+                            </DropdownItem>
                         )
                     }) }
                 </LabeledDropdown>
                 <DateRangePicker
                     label={ dateRangeLabel }
+                    minDate={ addDays(new Date(), 10) }
                     onClickApply={
                         (valueStart, valueEnd) => {
                             _handleFilterChange('startDate', format(valueStart, 'yyyy-MM-dd'))

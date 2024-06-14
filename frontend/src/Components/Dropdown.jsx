@@ -1,4 +1,6 @@
-import { createClassName } from "../utils/utils";
+import { useState, cloneElement } from "react";
+
+import { createClassName, useOutsideClick } from "../utils/utils";
 
 const Dropdown = ({ className, children }) => {
     return (
@@ -14,4 +16,25 @@ const DropdownItem = ({ className, children, onClick }) => {
     )
 }
 
-export { Dropdown, DropdownItem };
+const LabeledDropdown = ({ className, children, label, value }) => {
+    const [open, setOpen] = useState(false);
+
+    const ref = useOutsideClick(() => { setOpen(false) })
+
+    return (
+        <div
+            onClick={ () => setOpen(!open) }
+            className={ createClassName("w-full relative flex items-center justify-between py-3", className) }
+            ref={ ref }
+        >
+            { label ? cloneElement(label, { active: open, value: value }) : null }
+            { open && (
+                <Dropdown className="overflow-y-scroll w-full" onClick={ () => setOpen(!open) }>
+                    { children }
+                </Dropdown>
+            ) }
+        </div>
+    )
+}
+
+export { Dropdown, DropdownItem, LabeledDropdown };

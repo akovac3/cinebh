@@ -1,6 +1,7 @@
 import Badge from "../Badge";
 import Button from "../Button";
 import { Carousel, CarouselItem } from "../Carousel";
+import Image from "../Image";
 
 const CoverCarousel = ({ movies }) => {
     return (
@@ -10,7 +11,7 @@ const CoverCarousel = ({ movies }) => {
                     <CarouselItem key={ index }>
                         { slide.photos.map((img) => {
                             if (img.cover) return (
-                                <img key={ img.link } className="w-full object-cover h-full" src={ img.link } alt="slika" />
+                                <Image key={ img.link } className="w-full object-cover h-[750px]" src={ img.link } alt="slika" />
                             )
                         }) }
                         <div className="absolute top-[376px] w-[45%] gap-32 left-[118px] font-body text-neutral-25">

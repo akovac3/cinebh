@@ -20,10 +20,11 @@ import Currently from './routes/admin/movies/Currently';
 import AddMovie from './routes/admin/movies/AddMovie';
 import Upcoming from './routes/admin/movies/Upcoming';
 import Archived from './routes/admin/movies/Archived';
-
-import { ROLES } from './utils/constants';
+import Venues from './routes/admin/venues/Venues';
 import AddVenue from './routes/admin/venues/AddVenue';
 import VenueDetails from './routes/venues/VenueDetails';
+
+import { ROLES } from './utils/constants';
 
 const App = () => {
   return (

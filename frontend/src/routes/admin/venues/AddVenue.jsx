@@ -18,7 +18,13 @@ const AddVenue = () => {
     const [file, setFile] = useState(null);
     const [cityList, setCityList] = useState([]);
     const [venueRequest, setVenueRequest] = useState({
-        id: null, name: "", street: "", number: "", city: null, link: null, telephone: ""
+        id: null,
+        name: "",
+        street: "",
+        number: "",
+        city: null,
+        link: null,
+        telephone: "",
     });
     const [venueDataFocused, setVenueDataFocused] = useState({});
     const { venue } = location.state || {};
@@ -27,7 +33,7 @@ const AddVenue = () => {
     const placeholder = !venueRequest.link && !file;
 
     useEffect(() => {
-        const getCities = async () => {
+        const fetchCities = async () => {
             try {
                 const response = await axios.get(`${url}${cities}`);
                 setCityList(response.data);
@@ -36,7 +42,8 @@ const AddVenue = () => {
             }
         };
 
-        getCities();
+        fetchCities();
+
         if (venue) {
             setVenueRequest({
                 id: venue.venueId,
@@ -45,7 +52,7 @@ const AddVenue = () => {
                 link: venue.photo,
                 street: venue.street,
                 number: venue.streetNumber,
-                telephone: venue.telephone
+                telephone: venue.telephone,
             });
             setEditable(false);
         }
@@ -67,11 +74,11 @@ const AddVenue = () => {
         setVenueRequest((prev) => ({ ...prev, [name]: value }));
     };
 
-    const onFocus = (field) => setVenueDataFocused((prev) => ({ ...prev, [field]: true }));
+    const handleFocus = (field) => setVenueDataFocused((prev) => ({ ...prev, [field]: true }));
 
-    const onBlur = (field) => setVenueDataFocused((prev) => ({ ...prev, [field]: false }));
+    const handleBlur = (field) => setVenueDataFocused((prev) => ({ ...prev, [field]: false }));
 
-    const getCityName = (id) => cityList.find(c => c.cityId === id)?.name || "City";
+    const getCityName = (id) => cityList.find((c) => c.cityId === id)?.name || "City";
 
     const handleVenueAction = useCallback(async (action) => {
         const token = localStorage.getItem("token");
@@ -80,7 +87,7 @@ const AddVenue = () => {
         if (action === "delete") {
             try {
                 const response = await axios.delete(`${url}${venues}/${venueRequest.id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if (response.status === 200) {
@@ -93,12 +100,15 @@ const AddVenue = () => {
             }
         } else if (action === "upload") {
             formData.append("photo", file);
-            formData.append("venue", new Blob([JSON.stringify(venueRequest)], { type: "application/json" }));
+            formData.append(
+                "venue",
+                new Blob([JSON.stringify(venueRequest)], { type: "application/json" })
+            );
 
             try {
-                const requestUrl = `${url}${venues}${venueRequest.id !== null ? `/${venueRequest.id}` : ''}`;
+                const requestUrl = `${url}${venues}${venueRequest.id ? `/${venueRequest.id}` : ""}`;
                 const response = await axios.post(requestUrl, formData, {
-                    headers: { 'Authorization': `Bearer ${token}` },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if ([200, 201].includes(response.status)) {
@@ -112,14 +122,11 @@ const AddVenue = () => {
         }
     }, [venueRequest, file, navigate]);
 
-    useEffect(() => {
-        console.log("Venue request updated:", venueRequest);
-    }, [venueRequest]);
-
     const cityLabel = (
         <Label
             label="City"
             value={ venueRequest.city }
+            variant={ editable ? "default" : "disabled" }
             className="mb-24 !text-neutral-700"
             leftIcon={ <FontAwesomeIcon className="mr-8" icon={ faLocationPin } /> }
             rightIcon={ <FontAwesomeIcon icon={ faChevronDown } /> }
@@ -131,10 +138,18 @@ const AddVenue = () => {
     return (
         <div className="pt-40 px-40 font-body text-neutral-800 w-full flex flex-col">
             <div className="flex pb-16 border-b border-b-neutral-200">
-                <p className="text-heading-h6 flex-1">{ venueRequest.id === null ? "New Venue" : venueRequest.name }</p>
+                <p className="text-heading-h6 flex-1">
+                    { venueRequest.id === null ? "New Venue" : venueRequest.name }
+                </p>
                 { !editable && <Button onClick={ () => setEditable(true) }>Edit Venue</Button> }
                 { editable && venueRequest.id && (
-                    <Button variant="tertiary" className="!text-error-600" onClick={ () => handleVenueAction("delete") }>Delete Venue</Button>
+                    <Button
+                        variant="tertiary"
+                        className="!text-error-600"
+                        onClick={ () => handleVenueAction("delete") }
+                    >
+                        Delete Venue
+                    </Button>
                 ) }
             </div>
 
@@ -147,18 +162,27 @@ const AddVenue = () => {
                         ref={ inputRef }
                     />
                     <img
-                        className={ `w-[270px] h-[260px] rounded-16 object-cover ${placeholder ? 'opacity-60' : ''}` }
-                        src={ placeholder ? "/placeholder.png" : venueRequest.link ? venueRequest.link : URL.createObjectURL(file) }
+                        className={ `w-[270px] h-[260px] rounded-16 object-cover ${placeholder ? "opacity-60" : ""
+                            }` }
+                        src={
+                            placeholder
+                                ? "/placeholder.png"
+                                : venueRequest.link
+                                    ? venueRequest.link
+                                    : URL.createObjectURL(file)
+                        }
                         alt={ placeholder ? "" : "Uploaded" }
                     />
-                    <div className="bg-neutral-800 bg-opacity-80 absolute top-[75%] rounded-b-16 w-full flex justify-center">
-                        { editable && <Button
-                            variant="tertiary"
-                            className="!text-neutral-0 !font-normal"
-                            onClick={ onChooseFile }
-                        >
-                            Upload Photo
-                        </Button> }
+                    <div className="bg-neutral-800 bg-opacity-80 absolute top-[75.4%] rounded-b-16 w-full flex justify-center">
+                        { editable && (
+                            <Button
+                                variant="tertiary"
+                                className="!text-neutral-0 !font-normal"
+                                onClick={ onChooseFile }
+                            >
+                                Upload Photo
+                            </Button>
+                        ) }
                     </div>
                 </div>
             </div>
@@ -176,8 +200,8 @@ const AddVenue = () => {
                             text="Venue"
                             value={ venueRequest.name || "" }
                             onChange={ handleChange }
-                            onFocus={ () => onFocus("name") }
-                            onBlur={ () => onBlur("name") }
+                            onFocus={ () => handleFocus("name") }
+                            onBlur={ () => handleBlur("name") }
                             disabled={ !editable }
                         />
                     </Label>
@@ -193,8 +217,8 @@ const AddVenue = () => {
                             text="Street"
                             value={ venueRequest.street || "" }
                             onChange={ handleChange }
-                            onFocus={ () => onFocus("street") }
-                            onBlur={ () => onBlur("street") }
+                            onFocus={ () => handleFocus("street") }
+                            onBlur={ () => handleBlur("street") }
                             disabled={ !editable }
                         />
                     </Label>
@@ -212,8 +236,8 @@ const AddVenue = () => {
                             text="Phone"
                             value={ venueRequest.telephone || "" }
                             onChange={ handleChange }
-                            onFocus={ () => onFocus("telephone") }
-                            onBlur={ () => onBlur("telephone") }
+                            onFocus={ () => handleFocus("telephone") }
+                            onBlur={ () => handleBlur("telephone") }
                             disabled={ !editable }
                         />
                     </Label>
@@ -229,8 +253,8 @@ const AddVenue = () => {
                             text="Number"
                             value={ venueRequest.number || "" }
                             onChange={ handleChange }
-                            onFocus={ () => onFocus("number") }
-                            onBlur={ () => onBlur("number") }
+                            onFocus={ () => handleFocus("number") }
+                            onBlur={ () => handleBlur("number") }
                             disabled={ !editable }
                         />
                     </Label>
@@ -240,21 +264,29 @@ const AddVenue = () => {
                         <LabeledDropdown value={ venueRequest.city } label={ cityLabel }>
                             <DropdownItem
                                 onClick={ () => setVenueRequest({ ...venueRequest, city: null }) }
-                                className={ `${venueRequest.city === null ? "font-semibold" : "font-normal"}` }
+                                className={ `${venueRequest.city === null ? "font-semibold" : "font-normal"
+                                    }` }
                             >
                                 Choose city
                             </DropdownItem>
                             { cityList.map((city) => (
                                 <DropdownItem
                                     key={ city.cityId }
-                                    onClick={ () => setVenueRequest({ ...venueRequest, city: city.cityId }) }
-                                    className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === venueRequest.city ? "font-semibold" : "font-normal"}` }
+                                    onClick={ () =>
+                                        setVenueRequest({ ...venueRequest, city: city.cityId })
+                                    }
+                                    className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === venueRequest.city
+                                        ? "font-semibold"
+                                        : "font-normal"
+                                        }` }
                                 >
                                     { city.name }
                                 </DropdownItem>
                             )) }
                         </LabeledDropdown>
-                    ) : cityLabel }
+                    ) : (
+                        cityLabel
+                    ) }
                 </div>
             </div>
             { editable && (

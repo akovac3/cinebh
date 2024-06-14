@@ -1,5 +1,6 @@
-import { createClassName } from "../../utils/utils";
 import Card from "../Card";
+
+import { createClassName } from "../../utils/utils";
 
 const VenueCard = ({ className, onClick, ...props }) => {
     const venue = props.venue;

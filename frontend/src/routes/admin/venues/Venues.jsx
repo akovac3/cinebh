@@ -46,6 +46,7 @@ const Venues = () => {
                     { venueList.map((item, index) => {
                         return (
                             <VenueCard
+                                className="cursor-pointer"
                                 key={ index }
                                 venue={ item }
                                 onClick={ () => navigate('/admin-panel/add-venue', { state: { venue: item } }) }

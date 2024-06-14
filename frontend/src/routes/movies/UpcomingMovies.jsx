@@ -89,6 +89,7 @@ const UpcomingmovieList = () => {
         const search = searchParams.size > 0 ? decodeURIComponent(`?${searchParams}`) : ''
         const pagination = getPaginationParams(searchParams)
         setPagination(pagination)
+        if (pagination.page === null) return
         axios.get(`${route}${search}`)
             .then(response => {
                 if (parseInt(pagination.page) > 1)

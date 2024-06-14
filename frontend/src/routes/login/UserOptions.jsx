@@ -20,17 +20,18 @@ const UserOptions = ({ setUserClick }) => {
             });
             if (response.status === 200) {
                 localStorage.clear()
+                navigate('/')
                 setUserClick(false)
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 
     return (
         <Dropdown className="w-[300px] right-[118px]">
             <DropdownItem>Profile</DropdownItem>
-            { userRole === 'ADMIN' && <DropdownItem onClick={ () => navigate("/admin-panel/movies/drafts") }>Admin</DropdownItem> }
+            { userRole === 'ADMIN' && <DropdownItem onClick={ () => { navigate("/admin-panel/movies/drafts"); setUserClick(false) } }>Admin</DropdownItem> }
             <DropdownItem className="text-primary-600 z-50" onClick={ onFinish }>Log Out</DropdownItem>
         </Dropdown>
     )

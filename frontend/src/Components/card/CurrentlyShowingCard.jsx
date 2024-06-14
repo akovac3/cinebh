@@ -39,7 +39,7 @@ const CurrentlyShowingCard = ({ className, ...props }) => {
         <Link to={ `/movie-details/${movie.movieId}` }>
             <Card className={ createClassName("lg:h-[318px] md:h-[450px] sm:h-[450px] py-4 px-8 cursor-pointer", className) }>
                 <div className="grid lg:grid-cols-4 gap-24 p-[10px]">
-                    <Image className="w-[96%] h-[287px] rounded-16" src={ cover } alt="Movie cover" />
+                    <Image className="w-[96%] h-[287px] rounded-16 object-cover" src={ cover } alt="Movie cover" />
                     <div className="text-neutral-800 mr-24 relative">
                         <p className="text-heading-h4 pb-8">{ movie.name }</p>
                         <div className="flex text-body-l font-normal pt-[10px] pb-[6px]">

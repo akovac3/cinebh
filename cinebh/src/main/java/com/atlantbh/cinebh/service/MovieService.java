@@ -90,7 +90,8 @@ public class MovieService {
     public Page<Movie> findAllSimilarMoviesByGenre(Movie movie, PaginationParams paginationParams){
         Set<Genre> genreList = movie.getGenres();
         Specification<Movie> filters = Specification.where(hasSimilarGenres(movie.getMovieId(), genreList))
-                .and(projectionEndGreaterThenDate(null));
+                .and(projectionEndGreaterThenDate(null))
+                .and(hasStatus(Status.PUBLISHED));
         return movieRepository.findAll(filters, PageRequest.of(paginationParams.getPage()-1, paginationParams.getSize()));
     }
 

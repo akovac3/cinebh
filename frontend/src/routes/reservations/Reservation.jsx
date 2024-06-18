@@ -117,7 +117,7 @@ const Reservation = () => {
                 <div className="py-12 flex flex-col text-body-l">
                     <p className="text-heading-h6 pb-[10px]">Booking Details</p>
                     <p className="pb-8">{ format(date, "EEEE, MMM dd") } at { projection.time.slice(0, 5) }</p>
-                    <p className="pb-[10px]">{ projection.venue.address }, { projection.venue.city.name }</p>
+                    <p className="pb-[10px]">{ projection.venue.street } { projection.venue.streetNumber }, { projection.venue.city.name }</p>
                     <p>Hall 1</p>
                 </div>
             </div>

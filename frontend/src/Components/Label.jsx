@@ -29,7 +29,7 @@ const Label = ({ className, label, active, value, error, children, errorMessage,
                     </div>
                 </div>
             </div>
-            { error ? <p className="absolute pt-8 text-error-600 text-body-s">{ errorMessage }</p> : null }
+            { error ? <p className="absolute pt-4 text-error-600 text-body-s">{ errorMessage }</p> : null }
         </div>
     )
 }

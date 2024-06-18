@@ -21,7 +21,7 @@ const savedCards = [
 const PaymentDetails = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { movie, cover, projection, date, totalPrice, selectedSeats } = location.state;
+    const { reservationId, movie, cover, projection, date, totalPrice, selectedSeats } = location.state;
 
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
     const [modal, setModal] = useState(false);
@@ -29,21 +29,35 @@ const PaymentDetails = () => {
     const handlePayment = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post(
-                `${url}${reservation}`,
-                {
-                    date,
-                    projectionId: projection.projectionId,
-                    seats: selectedSeats,
-                    price: totalPrice,
-                    type: "PURCHASE"
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+            let response;
+
+            if (!reservationId) {
+                response = await axios.post(
+                    `${url}${reservation}`,
+                    {
+                        date,
+                        projectionId: projection.projectionId,
+                        seats: selectedSeats,
+                        price: totalPrice,
+                        type: "PURCHASE"
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
                     }
-                }
-            );
+                )
+            } else {
+                response = await axios.put(
+                    `${url}${reservation}/${reservationId}/buy-ticket`,
+                    {},
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                )
+            }
 
             if (response.status === 200) {
                 setModal(true);
@@ -144,7 +158,7 @@ const PaymentDetails = () => {
                             <p className="text-neutral-400 pb-4">Date and Time</p>
                             <p className="font-semibold pb-16">{ format(date, "EEEE, MMM dd") } at { projection.time.slice(0, 5) }</p>
                             <p className="text-neutral-400 pb-4">Cinema Details</p>
-                            <p className="font-semibold">{ projection.venue.address },<br />{ projection.venue.city.name }</p>
+                            <p className="font-semibold">{ projection.venue.street } { projection.venue.streetNumber },<br />{ projection.venue.city.name }</p>
                             <p className="font-semibold pb-16 pt-4">Hall 1</p>
                             <p className="text-neutral-400 pb-4">Seat(s) Details</p>
                             <p>Seat(s): <span className="font-semibold">{ selectedSeats.join(', ') }</span></p>

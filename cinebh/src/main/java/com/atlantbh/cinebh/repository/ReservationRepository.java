@@ -19,4 +19,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'RESERVATION'")
     List<Reservation> findAllByUser(User user);
+
+    @Query("SELECT COUNT(res) FROM Reservation res WHERE res.user = :user AND res.type = 'RESERVATION'")
+    long countReservations(User user);
 }

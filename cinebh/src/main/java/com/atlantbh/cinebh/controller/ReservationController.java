@@ -1,23 +1,32 @@
 package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
-import com.atlantbh.cinebh.model.Type;
+import com.atlantbh.cinebh.model.Reservation;
 import com.atlantbh.cinebh.model.User;
 import com.atlantbh.cinebh.request.PaymentRequest;
 import com.atlantbh.cinebh.request.ReservationRequest;
 import com.atlantbh.cinebh.response.PaymentResponse;
+import com.atlantbh.cinebh.service.JWTService;
 import com.atlantbh.cinebh.service.PaymentService;
 import com.atlantbh.cinebh.service.ReservationService;
+import com.atlantbh.cinebh.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -29,6 +38,25 @@ public class ReservationController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @GetMapping("/user")
+    public ResponseEntity<List<Reservation>> getReservationsForUser(@RequestHeader("Authorization") String token){
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(reservationService.getReservations(user));
+    }
+
+    @PutMapping("/{id}/buy-ticket")
+    public ResponseEntity<String> buyTicket(@PathVariable long id) {
+        Reservation reservation = reservationService.findById(id);
+        return ResponseEntity.ok(reservationService.makePurchase(reservation));
+    }
 
     @PostMapping
     public ResponseEntity<String> createReservation(@RequestBody ReservationRequest request){
@@ -55,5 +83,14 @@ public class ReservationController {
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteReservation(@PathVariable long id, @RequestHeader("Authorization") String token){
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        Reservation reservation = reservationService.findById(id);
+        if(!user.equals(reservation.getUser())) ResponseEntity.badRequest().body("Error: Invalid user!");
+        return ResponseEntity.ok(reservationService.cancelReservation(reservation));
     }
 }

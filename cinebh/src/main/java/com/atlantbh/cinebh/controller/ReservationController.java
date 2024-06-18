@@ -46,10 +46,17 @@ public class ReservationController {
     private JWTService jwtService;
 
     @GetMapping("/user")
-    public ResponseEntity<List<Reservation>> getReservationsForUser(@RequestHeader("Authorization") String token){
+    public ResponseEntity<List<Reservation>> getReservationsForUser(@RequestHeader("Authorization") String token) {
         String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
         User user = userService.getUserByUsername(username);
         return ResponseEntity.ok(reservationService.getReservations(user));
+    }
+
+    @GetMapping("/user/count")
+    public ResponseEntity<Long> getReservationsNumber(@RequestHeader("Authorization") String token) {
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(reservationService.getReservationsNumber(user));
     }
 
     @PutMapping("/{id}/buy-ticket")

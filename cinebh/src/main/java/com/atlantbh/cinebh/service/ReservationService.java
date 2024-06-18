@@ -32,6 +32,10 @@ public class ReservationService {
         return reservationRepository.findAllByUser(user);
     }
 
+    public Long getReservationsNumber(User user) {
+        return reservationRepository.countReservations(user);
+    }
+
     public Reservation findById(Long id){
         return reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation with provided id not found!"));
     }

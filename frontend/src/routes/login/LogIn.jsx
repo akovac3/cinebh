@@ -21,6 +21,7 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
     const [passwordFocused, setPasswordFocused] = useState(false)
     const [validData, setValidData] = useState(true)
     const [validEmail, setValidEmail] = useState(true)
+    const [errorMessage, setErrorMessage] = useState("")
     const [passwordVisibility, setPasswordVisibility] = useState(false);
 
     const onFocus = (setFocused) => setFocused(true)
@@ -50,9 +51,13 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 setValidData(false)
+                setErrorMessage("Email or Password that you've entered is incorrect.")
                 console.log('Incorrect email or password');
             } else if (error.response && error.response.status === 500) {
                 console.log('Internal Server Error');
+            } else if (error.response && error.response.status === 400) {
+                setValidData(false)
+                setErrorMessage("Account deactivated!")
             } else {
                 console.log('An error occurred');
             }
@@ -121,7 +126,7 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
                     variant={ !validData ? 'error' : 'default' }
                     className="mb-8"
                     error={ !validData }
-                    errorMessage="Email or Password that you've entered is incorrect."
+                    errorMessage={ errorMessage }
                 >
                     <Input
                         text="Password"

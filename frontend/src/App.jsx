@@ -23,6 +23,11 @@ import Archived from './routes/admin/movies/Archived';
 import Venues from './routes/admin/venues/Venues';
 import AddVenue from './routes/admin/venues/AddVenue';
 import VenueDetails from './routes/venues/VenueDetails';
+import UserProfile from './routes/user/UserProfile';
+import PersonalInformation from './routes/user/PersonalInformation';
+import Password from './routes/user/Password';
+import PendingReservations from './routes/user/PendingReservations';
+import Projections from './routes/user/Projections';
 
 import { ROLES } from './utils/constants';
 
@@ -44,6 +49,12 @@ const App = () => {
           <Route element={ <RequireAuth allowedRoles={ [ROLES.User] } /> }>
             <Route path='/reservation' element={ <Reservation /> } />
             <Route path='/payment-details' element={ <PaymentDetails /> } />
+            <Route path='/user-profile' element={ <UserProfile /> } >
+              <Route path='info' element={ <PersonalInformation /> } />
+              <Route path='password' element={ <Password /> } />
+              <Route path='reservations' element={ <PendingReservations /> } />
+              <Route path='projections' element={ <Projections /> } />
+            </Route>
           </Route>
 
           <Route element={ <RequireAuth allowedRoles={ [ROLES.Admin] } /> }>

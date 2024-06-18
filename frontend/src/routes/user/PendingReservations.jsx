@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
@@ -9,6 +9,7 @@ import Tooltip from "../../components/Tooltip";
 import Image from "../../components/Image";
 import Modal from "../../components/Modal";
 import Button from "../../components/Button";
+import { NumberOfElementsContext } from "./UserProfile";
 
 import { url, reservation } from "../../utils/api";
 
@@ -18,6 +19,8 @@ const PendingReservations = () => {
     const [showTooltip, setShowTooltip] = useState(false);
     const [modal, setModal] = useState(false)
     const [reservationId, setReservationId] = useState("")
+
+    const { numberOfReservations, setNumberOfReservations } = useContext(NumberOfElementsContext);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -69,6 +72,7 @@ const PendingReservations = () => {
                 setReservations(prevReservations =>
                     prevReservations.filter(reservation => reservation.id !== reservationId)
                 );
+                setNumberOfReservations(numberOfReservations - 1)
                 setModal(false);
                 setReservationId("");
             }

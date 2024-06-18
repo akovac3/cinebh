@@ -39,7 +39,7 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
-    public JWTAuthenticationResponse signin(SignInRequest signInRequest) {
+    public JWTAuthenticationResponse signin(SignInRequest signInRequest) throws IllegalAccessException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
         } catch (AuthenticationException e) {
@@ -47,6 +47,7 @@ public class AuthenticationService {
         }
 
         var user = userRepository.findByEmail(signInRequest.getEmail()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+        if(user.getSoftDelete()) throw new IllegalAccessException("Account deactivated.");
         var jwt = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
 
@@ -61,7 +62,6 @@ public class AuthenticationService {
         authenticationResponse.setRole(user.getRole());
         return authenticationResponse;
     }
-
 
     private void revokeAllTokensForUser(User user) {
         List<Token> validTokensOfUser = tokenRepository.findAllTokensByUser(user);

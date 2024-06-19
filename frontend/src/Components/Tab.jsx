@@ -29,7 +29,7 @@ const Tab = ({ children, onChange, value, selected }) => {
 
 const TabContent = ({ children }) => {
     return (
-        <div className="py-40">
+        <div className="py-24">
             { children }
         </div>
     );

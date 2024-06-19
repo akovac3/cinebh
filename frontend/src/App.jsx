@@ -28,6 +28,8 @@ import PersonalInformation from './routes/user/PersonalInformation';
 import Password from './routes/user/Password';
 import PendingReservations from './routes/user/PendingReservations';
 import Projections from './routes/user/Projections';
+import UpcomingProjections from './routes/user/UpcomingProjections';
+import PastProjections from './routes/user/PastProjections';
 
 import { ROLES } from './utils/constants';
 
@@ -53,7 +55,11 @@ const App = () => {
               <Route path='info' element={ <PersonalInformation /> } />
               <Route path='password' element={ <Password /> } />
               <Route path='reservations' element={ <PendingReservations /> } />
-              <Route path='projections' element={ <Projections /> } />
+              <Route path='projections' element={ <Projections /> }>
+                <Route index element={ <Navigate to="upcoming" /> } />
+                <Route path='upcoming' element={ <UpcomingProjections /> } />
+                <Route path='past' element={ <PastProjections /> } />
+              </Route>
             </Route>
           </Route>
 

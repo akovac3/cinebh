@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import Tooltip from "../../components/Tooltip";
 import Image from "../../components/Image";
@@ -14,11 +14,11 @@ import { NumberOfElementsContext } from "./UserProfile";
 import { url, reservation } from "../../utils/api";
 
 const PendingReservations = () => {
-    const navigate = useNavigate()
-    const [reservations, setReservations] = useState([])
+    const navigate = useNavigate();
+    const [reservations, setReservations] = useState([]);
     const [showTooltip, setShowTooltip] = useState(false);
-    const [modal, setModal] = useState(false)
-    const [reservationId, setReservationId] = useState("")
+    const [modal, setModal] = useState(false);
+    const [reservationId, setReservationId] = useState("");
 
     const { numberOfReservations, setNumberOfReservations } = useContext(NumberOfElementsContext);
 
@@ -46,7 +46,7 @@ const PendingReservations = () => {
         };
 
         fetchReservations();
-    }, [])
+    }, []);
 
     const getCover = (photos) => {
         for (let element of photos) {
@@ -58,7 +58,7 @@ const PendingReservations = () => {
     };
 
     const handleCancel = async () => {
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
         try {
             const response = await axios.delete(
                 `${url}${reservation}/${reservationId}`,
@@ -67,58 +67,63 @@ const PendingReservations = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 }
-            )
+            );
             if (response.status === 200) {
                 setReservations(prevReservations =>
                     prevReservations.filter(reservation => reservation.id !== reservationId)
                 );
-                setNumberOfReservations(numberOfReservations - 1)
+                setNumberOfReservations(numberOfReservations - 1);
                 setModal(false);
                 setReservationId("");
             }
         } catch (error) {
             console.error("Error canceling reservation:", error);
         }
-    }
+    };
 
     return (
         <div className="bg-neutral-25 text-neutral-800 px-32 pb-160 font-body">
-            <p className="text-heading-h5 pt-40 pb-24 w-full border-b border-b-neutral-200 mb-12">Pending Reservations</p>
+            <p className="text-heading-h5 pt-40 pb-24 w-full border-b border-b-neutral-200 mb-24">Pending Reservations</p>
             {
                 reservations.map((reservation, index) => {
                     return (
-                        <div key={ index } className="h-[252px] border border-neutral-200 rounded-16 px-12 py-24 text-body-l">
+                        <div key={ index } className="h-[252px] border border-neutral-200 rounded-16 px-12 py-24 text-body-l mb-24">
                             <div className="flex">
-                                <p className="flex-1 text-heading-h6">{ reservation.projection.movie.name } </p>
+                                <Link to={ `/movie-details/${reservation.projection.movie.movieId}` } className="flex-1">
+                                    <p className="text-heading-h6">{ reservation.projection.movie.name } </p>
+                                </Link>
                                 <Tooltip position="right" infoText="Reservation expires one hour before projection.">
                                     <FontAwesomeIcon className="text-neutral-500 mr-24" onClick={ () => setShowTooltip(!showTooltip) } icon={ faInfoCircle } />
                                 </Tooltip>
                             </div>
                             <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-1 pt-[36px] gap-64">
                                 <div className="col-span-3 flex gap-24">
-                                    <div>
+                                    <Link to={ `/movie-details/${reservation.projection.movie.movieId}` }>
                                         <Image src={ getCover(reservation.projection.movie.photos) || '' }
                                             alt="Photo" className={ `object-cover w-[134px] h-[126px] rounded-16` } />
-                                    </div>
-                                    <div className="flex flex-col gap-12">
-                                        <p className="text-neutral-500 text-heading-h6">Booking Details</p>
-                                        <p>{ format(reservation.date, "EEEE, MMM dd") } at { reservation.projection.time.slice(0, 5) }</p>
-                                        <p>{ reservation.projection.venue.name }, { reservation.projection.venue.street } { reservation.projection.venue.streetNumber }, { reservation.projection.venue.city.name }</p>
-                                        <div className="flex">
-                                            <p className="border-primary-600 h-[20px] pr-12 border-r">{ reservation.projection.movie.rating }</p>
-                                            <p className="border-primary-600 h-[20px] px-12 border-r">{ reservation.projection.movie.language }</p>
-                                            <p className="pl-12">{ reservation.projection.movie.duration } Min</p>
+                                    </Link>
+                                    <Link to={ `/movie-details/${reservation.projection.movie.movieId}` } className="flex-1">
+                                        <div className="flex flex-col gap-12">
+                                            <p className="text-neutral-500 text-heading-h6">Booking Details</p>
+                                            <p>{ format(reservation.date, "EEEE, MMM dd") } at { reservation.projection.time.slice(0, 5) }</p>
+                                            <p>{ reservation.projection.venue.name }, { reservation.projection.venue.street } { reservation.projection.venue.streetNumber }, { reservation.projection.venue.city.name }</p>
+                                            <div className="flex">
+                                                <p className="border-primary-600 h-[20px] pr-12 border-r">{ reservation.projection.movie.rating }</p>
+                                                <p className="border-primary-600 h-[20px] px-12 border-r">{ reservation.projection.movie.language }</p>
+                                                <p className="pl-12">{ reservation.projection.movie.duration } Min</p>
+                                            </div>
                                         </div>
+                                    </Link>
+                                </div>
+                                <Link to={ `/movie-details/${reservation.projection.movie.movieId}` } className="flex-1">
+                                    <div className="flex flex-col gap-12">
+                                        <p className="text-neutral-500 text-heading-h6">Seat(s) Details</p>
+                                        <p>Seat(s): <span className="font-semibold">{ reservation.seats.join(', ') }</span></p>
+                                        <p> Hall: <span className="font-semibold">Hall 1</span></p>
+                                        <p>Total Price: <span className="font-semibold">{ reservation.price } KM</span></p>
                                     </div>
-                                </div>
-                                <div className="flex flex-col gap-12">
-                                    <p className="text-neutral-500 text-heading-h6">Seat(s) Details</p>
-                                    <p>Seat(s): <span className="font-semibold">{ reservation.seats.join(', ') }</span></p>
-                                    <p> Hall: <span className="font-semibold">Hall 1</span></p>
-                                    <p>Total Price: <span className="font-semibold">{ reservation.price } KM</span></p>
-
-                                </div>
-                                <div className="flex flex-col gap-12 w-[180px]">
+                                </Link>
+                                <div className="flex flex-col gap-12 w-[180px]" onClick={ (e) => e.stopPropagation() }>
                                     <Button onClick={ () => {
                                         navigate("/payment-details", {
                                             state: {

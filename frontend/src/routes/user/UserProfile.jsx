@@ -66,7 +66,7 @@ const UserProfile = () => {
                     <span className="pl-4">Pending reservations ({ numberOfReservations })</span>
                 </NavLink>
                 <NavLink
-                    to="/user-profile/projections"
+                    to="/user-profile/projections/"
                     className={ ({ isActive }) => isActive ? "font-semibold text-neutral-0 shadow-light-400 underline" : "" }
                 >
                     <FontAwesomeIcon icon={ faFilm } />

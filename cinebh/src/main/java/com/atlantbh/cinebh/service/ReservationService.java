@@ -9,6 +9,7 @@ import com.atlantbh.cinebh.repository.ProjectionRepository;
 import com.atlantbh.cinebh.repository.ReservationRepository;
 import com.atlantbh.cinebh.request.EmailRequest;
 import com.atlantbh.cinebh.request.ReservationRequest;
+import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,11 +30,21 @@ public class ReservationService {
     private EmailService emailService;
 
     public List<Reservation> getReservations(User user){
-        return reservationRepository.findAllByUser(user);
+        return reservationRepository.findReservationsByUser(user);
     }
+
+    public List<Reservation> getUpcomingPurchases(User user) { return  reservationRepository.findUpcomingPurchasesByUser(user); }
+
+    public List<Reservation> getPastPurchases(User user) { return  reservationRepository.findPastPurchasesByUser(user); }
 
     public Long getReservationsNumber(User user) {
         return reservationRepository.countReservations(user);
+    }
+
+    public NumberOfElementsResponse getNumberOfElements(User user) {
+        int upcoming = (int) reservationRepository.countUpcoming(user);
+        int archived = (int) reservationRepository.countPast(user);
+        return new NumberOfElementsResponse(0, 0, upcoming, archived);
     }
 
     public Reservation findById(Long id){

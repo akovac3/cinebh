@@ -5,6 +5,7 @@ import com.atlantbh.cinebh.model.Reservation;
 import com.atlantbh.cinebh.model.User;
 import com.atlantbh.cinebh.request.PaymentRequest;
 import com.atlantbh.cinebh.request.ReservationRequest;
+import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import com.atlantbh.cinebh.response.PaymentResponse;
 import com.atlantbh.cinebh.service.JWTService;
 import com.atlantbh.cinebh.service.PaymentService;
@@ -50,6 +51,27 @@ public class ReservationController {
         String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
         User user = userService.getUserByUsername(username);
         return ResponseEntity.ok(reservationService.getReservations(user));
+    }
+
+    @GetMapping("/count-elements")
+    public ResponseEntity<NumberOfElementsResponse> getNumberOfElements(@RequestHeader("Authorization") String token) {
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(reservationService.getNumberOfElements(user));
+    }
+
+    @GetMapping("/user/upcoming-projections")
+    public ResponseEntity<List<Reservation>> getUpcomingPurchasesForUser(@RequestHeader("Authorization") String token) {
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(reservationService.getUpcomingPurchases(user));
+    }
+
+    @GetMapping("/user/past-projections")
+    public ResponseEntity<List<Reservation>> getPastPurchasesForUser(@RequestHeader("Authorization") String token) {
+        String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(reservationService.getPastPurchases(user));
     }
 
     @GetMapping("/user/count")

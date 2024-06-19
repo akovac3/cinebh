@@ -18,8 +18,20 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     void deleteByProjectionAndType(Projection projection, Type type);
 
     @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'RESERVATION'")
-    List<Reservation> findAllByUser(User user);
+    List<Reservation> findReservationsByUser(User user);
 
-    @Query("SELECT COUNT(res) FROM Reservation res WHERE res.user = :user AND res.type = 'RESERVATION'")
+    @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date > CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time >= CURRENT_TIME))")
+    List<Reservation> findUpcomingPurchasesByUser(User user);
+
+    @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date < CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time < CURRENT_TIME))")
+    List<Reservation> findPastPurchasesByUser(User user);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user = :user AND r.type = 'RESERVATION'")
     long countReservations(User user);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date > CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time >= CURRENT_TIME))")
+    long countUpcoming(User user);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date < CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time < CURRENT_TIME))")
+    long countPast(User user);
 }

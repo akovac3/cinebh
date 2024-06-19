@@ -1,5 +1,7 @@
 package com.atlantbh.cinebh.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -29,6 +31,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "movieId")
 public class Movie {
     @Id
     @Column(name = "movieId", nullable = false)
@@ -52,11 +55,11 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     private Step step;
 
-    @OneToMany(mappedBy = "movie")
-    private Set<Photo> photos = new HashSet<>();
-
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Projection> projections = new HashSet<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Photo> photos = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -75,7 +78,7 @@ public class Movie {
     private Set<Writer> writers = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
-    Set<MovieActor> movieActors = new HashSet<>();
+    private Set<MovieActor> movieActors = new HashSet<>();
 
     public Movie(String name, Step step, String language, Date projectionStart, Date projectionEnd, String director, String synopsis, String rating, Integer duration, String trailer, Status status) {
         this.name = name;

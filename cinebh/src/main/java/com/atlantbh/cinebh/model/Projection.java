@@ -1,6 +1,7 @@
 package com.atlantbh.cinebh.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -16,8 +17,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
-import java.util.ArrayList;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "projectionId")
 public class Projection {
     @Id
     @Column(name = "projectionId", nullable = false)
@@ -36,9 +38,8 @@ public class Projection {
     private List<String> reservedSeats = new ArrayList<>();
     private List<String> purchasedSeats = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonIgnore
     private Movie movie;
 
     @ManyToOne(fetch = FetchType.EAGER)

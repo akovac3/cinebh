@@ -39,6 +39,7 @@ public class User implements UserDetails {
     private String lastName;
     private String phone;
     private String photo;
+    private Boolean softDelete = false;
 
     @Column(name = "email", nullable = false, unique = true)
     @Email(message = "Email must be valid!")

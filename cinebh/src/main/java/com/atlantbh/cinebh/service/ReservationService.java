@@ -9,6 +9,7 @@ import com.atlantbh.cinebh.repository.ProjectionRepository;
 import com.atlantbh.cinebh.repository.ReservationRepository;
 import com.atlantbh.cinebh.request.EmailRequest;
 import com.atlantbh.cinebh.request.ReservationRequest;
+import com.atlantbh.cinebh.response.NumberOfElementsResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,52 @@ public class ReservationService {
 
     @Autowired
     private EmailService emailService;
+
+    public List<Reservation> getReservations(User user){
+        return reservationRepository.findReservationsByUser(user);
+    }
+
+    public List<Reservation> getUpcomingPurchases(User user) { return  reservationRepository.findUpcomingPurchasesByUser(user); }
+
+    public List<Reservation> getPastPurchases(User user) { return  reservationRepository.findPastPurchasesByUser(user); }
+
+    public Long getReservationsNumber(User user) {
+        return reservationRepository.countReservations(user);
+    }
+
+    public NumberOfElementsResponse getNumberOfElements(User user) {
+        int upcoming = (int) reservationRepository.countUpcoming(user);
+        int archived = (int) reservationRepository.countPast(user);
+        return new NumberOfElementsResponse(0, 0, upcoming, archived);
+    }
+
+    public Reservation findById(Long id){
+        return reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation with provided id not found!"));
+    }
+
+    public String makePurchase(Reservation reservation) {
+        reservation.setType(Type.PURCHASE);
+        reservationRepository.save(reservation);
+        String reservationDetails = "Movie: " + reservation.getProjection().getMovie().getName() + "\nDate: " + reservation.getDate() + "\nTime: " + reservation.getProjection().getTime().toString().substring(0, 5) + "\nVenue: " +
+                reservation.getProjection().getVenue().getName() + ", " + reservation.getProjection().getVenue().getStreet() + reservation.getProjection().getVenue().getStreetNumber() + "\nSeats: " + String.join(", ", reservation.getSeats());
+        return emailService.sendEmail(
+                new EmailRequest(
+                        reservation.getUser().getEmail(),
+                        "Payment Confirmation",
+                        "Hi " + reservation.getUser().getFirstName() + " " + reservation.getUser().getLastName() + ", \n\nWe are pleased to confirm your payment for the following details:\n\n" +
+                                reservationDetails +
+                                "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
+                                "\n -The Cinebh Team"));
+    }
+
+    public String cancelReservation(Reservation reservation){
+        Projection projection = reservation.getProjection();
+        projection.setReservedSeats(new ArrayList<>());
+        projectionRepository.save(projection);
+
+        reservationRepository.delete(reservation);
+        return "Reservation successfully canceled!";
+    }
 
     public String create(ReservationRequest request, User user) {
         Projection projection = projectionRepository.findById(request.getProjectionId()).orElseThrow(() -> new ResourceNotFoundException("Invalid projection id!"));

@@ -7,6 +7,7 @@ import com.atlantbh.cinebh.request.SignUpRequest;
 import com.atlantbh.cinebh.response.JWTAuthenticationResponse;
 import com.atlantbh.cinebh.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,14 @@ public class AuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthenticationResponse> signin(@RequestBody SignInRequest signInRequest) {
-        return ResponseEntity.ok(authenticationService.signin(signInRequest));
+        JWTAuthenticationResponse response = null;
+        try {
+            response = authenticationService.signin(signInRequest);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")

@@ -1,7 +1,6 @@
 package com.atlantbh.cinebh.scheduled;
 
-import com.atlantbh.cinebh.model.Projection;
-import com.atlantbh.cinebh.model.Type;
+import com.atlantbh.cinebh.model.Reservation;
 import com.atlantbh.cinebh.repository.ProjectionRepository;
 import com.atlantbh.cinebh.repository.ReservationRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,16 +30,14 @@ public class ReservationScheduler {
         LocalTime currentHour = LocalTime.now().truncatedTo(ChronoUnit.MINUTES).plusHours(1);
         log.info("Task for deleting reserved seats started at {}", LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
 
-        List<Projection> projections = projectionRepository.getTodaysProjections();
+        List<Reservation> reservations = reservationRepository.getTodaysReservations();
 
-        for (Projection projection : projections) {
-            Time projectionTime = projection.getTime();
+        for (Reservation r : reservations) {
+            Time projectionTime = r.getProjection().getTime();
             LocalTime localProjectionTime = projectionTime.toLocalTime();
 
             if (localProjectionTime.isBefore(currentHour) || localProjectionTime.equals(currentHour)) {
-                reservationRepository.deleteByProjectionAndType(projection, Type.RESERVATION);
-                projection.setReservedSeats(new ArrayList<>());
-                projectionRepository.save(projection);
+                reservationRepository.delete(r);
             }
         }
     }

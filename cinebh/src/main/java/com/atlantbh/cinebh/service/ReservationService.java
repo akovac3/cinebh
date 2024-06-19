@@ -14,8 +14,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -67,58 +69,63 @@ public class ReservationService {
     }
 
     public String cancelReservation(Reservation reservation){
-        Projection projection = reservation.getProjection();
-        projection.setReservedSeats(new ArrayList<>());
-        projectionRepository.save(projection);
-
         reservationRepository.delete(reservation);
         return "Reservation successfully canceled!";
     }
 
     public String create(ReservationRequest request, User user) {
-        Projection projection = projectionRepository.findById(request.getProjectionId()).orElseThrow(() -> new ResourceNotFoundException("Invalid projection id!"));
-        List<String> reservedSeats = projection.getReservedSeats();
-        List<String> purchasedSeats = projection.getPurchasedSeats();
-        if(reservedSeats == null ) reservedSeats = new ArrayList<>();
-        if(purchasedSeats == null) purchasedSeats = new ArrayList<>();
+        Projection projection = projectionRepository.findById(request.getProjectionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid projection id!"));
 
-        if (request.getSeats().isEmpty()) throw new IllegalArgumentException("Please select seats!");
-        List<String> finalReservedSeats = reservedSeats;
-        List<String> finalPurchasedSeats = purchasedSeats;
-        boolean seatsAvailable = request.getSeats().stream()
-                .noneMatch(seat -> finalReservedSeats.contains(seat) || finalPurchasedSeats.contains(seat));
+        List<Reservation> reservations = reservationRepository.findReservationsByProjectionAndDate(projection, request.getDate());
 
-        if (!seatsAvailable) throw new IllegalArgumentException("Seats are already reserved!");
-        if (request.getType().equals(Type.RESERVATION)) {
-            reservedSeats.addAll(request.getSeats());
-            projection.setReservedSeats(reservedSeats);
-        } else {
-            purchasedSeats.addAll(request.getSeats());
-            projection.setPurchasedSeats(purchasedSeats);
+        if (request.getSeats().isEmpty()) {
+            throw new IllegalArgumentException("Please select seats!");
         }
-        Reservation reservation = new Reservation(request.getSeats(), request.getDate(), request.getPrice(), request.getType(), user, projection);
+
+        Set<String> finalReservedSeats = reservations.stream()
+                .flatMap(reservation -> reservation.getSeats().stream())
+                .collect(Collectors.toSet());
+
+        boolean seatsAvailable = request.getSeats().stream()
+                .noneMatch(seat -> finalReservedSeats.contains(seat));
+
+        if (!seatsAvailable) {
+            throw new IllegalArgumentException("Seats are already reserved!");
+        }
+
+        Reservation reservation = new Reservation(request.getSeats(), request.getDate(),
+                request.getPrice(), request.getType(), user, projection);
+
         reservationRepository.save(reservation);
         projectionRepository.save(projection);
-        String reservationDetails = "Movie: " + projection.getMovie().getName() + "\nDate: " + request.getDate() + "\nTime: " + projection.getTime().toString().substring(0, 5) + "\nVenue: " +
-                projection.getVenue().getName() + ", " + projection.getVenue().getStreet() + projection.getVenue().getStreetNumber() + "\nSeats: " + String.join(", ", request.getSeats());
-        if (request.getType().equals(Type.RESERVATION)) return emailService.sendEmail(
-                new EmailRequest(
-                        user.getEmail(),
-                        "Reservation Confirmation",
-                        "Hi " + user.getFirstName() + " " + user.getLastName() + ", \n\nWe are pleased to confirm your reservation for the following details:\n\n" +
-                                reservationDetails +
-                                "\n\nPlease note that your reservation will expire if the tickets are not purchased at least one hour before the showtime. \nTo ensure your seats are secured, we recommend completing your purchase well in advance." +
-                                "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
-                                "\n -The Cinebh Team"));
-        else {
-            return emailService.sendEmail(
-                    new EmailRequest(
-                            user.getEmail(),
-                            "Payment Confirmation",
-                            "Hi " + user.getFirstName() + " " + user.getLastName() + ", \n\nWe are pleased to confirm your payment for the following details:\n\n" +
-                                    reservationDetails +
-                                    "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
-                                    "\n -The Cinebh Team"));
+
+        String reservationDetails = "Movie: " + projection.getMovie().getName() + "\nDate: " + request.getDate() +
+                "\nTime: " + projection.getTime().toString().substring(0, 5) + "\nVenue: " +
+                projection.getVenue().getName() + ", " + projection.getVenue().getStreet() +
+                projection.getVenue().getStreetNumber() + "\nSeats: " + String.join(", ", request.getSeats());
+
+        if (request.getType().equals(Type.RESERVATION)) {
+            return emailService.sendEmail(new EmailRequest(
+                    user.getEmail(),
+                    "Reservation Confirmation",
+                    "Hi " + user.getFirstName() + " " + user.getLastName() + ", \n\nWe are pleased to confirm your reservation for the following details:\n\n" +
+                            reservationDetails +
+                            "\n\nPlease note that your reservation will expire if the tickets are not purchased at least one hour before the showtime. \nTo ensure your seats are secured, we recommend completing your purchase well in advance." +
+                            "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
+                            "\n -The Cinebh Team"));
+        } else {
+            return emailService.sendEmail(new EmailRequest(
+                    user.getEmail(),
+                    "Payment Confirmation",
+                    "Hi " + user.getFirstName() + " " + user.getLastName() + ", \n\nWe are pleased to confirm your payment for the following details:\n\n" +
+                            reservationDetails +
+                            "\n\nThank you for choosing us, we look forward to providing you with an enjoyable movie experience.\n" +
+                            "\n -The Cinebh Team"));
         }
+    }
+
+    public List<Reservation> getReservationsForProjection(Projection p, Date date) {
+        return reservationRepository.findReservationsByProjectionAndDate(p, date);
     }
 }

@@ -82,11 +82,12 @@ const AddMovie = () => {
                     const key = `${projection.time}-${projection.venue.venueId}-${projection.venue.city.cityId}`;
                     return seen.has(key) ? false : seen.add(key);
                 }).map(projection => ({
+                    id: projection.projectionId,
                     venue: projection.venue.venueId,
                     city: projection.venue.city.cityId,
                     time: projection.time
                 }));
-            })() : [{ venue: null, city: null, time: null }];
+            })() : [{ id: null, venue: null, city: null, time: null }];
             setProjectionsData(projections);
         }
     }, [movie]);
@@ -362,7 +363,7 @@ const AddMovie = () => {
         for (let projection of projectionsData) {
             const key = `${projection.city}-${projection.venue}-${projection.time}`;
             if (projectionMap.has(key)) {
-                return true; // Collision detected
+                return true;
             }
             projectionMap.set(key, true);
         }

@@ -17,7 +17,7 @@ import { NoDataRow, Table, TableCell, TableHeaderCell, TableHeaderRow, TableRow 
 
 import { NumberOfElementsContext } from "../AdminPanel";
 
-import { url, movies, searchStatus, venues, currently } from "../../../utils/api";
+import { url, movies, searchStatus, venues, currently, projections } from "../../../utils/api";
 
 const MovieTable = ({ type, selectable = false, actions = false }) => {
     const navigate = useNavigate();
@@ -123,11 +123,24 @@ const MovieTable = ({ type, selectable = false, actions = false }) => {
         route += `&page=${pagination.page}&size=${pagination.size}`
 
         const result = await axios.get(route);
-        setMovieList(result.data.content);
+        axios.get(`${route}`)
+            .then(async response => {
+                const moviesData = response.data.content;
+                for (const movie of moviesData) {
+                    try {
+                        const projectionsResponse = await axios.get(`${url}${projections}/movie/${movie.movieId}`);
+                        movie.projections = projectionsResponse.data;
+                    } catch (error) {
+                        console.log(error);
+                        movie.projections = [];
+                    }
+                }
+                setMovieList(moviesData);
 
-        setTotalPosts(result.data.totalElements);
-        setMaxPages(result.data.totalPages + 1);
-        setNumberOfElementsChanged(result.data.content[0])
+                setTotalPosts(result.data.totalElements);
+                setMaxPages(result.data.totalPages + 1);
+                setNumberOfElementsChanged(result.data.content[0])
+            })
     };
 
     const getVenueNames = (projections) => {

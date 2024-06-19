@@ -52,14 +52,19 @@ const App = () => {
             <Route path='/reservation' element={ <Reservation /> } />
             <Route path='/payment-details' element={ <PaymentDetails /> } />
             <Route path='/user-profile' element={ <UserProfile /> } >
-              <Route path='info' element={ <PersonalInformation /> } />
-              <Route path='password' element={ <Password /> } />
               <Route path='reservations' element={ <PendingReservations /> } />
               <Route path='projections' element={ <Projections /> }>
                 <Route index element={ <Navigate to="upcoming" /> } />
                 <Route path='upcoming' element={ <UpcomingProjections /> } />
                 <Route path='past' element={ <PastProjections /> } />
               </Route>
+            </Route>
+          </Route>
+
+          <Route element={ <RequireAuth allowedRoles={ [ROLES.User, ROLES.Admin] } /> }>
+            <Route path='/user-profile' element={ <UserProfile /> } >
+              <Route path='info' element={ <PersonalInformation /> } />
+              <Route path='password' element={ <Password /> } />
             </Route>
           </Route>
 

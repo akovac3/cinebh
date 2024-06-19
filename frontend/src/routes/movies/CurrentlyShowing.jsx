@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fas } from "@fortawesome/free-solid-svg-icons"
+import { fas } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 
 import { LabeledDropdown, DropdownItem } from "../../components/Dropdown";
@@ -14,7 +14,7 @@ import Button from "../../components/Button";
 import Card from "../../components/Card";
 import Label from "../../components/Label";
 
-import { url, movies, venues, genres, cities, searchCurrently } from "../../utils/api";
+import { url, movies, venues, genres, cities, searchCurrently, projections } from "../../utils/api";
 import { getFilterParams, getPaginationParams, handleFilterChange, handlePageChange } from "../../utils/utils";
 
 const CurrentlyShowing = () => {
@@ -25,31 +25,30 @@ const CurrentlyShowing = () => {
     const [times, setTimes] = useState([]);
     const [venueList, setVenueList] = useState([]);
     const [movieList, setMovieList] = useState([]);
-    const [dates, setDates] = useState([])
+    const [dates, setDates] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
 
     const [pagination, setPagination] = useState({ page: 1, size: 4 });
 
-    const [filterParams, setFilterParams] = useState({ city: null, genre: null, venue: null, time: null, startDate: null })
+    const [filterParams, setFilterParams] = useState({ city: null, genre: null, venue: null, time: null, startDate: null });
 
-    const [focused, setFocused] = useState(false)
-    const onFocus = () => setFocused(true)
-    const onBlur = () => setFocused(false)
+    const [focused, setFocused] = useState(false);
+    const onFocus = () => setFocused(true);
+    const onBlur = () => setFocused(false);
 
     function handleSearchChange(event) {
         if (event.target.value.length >= 3) {
             handleFilterChange(searchParams, setSearchParams, 'contains', event.target.value);
-        }
-        else {
+        } else {
             handleFilterChange(searchParams, setSearchParams, 'contains', null);
         }
     }
 
     function _handleFilterChange(field, value) {
-        _handlePageChange()
+        _handlePageChange();
         if (field === 'city') {
             handleFilterChange(searchParams, setSearchParams, 'venue', null);
-            getVenues(value)
+            getVenues(value);
         }
         handleFilterChange(searchParams, setSearchParams, field, value);
     }
@@ -61,109 +60,117 @@ const CurrentlyShowing = () => {
     const getGenres = async () => {
         axios.get(`${url}${genres}`)
             .then(response => {
-                setGenreList(response.data)
+                setGenreList(response.data);
             }).catch(error => {
-                console.log(error)
-                console.warning(error.response.data.message)
-            })
-    }
+                console.log(error);
+                console.warning(error.response.data.message);
+            });
+    };
 
     const getCities = () => {
         axios.get(`${url}${cities}`)
             .then(response => {
-                setCityList(response.data)
+                setCityList(response.data);
             }).catch(error => {
-                {
-                    console.log(error)
-                    console.warning(error.response.data.message)
-                }
-            })
-    }
+                console.log(error);
+                console.warning(error.response.data.message);
+            });
+    };
 
     const getTimes = async () => {
         try {
-            const array = []
+            const array = [];
             for (let i = 10; i <= 23; i += 1) {
-                array.push(i + ":" + "00", i + ":" + "30")
+                array.push(i + ":" + "00", i + ":" + "30");
             }
-            setTimes(array)
+            setTimes(array);
         } catch (error) {
-            console.log(error)
-            console.warning(error.response.data.message)
+            console.log(error);
+            console.warning(error.response.data.message);
         }
-    }
+    };
 
     const getDates = () => {
         let date = new Date();
         let array = [];
         for (let i = 0; i < 10; i++) {
-            array.push(date)
+            array.push(date);
             date = new Date(new Date(date).setDate(date.getDate() + 1));
         }
-        setDates(array)
-    }
+        setDates(array);
+    };
 
     const getVenues = async (city) => {
-        const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`
+        const fullUrl = city ? `${url}${venues}/city/${city}` : `${url}${venues}/all`;
         axios.get(fullUrl)
             .then(response => setVenueList(response.data))
             .catch(error => {
-                console.log(error)
-                console.warning(error.response.data.message)
-            })
-    }
+                console.log(error);
+                console.warning(error.response.data.message);
+            });
+    };
 
     const loadMovies = async () => {
         let route = url + movies + searchCurrently;
-        const search = searchParams.size > 0 ? decodeURIComponent(`?${searchParams}`) : ''
-        const pagination = getPaginationParams(searchParams)
-        setPagination(pagination)
-        if (pagination.page === null) return
+        const search = searchParams.size > 0 ? decodeURIComponent(`?${searchParams}`) : '';
+        const pagination = getPaginationParams(searchParams);
+        setPagination(pagination);
+        if (pagination.page === null) return;
         axios.get(`${route}${search}`)
-            .then(response => {
+            .then(async response => {
+                const moviesData = response.data.content;
+                for (const movie of moviesData) {
+                    try {
+                        const projectionsResponse = await axios.get(`${url}${projections}/movie/${movie.movieId}`);
+                        movie.projections = projectionsResponse.data;
+                    } catch (error) {
+                        console.log(error);
+                        movie.projections = [];
+                    }
+                }
                 if (parseInt(pagination.page) > 1)
-                    setMovieList(pre => [...pre, ...response.data.content])
+                    setMovieList(pre => [...pre, ...moviesData]);
                 else {
-                    setTotalPages(response.data.totalPages)
-                    setMovieList(response.data.content)
+                    setTotalPages(response.data.totalPages);
+                    setMovieList(moviesData);
                 }
             })
             .catch(error => {
-                console.log(error)
-                console.warning(error.response.data.message)
-            })
-    }
+                console.log(error);
+                console.warning(error.response.data.message);
+            });
+    };
 
     useEffect(() => {
-        const filterParams = getFilterParams(searchParams)
-        setFilterParams(filterParams)
-        if (filterParams.startDate === null) _handleFilterChange('startDate', format(new Date(), 'yyyy-MM-dd'))
+        const filterParams = getFilterParams(searchParams);
+        setFilterParams(filterParams);
+        if (filterParams.startDate === null) _handleFilterChange('startDate', format(new Date(), 'yyyy-MM-dd'));
         loadMovies();
-    }, [searchParams])
+    }, [searchParams]);
 
     useEffect(() => {
-        _handlePageChange()
+        _handlePageChange();
 
-        const pagination = getPaginationParams(searchParams)
-        setPagination(pagination)
+        const pagination = getPaginationParams(searchParams);
+        setPagination(pagination);
 
-        getCities()
-        getVenues()
-        getGenres()
-        getDates()
-        getTimes()
-    }, [])
+        getCities();
+        getVenues();
+        getGenres();
+        getDates();
+        getTimes();
+    }, []);
 
     function getCityName(id) {
-        return cityList?.find(c => c.cityId.toString() === id)?.name
+        return cityList?.find(c => c.cityId.toString() === id)?.name;
     }
 
     function getVenueName(id) {
-        return venueList?.find(c => c.venueId.toString() === id)?.name
+        return venueList?.find(c => c.venueId.toString() === id)?.name;
     }
 
     function getGenreName(id) {
-        return genreList?.find(c => c.id.toString() === id)?.name
+        return genreList?.find(c => c.id.toString() === id)?.name;
     }
 
     const cityLabel = (
@@ -173,7 +180,7 @@ const CurrentlyShowing = () => {
         >
             { getCityName(filterParams.city) || "All cities" }
         </Label>
-    )
+    );
 
     const venueLabel = (
         <Label
@@ -182,7 +189,7 @@ const CurrentlyShowing = () => {
         >
             { getVenueName(filterParams.venue) || "All venues" }
         </Label>
-    )
+    );
 
     const genreLabel = (
         <Label
@@ -191,7 +198,7 @@ const CurrentlyShowing = () => {
         >
             { getGenreName(filterParams.genre) || "All genres" }
         </Label>
-    )
+    );
 
     const timeLabel = (
         <Label
@@ -200,7 +207,7 @@ const CurrentlyShowing = () => {
         >
             { filterParams.time?.slice(0, 5) || "All projection times" }
         </Label>
-    )
+    );
 
     return (
         <div className="font-body px-[118px] pt-32">
@@ -238,7 +245,7 @@ const CurrentlyShowing = () => {
                             >
                                 { city.name }
                             </DropdownItem>
-                        )
+                        );
                     }) }
                 </LabeledDropdown>
                 <LabeledDropdown
@@ -260,7 +267,7 @@ const CurrentlyShowing = () => {
                             >
                                 { venue.name }
                             </DropdownItem>
-                        )
+                        );
                     }) }
                 </LabeledDropdown>
                 <LabeledDropdown
@@ -282,7 +289,7 @@ const CurrentlyShowing = () => {
                             >
                                 { genre.name }
                             </DropdownItem>
-                        )
+                        );
                     }) }
                 </LabeledDropdown>
                 <LabeledDropdown
@@ -304,14 +311,14 @@ const CurrentlyShowing = () => {
                             >
                                 { time }
                             </DropdownItem>
-                        )
+                        );
                     }) }
                 </LabeledDropdown>
-            </div >
+            </div>
             <div className="grid lg:grid-cols-10 md:grid-cols-5 sm:grid-cols-3 gap-16 pb-[20px]">
                 {
                     dates.map((date, index) => {
-                        const formattedDate = format(date, 'yyyy-MM-dd')
+                        const formattedDate = format(date, 'yyyy-MM-dd');
                         return (
                             <DateCard
                                 value={ filterParams.startDate }
@@ -320,14 +327,14 @@ const CurrentlyShowing = () => {
                                 className={ `${formattedDate === filterParams.startDate ? "bg-primary-600 !text-neutral-0" : "bg-neutral-0 !text-neutral-800"} cursor-pointer` }
                                 onClick={ () => _handleFilterChange('startDate', formattedDate) }
                             />
-                        )
+                        );
                     })
                 }
             </div>
             <p className="text-body-m font-normal italic text-neutral-500">Quick reminder that our cinema schedule is on a ten-day update cycle.</p>
 
             <div className="gap-24">
-                { movieList.length != 0 ? movieList.map((item, index) => {
+                { movieList.length !== 0 ? movieList.map((item, index) => {
                     return (
                         <CurrentlyShowingCard
                             key={ index }
@@ -338,7 +345,7 @@ const CurrentlyShowing = () => {
                             photos={ item.photos }
                             className="my-[20px]"
                         />
-                    )
+                    );
                 }) :
                     <Card className="flex justify-center items-center shadow-light-50 mt-12 mb-32">
                         <div className="text-neutral-600 w-[55%] flex flex-col justify-center items-center py-64 text-body-l">
@@ -355,8 +362,8 @@ const CurrentlyShowing = () => {
                     <Button variant="tertiary" onClick={ () => _handlePageChange(parseInt(pagination.page) + 1) }>Load More</Button>
                 }
             </div>
-        </div >
-    )
+        </div>
+    );
 }
 
 export default CurrentlyShowing;

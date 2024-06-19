@@ -4,7 +4,9 @@ import com.atlantbh.cinebh.exception.ResourceNotFoundException;
 import com.atlantbh.cinebh.model.City;
 import com.atlantbh.cinebh.model.Venue;
 import com.atlantbh.cinebh.request.PaginationParams;
+import com.atlantbh.cinebh.request.VenueFilterParams;
 import com.atlantbh.cinebh.request.VenueRequest;
+import com.atlantbh.cinebh.service.AmazonService;
 import com.atlantbh.cinebh.service.CityService;
 import com.atlantbh.cinebh.service.VenueService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,12 +22,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -40,6 +44,8 @@ public class VenueController {
 
     ObjectMapper objectMapper;
 
+    private AmazonService amazonClient;
+
     @GetMapping("/all")
     public ResponseEntity<Iterable<Venue>> getAll() {
         return ResponseEntity.ok(venueService.getAll());
@@ -48,6 +54,11 @@ public class VenueController {
     @GetMapping
     public ResponseEntity<Page<Venue>> getVenues(PaginationParams paginationParams) {
         return ResponseEntity.ok(venueService.getVenues(paginationParams.getPage(), paginationParams.getSize()));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Venue>> getVenuesForFilter(VenueFilterParams filterParams, PaginationParams paginationParams) {
+        return ResponseEntity.ok(venueService.getVenuesByFilter(filterParams, paginationParams));
     }
 
     @GetMapping("/{id}")
@@ -63,21 +74,27 @@ public class VenueController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createVenue(@Validated @RequestBody VenueRequest venueRequest) {
-        City city = cityService.findByName(venueRequest.getCityName());
-        Venue venue = new Venue(venueRequest.getName(), venueRequest.getPhoto(), venueRequest.getAddress(), venueRequest.getTelephone(), city);
+    public ResponseEntity<String> createVenue(@RequestPart(value = "photo", required = false) MultipartFile photo, @Validated @RequestPart(value = "venue", required = false) VenueRequest venueRequest) {
+        City city = cityService.findById(venueRequest.getCity());
+        String photoUrl = amazonClient.uploadFile(photo);
+        Venue venue = new Venue(venueRequest.getName(),photoUrl, venueRequest.getStreet(), venueRequest.getNumber(), venueRequest.getTelephone(), city);
         venueService.save(venue);
         return new ResponseEntity<>("Venue successfully added!", HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<String> updateVenue(@PathVariable Long id, @Validated @RequestBody VenueRequest venueRequest) {
+    public ResponseEntity<String> updateVenue(@PathVariable Long id, @RequestPart(value = "photo", required = false) MultipartFile photo, @Validated @RequestPart(value = "venue", required = false) VenueRequest venueRequest) {
         Venue updateVenue = venueService.findById(id);
         updateVenue.setName(venueRequest.getName());
-        updateVenue.setAddress(venueRequest.getAddress());
+        updateVenue.setStreet(venueRequest.getStreet());
+        updateVenue.setStreetNumber(venueRequest.getNumber());
         updateVenue.setTelephone(venueRequest.getTelephone());
-        City newCity = cityService.findByName(venueRequest.getCityName());
+        City newCity = cityService.findById(venueRequest.getCity());
         updateVenue.setCity(newCity);
+        if(photo!=null) {
+            amazonClient.deleteFileFromS3Bucket(updateVenue.getPhoto());
+            updateVenue.setPhoto(amazonClient.uploadFile(photo));
+        }
         venueService.save(updateVenue);
         return new ResponseEntity<>("Venue with id = " + id + " successfully updated!", HttpStatus.OK);
     }
@@ -103,6 +120,9 @@ public class VenueController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVenue(@PathVariable long id) throws JsonProcessingException {
+        Venue venue = venueService.findById(id);
+        String photoUrl = venue.getPhoto();
+        amazonClient.deleteFileFromS3Bucket(photoUrl);
         venueService.remove(id);
         return new ResponseEntity<>("Venue successfully deleted!", HttpStatus.OK);
     }

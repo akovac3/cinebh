@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class VenueRequest {
-    private String name;
-    private String street;
-    private Integer number;
-    private String telephone;
-    private Long city;
+public class VenueFilterParams {
+        private String contains;
+        private Long city = 0L;
 }

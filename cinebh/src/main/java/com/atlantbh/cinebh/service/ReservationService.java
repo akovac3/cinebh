@@ -53,7 +53,7 @@ public class ReservationService {
         reservationRepository.save(reservation);
         projectionRepository.save(projection);
         String reservationDetails = "Movie: " + projection.getMovie().getName() + "\nDate: " + request.getDate() + "\nTime: " + projection.getTime().toString().substring(0, 5) + "\nVenue: " +
-                projection.getVenue().getName() + ", " + projection.getVenue().getAddress() + "\nSeats: " + String.join(", ", request.getSeats());
+                projection.getVenue().getName() + ", " + projection.getVenue().getStreet() + projection.getVenue().getStreetNumber() + "\nSeats: " + String.join(", ", request.getSeats());
         if (request.getType().equals(Type.RESERVATION)) return emailService.sendEmail(
                 new EmailRequest(
                         user.getEmail(),

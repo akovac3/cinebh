@@ -26,17 +26,19 @@ public class Venue {
     private Long venueId;
     private String name;
     private String photo;
-    private String address;
+    private String street;
+    private Integer streetNumber;
     private String telephone;
 
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
 
-    public Venue(String name, String photo, String address, String telephone, City city) {
+    public Venue(String name, String photo, String street, Integer streetNumber, String telephone, City city) {
         this.name = name;
         this.photo = photo;
-        this.address = address;
+        this.street = street;
+        this.streetNumber = streetNumber;
         this.telephone = telephone;
         this.city = city;
     }

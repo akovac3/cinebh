@@ -6,7 +6,7 @@ import { createClassName } from "../utils/utils";
 
 const Input = forwardRef(({ className, label, error, open, text, ...props }, ref) => {
     return (
-        <input placeholder={ text } { ...props } ref={ ref } className={ createClassName(`${error ? "text-error-600" : "text-neutral-900"} focus-within:outline-none w-full`, className) } />
+        <input placeholder={ text } { ...props } ref={ ref } className={ createClassName(`${error ? "text-error-600" : "text-neutral-900"} focus-within:outline-none w-full disabled:bg-neutral-0`, className) } />
     )
 })
 

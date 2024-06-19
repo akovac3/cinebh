@@ -32,7 +32,7 @@ const Nav = ({ className, toggleSidebar }) => {
           Upcoming Movies
         </li>
       </a>
-      <a to="/venues">
+      <a href="/venues">
         <li className="hover:border-b hover:font-semibold hover:shadow-light-100 cursor-pointer">
           Venues
         </li>

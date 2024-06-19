@@ -7,6 +7,7 @@ import Tickets from './routes/tickets/Tickets';
 import Layout from './components/Layout';
 import CurrentlyShowing from './routes/movies/CurrentlyShowing';
 import UpcomingMovies from './routes/movies/UpcomingMovies';
+import AllVenues from './routes/venues/AllVenues';
 import MovieDetails from './routes/movies/MovieDetails';
 import Reservation from './routes/reservations/Reservation';
 import RequireAuth from './routes/auth/RequireAuth';
@@ -19,6 +20,9 @@ import Currently from './routes/admin/movies/Currently';
 import AddMovie from './routes/admin/movies/AddMovie';
 import Upcoming from './routes/admin/movies/Upcoming';
 import Archived from './routes/admin/movies/Archived';
+import Venues from './routes/admin/venues/Venues';
+import AddVenue from './routes/admin/venues/AddVenue';
+import VenueDetails from './routes/venues/VenueDetails';
 
 import { ROLES } from './utils/constants';
 
@@ -33,6 +37,8 @@ const App = () => {
           <Route path='/movie-details/:id' element={ <MovieDetails /> } />
           <Route path='/currently-showing' element={ <CurrentlyShowing /> } />
           <Route path='/upcoming-movies' element={ <UpcomingMovies /> } />
+          <Route path='/venues' element={ <AllVenues /> } />
+          <Route path='/venue-details/:id' element={ <VenueDetails /> } />
           <Route path='/unauthorized' element={ <Unauthorized /> } />
 
           <Route element={ <RequireAuth allowedRoles={ [ROLES.User] } /> }>
@@ -50,6 +56,8 @@ const App = () => {
                 <Route path='archived' element={ <Archived /> } />
               </Route>
               <Route path='add-movie' element={ <AddMovie /> } />
+              <Route path='add-venue' element={ <AddVenue /> } />
+              <Route path='venues' element={ <Venues /> } />
             </Route>
           </Route>
         </Route>

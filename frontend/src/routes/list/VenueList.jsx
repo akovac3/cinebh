@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import VenueCard from "../../components/card/VenueCard";
 import { List, ListItem } from "../../components/List";
@@ -41,7 +42,9 @@ const VenueList = (props) => {
                 { venues.map((item, index) => {
                     return (
                         <ListItem key={ index }>
-                            <VenueCard key={ index } venue={ item } />
+                            <Link key={ index } to={ `/venue-details/${item.venueId}` }>
+                                <VenueCard key={ index } venue={ item } />
+                            </Link>
                         </ListItem>
                     )
                 }) }

@@ -87,13 +87,13 @@ const PendingReservations = () => {
             {
                 reservations.map((reservation, index) => {
                     return (
-                        <div key={ index } className="h-[252px] border border-neutral-200 rounded-16 px-12 py-24 text-body-l mb-24">
+                        <div key={ index } className="h-[252px] border border-neutral-200 rounded-16 px-16 py-24 text-body-l mb-24">
                             <div className="flex">
                                 <Link to={ `/movie-details/${reservation.projection.movie.movieId}` } className="flex-1">
                                     <p className="text-heading-h6">{ reservation.projection.movie.name } </p>
                                 </Link>
-                                <Tooltip position="right" infoText="Reservation expires one hour before projection.">
-                                    <FontAwesomeIcon className="text-neutral-500 mr-24" onClick={ () => setShowTooltip(!showTooltip) } icon={ faInfoCircle } />
+                                <Tooltip position="right" infoText="Reservation expires one hour before projection." className="w-[271px]">
+                                    <FontAwesomeIcon className="text-neutral-500" onClick={ () => setShowTooltip(!showTooltip) } icon={ faInfoCircle } />
                                 </Tooltip>
                             </div>
                             <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-1 pt-[36px] gap-64">
@@ -123,7 +123,7 @@ const PendingReservations = () => {
                                         <p>Total Price: <span className="font-semibold">{ reservation.price } KM</span></p>
                                     </div>
                                 </Link>
-                                <div className="flex flex-col gap-12 w-[180px]" onClick={ (e) => e.stopPropagation() }>
+                                <div className="flex flex-col gap-12 w-full" onClick={ (e) => e.stopPropagation() }>
                                     <Button onClick={ () => {
                                         navigate("/payment-details", {
                                             state: {

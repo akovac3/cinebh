@@ -56,8 +56,8 @@ const LogIn = ({ toggleSidebar, reservation = false }) => {
             } else if (error.response && error.response.status === 500) {
                 console.log('Internal Server Error');
             } else if (error.response && error.response.status === 400) {
+                alert("Account deactivated!")
                 setValidData(false)
-                setErrorMessage("Account deactivated!")
             } else {
                 console.log('An error occurred');
             }

@@ -14,15 +14,15 @@ import { LabeledDropdown, DropdownItem } from "../../components/Dropdown";
 import { url, cities, user } from "../../utils/api";
 
 const PersonalInformation = () => {
-    const [editable, setEditable] = useState(false)
+    const [editable, setEditable] = useState(false);
 
     const navigate = useNavigate();
     const inputRef = useRef();
     const [file, setFile] = useState(null);
     const [cityList, setCityList] = useState([]);
-    const [countryList, setCountryList] = useState([])
-    const [validEmail, setValidEmail] = useState(true)
-    const [modal, setModal] = useState(false)
+    const [countryList, setCountryList] = useState([]);
+    const [validEmail, setValidEmail] = useState(true);
+    const [modal, setModal] = useState(false);
     const [userRequest, setUserRequest] = useState({});
 
     const [userDataFocused, setUserDataFocused] = useState({});
@@ -49,11 +49,10 @@ const PersonalInformation = () => {
         };
 
         fetchCities();
-        fetchCountries()
+        fetchCountries();
     }, []);
 
     const handlePhotoChange = (e) => {
-        console.log(e)
         if (e.target.files.length > 0) {
             const selectedFile = e.target.files[0];
             setUserRequest((prev) => ({ ...prev, photo: null }));
@@ -92,7 +91,8 @@ const PersonalInformation = () => {
                 });
 
                 if (response.status === 200) {
-                    localStorage.clear()
+                    localStorage.clear();
+                    window.location.reload();
                     navigate("/");
                 } else {
                     throw new Error("Failed to deactivate account!");
@@ -102,11 +102,7 @@ const PersonalInformation = () => {
             }
         } else if (action === "upload") {
             formData.append("photo", file);
-            formData.append(
-                "user",
-                new Blob([JSON.stringify(userRequest
-                )], { type: "application/json" })
-            );
+            formData.append("user", new Blob([JSON.stringify(userRequest)], { type: "application/json" }));
 
             try {
                 const requestUrl = `${url}${user}/change-info`;
@@ -115,7 +111,7 @@ const PersonalInformation = () => {
                 });
 
                 if ([200, 201].includes(response.status)) {
-                    setEditable(false)
+                    setEditable(false);
                 } else {
                     throw new Error("Failed to save data");
                 }
@@ -158,7 +154,7 @@ const PersonalInformation = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                const userData = response.data
+                const userData = response.data;
                 setUserRequest({
                     id: userData.id,
                     firstName: userData.firstName,
@@ -167,15 +163,15 @@ const PersonalInformation = () => {
                     photo: userData.photo,
                     email: userData.email,
                     city: userData.city ? userData.city.cityId : null,
-                    country: userData.city ? userData.city.country.countryId : null
-                })
+                    country: userData.city ? userData.city.country.countryId : null,
+                });
             } catch (error) {
                 console.error("Error loading user details:", error);
             }
         };
 
         fetchUserDetails();
-    }, [])
+    }, []);
 
     if (!userRequest) {
         return <div className="text-heading-h6 text-neutral-600 pl-[118px] pt-80">Loading...</div>;
@@ -183,7 +179,7 @@ const PersonalInformation = () => {
 
     return (
         <div className="bg-neutral-25 text-neutral-800 px-32 pb-160">
-            <div className="flex pt-24 pb-32" >
+            <div className="flex pt-24 pb-32">
                 <p className="text-heading-h5 flex-1">Personal Information</p>
                 { !editable && <Button onClick={ () => setEditable(true) }>Edit Profile</Button> }
             </div>
@@ -191,10 +187,10 @@ const PersonalInformation = () => {
                 <div className="h-[292px] bg-neutral-0 border border-neutral-200 rounded-24">
                     <div className="grid grid-cols-2 w-[650px]">
                         <div className="pl-16 py-16">
-                            <Image className="h-[260px] w-[285px] object-cover rounded-16" src={ userRequest.photo ? userRequest.photo : file ? URL.createObjectURL(file) : "" } alt="User photo" />
+                            <Image className="h-[260px] w-[285px] object-cover rounded-16" src={ userRequest.photo ? userRequest.photo : file ? URL.createObjectURL(file) : "/user_placeholder.png" } alt="User photo" />
                         </div>
                         <div className="flex flex-col text-body-l gap-12 py-16">
-                            <p className="text-heading-h4"> { userRequest.firstName } { userRequest.lastName }</p>
+                            <p className="text-heading-h4">{ userRequest.firstName } { userRequest.lastName }</p>
                             <p><FontAwesomeIcon className="text-primary-600 mr-16" icon={ faPhone } />{ userRequest.phone }</p>
                             <p><FontAwesomeIcon className="text-primary-600 mr-16" icon={ faEnvelope } />{ userRequest.email }</p>
                             <p><FontAwesomeIcon className="text-primary-600 mr-[19px]" icon={ faLocationPin } />{ getCityName(userRequest.city) }</p>
@@ -205,7 +201,7 @@ const PersonalInformation = () => {
             ) : (
                 <div>
                     <div className="flex items-center justify-center border-b border-b-neutral-200">
-                        <div className="rounded-16 relative py-32">
+                        <div className="rounded-16 relative pt-16 pb-32">
                             <input
                                 type="file"
                                 onChange={ handlePhotoChange }
@@ -216,12 +212,12 @@ const PersonalInformation = () => {
                                 className={ `w-[270px] h-[260px] rounded-16 object-cover ${placeholder ? "opacity-60" : ""}` }
                                 src={
                                     placeholder
-                                        ? "/placeholder.png"
+                                        ? "/user_placeholder.png"
                                         : userRequest.photo
                                             ? userRequest.photo
                                             : URL.createObjectURL(file)
                                 }
-                                alt={ placeholder ? "" : "Uploaded" }
+                                alt={ placeholder ? "User placeholder" : "Uploaded" }
                             />
                             <div className="bg-neutral-800 bg-opacity-80 absolute top-[75.4%] rounded-b-16 w-full flex justify-center">
                                 { editable && (
@@ -259,7 +255,8 @@ const PersonalInformation = () => {
                                 value={ userRequest.phone }
                                 className="mb-24 !text-neutral-700"
                                 leftIcon={ <FontAwesomeIcon icon={ faPhone } /> }
-                                active={ userDataFocused.phone }>
+                                active={ userDataFocused.phone }
+                            >
                                 <Input
                                     name="phone"
                                     text="Phone"
@@ -272,14 +269,8 @@ const PersonalInformation = () => {
                             </Label>
                             <LabeledDropdown value={ userRequest.city } label={ cityLabel }>
                                 <DropdownItem
-                                    onClick={ () => setUserRequest
-                                        ({
-                                            ...userRequest
-                                            , city: null
-                                        }) }
-                                    className={ `${userRequest
-                                        .city === null ? "font-semibold" : "font-normal"
-                                        }` }
+                                    onClick={ () => setUserRequest({ ...userRequest, city: null }) }
+                                    className={ `${userRequest.city === null ? "font-semibold" : "font-normal"}` }
                                 >
                                     Choose city
                                 </DropdownItem>
@@ -287,17 +278,9 @@ const PersonalInformation = () => {
                                     <DropdownItem
                                         key={ city.cityId }
                                         onClick={ () =>
-                                            setUserRequest
-                                                ({
-                                                    ...userRequest
-                                                    , city: city.cityId
-                                                })
+                                            setUserRequest({ ...userRequest, city: city.cityId })
                                         }
-                                        className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === userRequest
-                                            .city
-                                            ? "font-semibold"
-                                            : "font-normal"
-                                            }` }
+                                        className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${city.cityId === userRequest.city ? "font-semibold" : "font-normal"}` }
                                     >
                                         { city.name }
                                     </DropdownItem>
@@ -332,8 +315,7 @@ const PersonalInformation = () => {
                             >
                                 <Input
                                     name="email"
-                                    value={ userRequest
-                                        .email || "" }
+                                    value={ userRequest.email || "" }
                                     text="Email Address"
                                     error={ !validEmail }
                                     onChange={ handleChange }
@@ -354,10 +336,7 @@ const PersonalInformation = () => {
                                         onClick={ () =>
                                             setUserRequest({ ...userRequest, country: country.countryId })
                                         }
-                                        className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${country.countryId === userRequest.country
-                                            ? "font-semibold"
-                                            : "font-normal"
-                                            }` }
+                                        className={ `flex hover:bg-neutral-100 rounded-8 px-12 py-8 cursor-pointer ${country.countryId === userRequest.country ? "font-semibold" : "font-normal"}` }
                                     >
                                         { country.name }
                                     </DropdownItem>
@@ -391,7 +370,7 @@ const PersonalInformation = () => {
                 </Modal>
             ) }
         </div>
-    )
+    );
 }
 
 export default PersonalInformation;

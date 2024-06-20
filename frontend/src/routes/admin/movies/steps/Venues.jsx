@@ -10,7 +10,7 @@ import Modal from "../../../../components/Modal";
 
 import { StepperContext } from "../../../../components/Stepper";
 
-import { url, venues, cities } from "../../../../utils/api";
+import { url, venues, cities, projections } from "../../../../utils/api";
 
 const Venues = () => {
     const [cityList, setCityList] = useState([]);
@@ -19,6 +19,7 @@ const Venues = () => {
     const { projectionsData, setProjectionsData } = useContext(StepperContext);
     const [conflictTime, setConflictTime] = useState([]);
     const [modal, setModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
     const [deleteIndex, setDeleteIndex] = useState(0);
 
     useEffect(() => {
@@ -70,6 +71,22 @@ const Venues = () => {
             });
     };
 
+    const deleteProjection = async () => {
+        if (deleteId !== null) {
+            const token = localStorage.getItem("token")
+            await axios.delete(`${url}${projections}/${deleteId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+        setDeleteId(null);
+        setDeleteIndex(0);
+    }
+
     const handleProjectionChange = (index, key, value) => {
         const updatedProjections = [...projectionsData];
         const updatedConflictTime = [...conflictTime];
@@ -109,7 +126,7 @@ const Venues = () => {
 
     useEffect(() => {
         if (!projectionsData || projectionsData.length === 0) {
-            setProjectionsData([{ venue: null, city: null, time: null }]);
+            setProjectionsData([{ venue: null, city: null, time: null, id: null }]);
         }
     }, [projectionsData, setProjectionsData]);
 
@@ -217,6 +234,7 @@ const Venues = () => {
                             className="mt-[35px] mb-8 h-[50px] hover:bg-primary-50"
                             disabled={ !projection.city || !projection.venue || !projection.time }
                             onClick={ () => {
+                                setDeleteId(projection.id);
                                 setDeleteIndex(index);
                                 setModal(true);
                             } }
@@ -229,7 +247,7 @@ const Venues = () => {
                 <p>No projections available.</p>
             ) }
             <div className="flex items-center justify-center pt-16">
-                <Button variant="tertiary" disabled={ isAddButtonDisabled } onClick={ () => setProjectionsData([...projectionsData, { city: null, venue: null, time: null }]) }>
+                <Button variant="tertiary" disabled={ isAddButtonDisabled } onClick={ () => setProjectionsData([...projectionsData, { id: null, city: null, venue: null, time: null }]) }>
                     <FontAwesomeIcon icon={ fas.faPlus } /> Add Projection
                 </Button>
             </div>
@@ -240,10 +258,11 @@ const Venues = () => {
                         Are you sure you want to delete this projection?
                     </p>
                     <div className="flex pt-32 gap-8 justify-end">
-                        <Button size="sm" variant="secondary" onClick={ () => setModal(false) }>Cancel</Button>
+                        <Button size="sm" variant="secondary" onClick={ () => { setDeleteId(null); setDeleteIndex(0); setModal(false) } }>Cancel</Button>
                         <Button size="sm" onClick={ () => {
                             const updatedProjections = projectionsData.filter((_, projIndex) => projIndex !== deleteIndex);
                             setProjectionsData(updatedProjections);
+                            deleteProjection();
                             setModal(false);
                         } }>Delete</Button>
                     </div>

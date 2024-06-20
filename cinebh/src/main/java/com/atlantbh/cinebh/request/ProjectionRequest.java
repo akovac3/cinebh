@@ -12,6 +12,7 @@ import java.sql.Time;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectionRequest {
+    private Long id;
     private Time time;
     private Long city;
     private Long venue;

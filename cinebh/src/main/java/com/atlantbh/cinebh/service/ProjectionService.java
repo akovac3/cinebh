@@ -10,14 +10,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -37,24 +33,8 @@ public class ProjectionService {
         projectionRepository.deleteByMovie(movie);
     }
 
-    public Set<Projection> createProjectionsForMovie(Movie movie, Time time, Venue venue) {
-        Set<Projection> projections = new HashSet<>();
-
-        LocalDate startLocalDate = movie.getProjectionStart().toLocalDate();
-        LocalDate endLocalDate = movie.getProjectionEnd().toLocalDate();
-
-        LocalDate currentDate = startLocalDate;
-        while (!currentDate.isAfter(endLocalDate)) {
-            Projection projection = new Projection();
-            projection.setMovie(movie);
-            projection.setDate(Date.valueOf(currentDate));
-            projection.setTime(time);
-            projection.setVenue(venue);
-            projectionRepository.save(projection);
-            projections.add(projection);            // Move to the next day
-            currentDate = currentDate.plusDays(1);
-        }
-        return projections;
+    public Projection createProjectionForMovie(Movie movie, Time time, Venue venue) {
+       return projectionRepository.save(new Projection(time, movie, venue));
     }
 
     public Projection save(Projection projection) {
@@ -73,8 +53,9 @@ public class ProjectionService {
         return strings;
     }
 
-    public List<Projection> getProjectionsForMovie(Movie movie, Venue venue, Date date) {
-        return projectionRepository.getProjectionsForMovieAndVenueAndDate(movie, venue, date);
+    public List<Projection> getProjectionsForMovie(Movie movie, Venue venue) {
+        if(venue==null) return projectionRepository.getProjectionsForMovie(movie);
+        return projectionRepository.getProjectionsForMovieAndVenue(movie, venue);
     }
 
     public void remove(Long id) throws JsonProcessingException {
@@ -82,5 +63,10 @@ public class ProjectionService {
             throw new ResourceNotFoundException("Projection with id= " + id + " does not exist");
         }
         projectionRepository.deleteById(id);
+    }
+
+    public String deleteProjection(long id) {
+        projectionRepository.deleteById(id);
+        return "Projection deleted!";
     }
 }

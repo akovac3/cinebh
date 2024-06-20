@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
 
@@ -16,11 +15,11 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long>, J
     @Query("SELECT DISTINCT time FROM Projection ORDER BY time ASC ")
     List<Time> getTimes();
 
-    @Query("SELECT proj FROM Projection proj WHERE proj.movie=?1 AND proj.venue=?2 AND proj.date=?3 ORDER BY proj.time")
-    List<Projection> getProjectionsForMovieAndVenueAndDate(Movie movie, Venue venue, Date date);
+    @Query("SELECT proj FROM Projection proj WHERE proj.movie=?1 AND proj.venue=?2 ORDER BY proj.time")
+    List<Projection> getProjectionsForMovieAndVenue(Movie movie, Venue venue);
 
-    @Query("SELECT proj FROM Projection proj WHERE proj.date=CURRENT_DATE()")
-    List<Projection> getTodaysProjections();
+    @Query("SELECT proj FROM Projection proj WHERE proj.movie=?1 ORDER BY proj.time")
+    List<Projection> getProjectionsForMovie(Movie movie);
 
     @Transactional
     void deleteByMovie(Movie movie);

@@ -39,7 +39,7 @@ const AllVenues = () => {
             const search = searchParams.toString() ? `?${searchParams.toString()}` : '';
             const pagination = getPaginationParams(searchParams);
             setPagination(pagination);
-
+            if (pagination.page === null) return;
             const response = await axios.get(`${route}${search}`);
             const data = response.data;
             if (parseInt(pagination.page) > 1) {

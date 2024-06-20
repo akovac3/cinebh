@@ -13,15 +13,16 @@ import Modal from "../../components/Modal";
 
 const Reservation = () => {
     const location = useLocation();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const movie = location.state.movie;
     const projection = location.state.projection;
     const date = location.state.date;
     const payment = location.state.payment;
-    const [modal, setModal] = useState(false)
+    const [modal, setModal] = useState(false);
     const [cover, setCover] = useState();
     const [selectedSeats, setSelectedSeats] = useState([]);
-    const reservedSeats = projection.reservedSeats.concat(projection.purchasedSeats);
+    const [reservedSeats, setReservedSeats] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const calculateSeatPrice = (seatId) => {
         if (seatId.startsWith("I")) {
@@ -40,31 +41,50 @@ const Reservation = () => {
     function getCover() {
         movie.photos.forEach(element => {
             if (element.cover) {
-                setCover(element.link)
+                setCover(element.link);
             }
         });
     }
 
     useEffect(() => {
         getCover();
-    }, [movie])
+    }, [movie]);
 
     const onFinish = async (values) => {
         try {
-            const token = localStorage.getItem("token")
+            const token = localStorage.getItem("token");
             const response = await axios.post(url + reservation, values, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.status === 200) {
-                setModal(true)
+                setModal(true);
             }
         } catch (error) {
-            console.log(error)
-            console.log(error.response.data.message)
+            console.log(error);
+            console.log(error.response.data.message);
         }
-    }
+    };
+
+    const getReservedSeats = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`${url}${reservation}/projection/${projection.projectionId}?date=${date}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.status === 200) {
+                const seats = response.data.flatMap(reservation => reservation.seats);
+                setReservedSeats(seats);
+                setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
+            console.log(error.response.data.message);
+        }
+    };
 
     const makeReservationClick = () => {
         if (selectedSeats.length !== 0) {
@@ -74,10 +94,10 @@ const Reservation = () => {
                 seats: selectedSeats,
                 price: totalPrice,
                 type: "RESERVATION"
-            }
-            onFinish(values)
+            };
+            onFinish(values);
         }
-    }
+    };
 
     const makePaymentClick = () => {
         if (selectedSeats.length !== 0) {
@@ -92,6 +112,14 @@ const Reservation = () => {
                 }
             });
         }
+    };
+
+    useEffect(() => {
+        getReservedSeats();
+    }, []);
+
+    if (loading) {
+        return <div className="text-heading-h6 text-neutral-600 pl-[118px] pt-80">Loading...</div>;
     }
 
     return (
@@ -116,7 +144,7 @@ const Reservation = () => {
                 </div>
                 <div className="py-12 flex flex-col text-body-l">
                     <p className="text-heading-h6 pb-[10px]">Booking Details</p>
-                    <p className="pb-8">{ format(date, "EEEE, MMM dd") } at { projection.time.slice(0, 5) }</p>
+                    <p className="pb-8">{ format(new Date(date), "EEEE, MMM dd") } at { projection.time.slice(0, 5) }</p>
                     <p className="pb-[10px]">{ projection.venue.street } { projection.venue.streetNumber }, { projection.venue.city.name }</p>
                     <p>Hall 1</p>
                 </div>
@@ -135,7 +163,7 @@ const Reservation = () => {
                 </div>
             </Modal> }
         </div>
-    )
-}
+    );
+};
 
 export default Reservation;

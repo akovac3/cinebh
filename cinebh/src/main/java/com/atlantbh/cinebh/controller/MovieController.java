@@ -265,22 +265,30 @@ public class MovieController {
             return new ResponseEntity<>("An error occurred while deleting photos", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @PostMapping(path = "/{id}/projection")
-    public ResponseEntity<String> addProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
+    public ResponseEntity<String> addOrUpdateProjections(@PathVariable long id, @Validated @RequestBody ProjectionRequest[] projectionRequests) {
         Movie movie = movieService.findById(id);
-        deleteProjectionsForMovie(movie);
 
-        Set<Projection> newProjections = Arrays.stream(projectionRequests)
-                .flatMap(projectionRequest -> {
-                    Venue venue = venueService.findById(projectionRequest.getVenue());
-                    return projectionService.createProjectionsForMovie(movie, projectionRequest.getTime(), venue).stream();
+        Set<Projection> updatedProjections = Arrays.stream(projectionRequests)
+                .map(projectionRequest -> {
+                    if (projectionRequest.getId() != null) {
+                        Projection projection = projectionService.findById(projectionRequest.getId());
+                        Venue venue = venueService.findById(projectionRequest.getVenue());
+                        projection.setTime(projectionRequest.getTime());
+                        projection.setVenue(venue);
+                        return projectionService.save(projection);
+                    } else {
+                        Venue venue = venueService.findById(projectionRequest.getVenue());
+                        return projectionService.createProjectionForMovie(movie, projectionRequest.getTime(), venue);
+                    }
                 })
                 .collect(Collectors.toSet());
-        movie.setProjections(newProjections);
+
+        movie.setProjections(updatedProjections);
         movieService.save(movie);
-        return new ResponseEntity<>("Successfully added projections for movie with id=" + id + "!", HttpStatus.OK);
+        return new ResponseEntity<>("Successfully added or updated projections for movie with id=" + id + "!", HttpStatus.OK);
     }
+
 
     private void deleteProjectionsForMovie(Movie movie) {
         movie.setProjections(new HashSet<>());

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.sql.Date;
 import java.util.List;
@@ -40,7 +42,17 @@ public class ProjectionController {
         Movie movieObj = movieService.findById(movie);
         Venue venueObj = venueService.findById(venue);
         Date dateObj = Date.valueOf(date);
-        return ResponseEntity.ok(projectionService.getProjectionsForMovie(movieObj, venueObj, dateObj));
+        return ResponseEntity.ok(projectionService.getProjectionsForMovie(movieObj, venueObj));
     }
 
+    @GetMapping("/movie/{id}")
+    ResponseEntity<List<Projection>> getMovieProjections(@PathVariable long id){
+        Movie movie = movieService.findById(id);
+        return ResponseEntity.ok(projectionService.getProjectionsForMovie(movie, null));
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<String> deleteProjection(@PathVariable long id) {
+        return ResponseEntity.ok(projectionService.deleteProjection(id));
+    }
 }

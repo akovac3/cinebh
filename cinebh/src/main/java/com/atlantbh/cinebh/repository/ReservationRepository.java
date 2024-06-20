@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.sql.Date;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -19,6 +20,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'RESERVATION'")
     List<Reservation> findReservationsByUser(User user);
+
+    @Query("SELECT r FROM Reservation r WHERE r.projection = :projection AND r.date = :date AND r.type = 'RESERVATION'")
+    List<Reservation> findReservationsByProjectionAndDate(Projection projection, Date date);
 
     @Query("SELECT r FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date > CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time >= CURRENT_TIME))")
     List<Reservation> findUpcomingPurchasesByUser(User user);
@@ -34,4 +38,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user = :user AND r.type = 'PURCHASE' AND (r.date < CURRENT_DATE OR (r.date = CURRENT_DATE AND r.projection.time < CURRENT_TIME))")
     long countPast(User user);
+
+    @Query("SELECT r FROM Reservation r WHERE r.date=CURRENT_DATE() AND r.type='RESERVATION'")
+    List<Reservation> getTodaysReservations();
 }

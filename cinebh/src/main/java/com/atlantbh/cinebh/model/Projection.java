@@ -1,7 +1,5 @@
 package com.atlantbh.cinebh.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,9 +15,6 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "projections")
@@ -27,16 +22,12 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "projectionId")
 public class Projection {
     @Id
     @Column(name = "projectionId", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectionId;
-    private Date date;
     private Time time;
-    private List<String> reservedSeats = new ArrayList<>();
-    private List<String> purchasedSeats = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "movie_id", nullable = false)
@@ -46,9 +37,8 @@ public class Projection {
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
-    public Projection(Time time, Date date, Movie movie, Venue venue) {
+    public Projection(Time time, Movie movie, Venue venue) {
         this.time = time;
-        this.date = date;
         this.movie = movie;
         this.venue = venue;
     }

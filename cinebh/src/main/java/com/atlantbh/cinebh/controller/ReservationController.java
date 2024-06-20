@@ -1,6 +1,7 @@
 package com.atlantbh.cinebh.controller;
 
 import com.atlantbh.cinebh.exception.ResourceNotFoundException;
+import com.atlantbh.cinebh.model.Projection;
 import com.atlantbh.cinebh.model.Reservation;
 import com.atlantbh.cinebh.model.User;
 import com.atlantbh.cinebh.request.PaymentRequest;
@@ -11,6 +12,7 @@ import com.atlantbh.cinebh.service.JWTService;
 import com.atlantbh.cinebh.service.PaymentService;
 import com.atlantbh.cinebh.service.ReservationService;
 import com.atlantbh.cinebh.service.UserService;
+import com.atlantbh.cinebh.service.ProjectionService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.sql.Date;
 import java.util.List;
 
 @RestController
@@ -46,11 +49,20 @@ public class ReservationController {
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private ProjectionService projectionService;
+
     @GetMapping("/user")
     public ResponseEntity<List<Reservation>> getReservationsForUser(@RequestHeader("Authorization") String token) {
         String username = jwtService.getUsernameFromToken(token.replace("Bearer ", ""));
         User user = userService.getUserByUsername(username);
         return ResponseEntity.ok(reservationService.getReservations(user));
+    }
+
+    @GetMapping("/projection/{id}")
+    public ResponseEntity<List<Reservation>> getReservationsForProjection(@PathVariable long id, Date date) {
+        Projection p = projectionService.findById(id);
+        return ResponseEntity.ok(reservationService.getReservationsForProjection(p, date));
     }
 
     @GetMapping("/count-elements")
